@@ -1,3 +1,7 @@
 [submodule "reamislands-platform"]
 	path = reamislands-platform
 	url = https://github.com/marksemenov8/reamislands-platform-.git
+[submodule "BCApps"]
+	path = BCApps
+	url = https://github.com/microsoft/BCApps.git
+	update = none
