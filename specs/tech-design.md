@@ -513,6 +513,62 @@ Status legend in the inventory: 🟢 live in MVP · 🟡 partial/manual · ⚪ n
 
 ## X-1 Architecture overview
 
+Solid lines = designed and agreed. Dashed = anticipated, not yet designed.
+
+```mermaid
+flowchart TB
+    PARTNER(["Partner / applicant"])
+    STAFF(["BD / Ops"])
+    GUEST(["Guest"])
+
+    subgraph ai["AI layer — external runtime"]
+        direction LR
+        AG1["Partner Intake agent"]
+        AGX["further agents"]
+    end
+
+    subgraph edge["Experience layer — outside BC"]
+        direction LR
+        WEB["Public Website<br/>forms · content<br/>captcha / rate limiting"]
+        PP["Partner Portal"]
+        CP["Customer Portal"]
+    end
+
+    MCP{{"BC MCP server"}}
+
+    subgraph bc["Business Central — system of record &amp; business logic"]
+        direction LR
+        CLIENT["BC Web Client<br/>Contact Card · Contact List<br/>Vendor Card"]
+        API["API layer<br/>APIV2 standard read<br/>ditPartnerContacts custom"]
+        LOGIC["Business logic<br/>status machine<br/>Contact→Vendor conversion<br/>field carry-over"]
+        DATA[("Contacts · Vendors<br/>Business Relation<br/>Dimensions · Vendor Templates")]
+        MAIL["Email engine<br/>scenario · queue · retry<br/>history on record"]
+    end
+
+    M365[/"Microsoft 365 — status emails to applicant"/]
+
+    PARTNER --> WEB
+    PARTNER --> PP
+    GUEST -.-> CP
+    STAFF --> CLIENT
+    AG1 --> MCP
+    AGX -.-> MCP
+
+    WEB --> API
+    PP --> API
+    CP -.-> API
+    MCP --> API
+
+    API --> LOGIC
+    CLIENT --> LOGIC
+    LOGIC --> DATA
+    LOGIC --> MAIL
+    MAIL --> M365
+
+    classDef pending stroke-dasharray: 5 5,color:#888;
+    class CP,AGX,GUEST pending;
+```
+
 Component inventory — role, and the processes that put it there.
 
 | Component | Role | Used by |
