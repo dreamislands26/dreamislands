@@ -19,6 +19,13 @@ Claude Code = speed, hypothesis testing, MVP (Supabase). Dmitry = architecture, 
 - Scope brief (original): `DIT_Enterprise_Scope_Dmitry.docx`
 - Task tracker: Notion — "DIT Task Tracker — Q3/Q4 2026" (Enterprise Architecture epic), workspace **dit**
 
+## Outside the SDD process
+
+`platform/` is the live website (dreamislands.org and its panel), brought in from
+`olegoonline/dit-platform`. The loop and the Rules below do not apply to it. Work there
+follows `platform/AGENTS.md` only: no specs, roadmap rows or changelog entries for it.
+The one rule that still holds in `platform/` is **never commit secrets**.
+
 ## Governing documents
 
 | Document | Holds | When to read |
