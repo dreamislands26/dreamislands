@@ -1,0 +1,32 @@
+# secrets: never commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa*
+service-account*.json
+
+# build output and dependencies
+node_modules/
+.next/
+out/
+build/
+*.tsbuildinfo
+next-env.d.ts
+
+# logs, backups, dumps
+*.log
+*.bak
+*.bak_*
+*.orig
+*.tgz
+*.tar.gz
+*_dump.txt
+stage1_backup_*/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

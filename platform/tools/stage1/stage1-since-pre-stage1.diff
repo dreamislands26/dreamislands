@@ -1,0 +1,1079 @@
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/_components/HomeView.tsx /opt/dit-platform/src/app/(public)/_components/HomeView.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/_components/HomeView.tsx	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/_components/HomeView.tsx	2026-10-07 18:11:36.000000000 +0700
+@@ -9,6 +9,7 @@
+ import InViewMotion from "./journey/InViewMotion"
+ import { HeroRoute, BDARoute } from "./journey/JourneyRoute"
+ import OutcomeSignature from "./journey/OutcomeSignature"
++import type { CatalogStats } from "@/lib/stats"
+ 
+ const TRACK_ICONS = {
+   Reset: "/icons/leaf.png",
+@@ -32,16 +33,7 @@
+   "weight-reset",
+ ]
+ 
+-// Program count is filled in from the live list at render time so it always
+-// matches the "Explore all N programs" button (was a hardcoded 54 vs 62).
+-const TRACTION_STATS = [
+-  { n: "300+", sub: "guests hosted" },
+-  { n: "{programs}", sub: "standardized programs" },
+-  { n: "17", sub: "partner destinations" },
+-  { n: "7", sub: "Asian markets" },
+-  { n: "3,000+", sub: "community" },
+-  { n: "70+", sub: "travel partners" },
+-] as const
++// Homepage counters come from getCatalogStats() (Supabase). No hardcoded inventory or marketing claims.
+ 
+ // China rail — spans all three destinations (Xi'an, Wudang, Mile) plus the
+ // Better Migrate hospital network, across all four tracks and a wide price band.
+@@ -53,11 +45,6 @@
+   "wudang-7-day-tai-chi-longevity",
+   "bm-package-a-outpatient-fast-track",
+ ]
+-const CHINA_STATS = [
+-  { n: "3", sub: "wellness destinations" },
+-  { n: "9", sub: "partner hospitals" },
+-  { n: "17", sub: "China programs" },
+-] as const
+ 
+ const ECOSYSTEM_BASE = "https://xbzrtofanbrahasxbisf.supabase.co/storage/v1/object/public/ecosystem"
+ const HOMEPAGE_PHOTOS = [
+@@ -111,7 +98,18 @@
+   count: number
+ }
+ 
+-export default async function HomeView({ programs, reviews }: { programs: LandingProgram[]; reviews: Review[] }) {
++export default async function HomeView({ programs, reviews, stats }: { programs: LandingProgram[]; reviews: Review[]; stats: CatalogStats }) {
++  const TRACTION_STATS = [
++    { n: String(stats.programs), sub: "standardized programs" },
++    { n: String(stats.countries), sub: "Asian markets" },
++    { n: String(stats.properties), sub: "wellness properties" },
++    { n: String(stats.clinics), sub: "partner hospitals" },
++  ]
++  const CHINA_STATS = [
++    { n: String(stats.china.wellnessDestinations), sub: "wellness destinations" },
++    { n: String(stats.china.clinics), sub: "partner hospitals" },
++    { n: String(stats.china.programs), sub: "China programs" },
++  ]
+   const bySlug = new Map(programs.filter((p) => p.slug).map((p) => [p.slug as string, p]))
+   const firstWa = programs.find((p) => p.contact_wa)?.contact_wa ?? null
+   // Fall back to the company WhatsApp rather than a bare wa.me/ with no number.
+@@ -568,7 +566,7 @@
+                     marginBottom: 4,
+                   }}
+                 >
+-                  {s.n === "{programs}" ? programs.length : s.n}
++                  {s.n}
+                 </div>
+                 <div className="body-sm" style={{ color: "var(--ink-2)" }}>{s.sub}</div>
+               </div>
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/_components/MatchedPrograms.tsx /opt/dit-platform/src/app/(public)/_components/MatchedPrograms.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/_components/MatchedPrograms.tsx	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/_components/MatchedPrograms.tsx	2026-10-08 12:57:54.485783635 +0700
+@@ -284,7 +284,14 @@
+       <div style={{ padding: "18px 18px 20px", display: "flex", flexDirection: "column", gap: 12, flex: 1 }}>
+         <div>
+           <h3 style={{ margin: "0 0 6px", fontSize: 18, fontWeight: 600, color: "var(--ink)" }}>{p.name}</h3>
+-          {p.summary && <p className="body-sm" style={{ margin: 0, color: "var(--ink-2)" }}>{p.summary}</p>}
++          {p.summary && (
++            <p
++              className="body-sm"
++              style={{ margin: 0, color: "var(--ink-2)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}
++            >
++              {p.summary}
++            </p>
++          )}
+         </div>
+         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+           <span className="body-sm">{p.duration_days} days</span>
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/destinations/[country]/page.tsx /opt/dit-platform/src/app/(public)/destinations/[country]/page.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/destinations/[country]/page.tsx	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/destinations/[country]/page.tsx	2026-10-07 18:43:22.743166724 +0700
+@@ -1,9 +1,22 @@
+ import Link from "next/link"
+ import { notFound } from "next/navigation"
+ import { supabaseAdmin } from "@/lib/supabase-server"
+-import { mapProgram, type DbProgramRow } from "../../_lib/programMapping"
++import { type DbProgramRow } from "../../_lib/programMapping"
++import { mapProgramsResolved } from "../../_lib/programMappingResolved"
+ import ProgramCard from "../../_components/ProgramCard"
+-import { COUNTRY_FLAGS, countryFromSlug } from "../../_lib/countries"
++import { COUNTRY_FLAGS } from "../../_lib/countries"
++import { supabasePublic } from "@/lib/supabase-public"
++
++// destination_countries is the source of truth for which countries exist and for their slugs.
++async function countryFromDb(slug: string): Promise<string | null> {
++  const { data } = await supabasePublic
++    .from("destination_countries")
++    .select("country")
++    .eq("slug", slug.toLowerCase())
++    .eq("active", true)
++    .maybeSingle()
++  return (data?.country as string | undefined) ?? null
++}
+ import type { Metadata } from "next"
+ import { dataLayerScript } from "../../_lib/track"
+ 
+@@ -13,7 +26,7 @@
+   params: Promise<{ country: string }>
+ }): Promise<Metadata> {
+   const { country: slug } = await params
+-  const country = countryFromSlug(slug)
++  const country = await countryFromDb(slug)
+   if (country == null) {
+     return { title: "Destination not found" }
+   }
+@@ -48,21 +61,31 @@
+   params: Promise<{ country: string }>
+ }) {
+   const { country: slug } = await params
+-  const country = countryFromSlug(slug)
++  const country = await countryFromDb(slug)
+   if (country == null) {
+     notFound()
+   }
+ 
+-  const { data: propRows } = await supabaseAdmin
++  // Properties block = wellness properties only. Clinics (hospital_clinic) are a separate entity type.
++  const { data: propRows } = await supabasePublic
+     .from("properties")
+     .select("id, name, slug, island, description, certified")
+     .eq("active", true)
++    .eq("entity_type", "wellness_property")
+     .eq("country", country)
+     .neq("name", "")
+     .order("name")
+ 
+   const properties = (propRows ?? []) as PropertyRow[]
+ 
++  const { count: clinicCountRaw } = await supabasePublic
++    .from("properties")
++    .select("id", { count: "exact", head: true })
++    .eq("active", true)
++    .eq("entity_type", "hospital_clinic")
++    .eq("country", country)
++  const clinicCount = clinicCountRaw ?? 0
++
+   const { data: progRows } = await supabaseAdmin
+     .from("programs")
+     .select(
+@@ -75,7 +98,7 @@
+     .eq("status", "published")
+     .order("sort_order")
+ 
+-  const allPrograms = ((progRows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
++  const allPrograms = await mapProgramsResolved((progRows ?? []) as unknown as DbProgramRow[])
+   const programs = allPrograms.filter((p) => p.country === country)
+ 
+   const jsonLd = {
+@@ -139,6 +162,13 @@
+           ))}
+         </div>
+ 
++        {country === "China" && clinicCount > 0 && (
++          <p className="body-sm" style={{ marginBottom: 48 }}>
++            {clinicCount} partner {clinicCount === 1 ? "hospital" : "hospitals"} in China:{" "}
++            <Link href="/medical/china" style={{ color: "inherit", textDecoration: "underline" }}>Medical in China</Link>
++          </p>
++        )}
++
+         {programs.length > 0 && (
+           <>
+             <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 28, marginBottom: 20, color: "var(--ink)" }}>
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/anxiety-stress-recovery-retreats-asia/page.tsx /opt/dit-platform/src/app/(public)/guides/anxiety-stress-recovery-retreats-asia/page.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/anxiety-stress-recovery-retreats-asia/page.tsx	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/guides/anxiety-stress-recovery-retreats-asia/page.tsx	2026-10-07 18:11:36.000000000 +0700
+@@ -1,7 +1,8 @@
+ import Link from "next/link"
+ import type { Metadata } from "next"
+ import { supabaseAdmin } from "@/lib/supabase-server"
+-import { mapProgram, type DbProgramRow } from "../../_lib/programMapping"
++import { type DbProgramRow } from "../../_lib/programMapping"
++import { mapProgramsResolved } from "../../_lib/programMappingResolved"
+ import ProgramCard from "../../_components/ProgramCard"
+ 
+ export const dynamic = "force-dynamic"
+@@ -143,7 +144,7 @@
+     .eq("active", true)
+     .eq("status", "published")
+ 
+-  const programs = ((rows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
++  const programs = await mapProgramsResolved((rows ?? []) as unknown as DbProgramRow[])
+   const bySlug = new Map(programs.map((p) => [p.slug, p]))
+   const orderedPrograms = ANXIETY_SLUGS.map((s) => bySlug.get(s)).filter((p): p is NonNullable<typeof p> => !!p)
+ 
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/bali-wellness-guide/page.tsx /opt/dit-platform/src/app/(public)/guides/bali-wellness-guide/page.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/bali-wellness-guide/page.tsx	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/guides/bali-wellness-guide/page.tsx	2026-10-07 18:11:36.000000000 +0700
+@@ -1,7 +1,8 @@
+ import Link from "next/link"
+ import type { Metadata } from "next"
+ import { supabaseAdmin } from "@/lib/supabase-server"
+-import { mapProgram, type DbProgramRow } from "../../_lib/programMapping"
++import { type DbProgramRow } from "../../_lib/programMapping"
++import { mapProgramsResolved } from "../../_lib/programMappingResolved"
+ import ProgramCard from "../../_components/ProgramCard"
+ 
+ export const dynamic = "force-dynamic"
+@@ -121,7 +122,7 @@
+     .eq("active", true)
+     .eq("status", "published")
+ 
+-  const programs = ((rows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
++  const programs = await mapProgramsResolved((rows ?? []) as unknown as DbProgramRow[])
+   const bySlug = new Map(programs.map((p) => [p.slug, p]))
+   const udaraPrograms = UDARA_SLUGS.map((s) => bySlug.get(s)).filter((p): p is NonNullable<typeof p> => !!p)
+   const mokkaPrograms = MOKKA_SLUGS.map((s) => bySlug.get(s)).filter((p): p is NonNullable<typeof p> => !!p)
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/boracay-wellness-guide/page.tsx /opt/dit-platform/src/app/(public)/guides/boracay-wellness-guide/page.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/boracay-wellness-guide/page.tsx	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/guides/boracay-wellness-guide/page.tsx	2026-10-07 18:11:36.000000000 +0700
+@@ -1,7 +1,8 @@
+ import Link from "next/link"
+ import type { Metadata } from "next"
+ import { supabaseAdmin } from "@/lib/supabase-server"
+-import { mapProgram, type DbProgramRow } from "../../_lib/programMapping"
++import { type DbProgramRow } from "../../_lib/programMapping"
++import { mapProgramsResolved } from "../../_lib/programMappingResolved"
+ import ProgramCard from "../../_components/ProgramCard"
+ 
+ export const dynamic = "force-dynamic"
+@@ -98,7 +99,7 @@
+     .eq("active", true)
+     .eq("status", "published")
+ 
+-  const programs = ((rows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
++  const programs = await mapProgramsResolved((rows ?? []) as unknown as DbProgramRow[])
+   const bySlug = new Map(programs.map((p) => [p.slug, p]))
+   const orderedPrograms = DESTINATION_SLUGS.map((s) => bySlug.get(s)).filter((p): p is NonNullable<typeof p> => !!p)
+ 
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/burnout-recovery-retreats-southeast-asia/page.tsx /opt/dit-platform/src/app/(public)/guides/burnout-recovery-retreats-southeast-asia/page.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/burnout-recovery-retreats-southeast-asia/page.tsx	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/guides/burnout-recovery-retreats-southeast-asia/page.tsx	2026-10-07 18:11:36.000000000 +0700
+@@ -1,7 +1,8 @@
+ import Link from "next/link"
+ import type { Metadata } from "next"
+ import { supabaseAdmin } from "@/lib/supabase-server"
+-import { mapProgram, type DbProgramRow } from "../../_lib/programMapping"
++import { type DbProgramRow } from "../../_lib/programMapping"
++import { mapProgramsResolved } from "../../_lib/programMappingResolved"
+ import ProgramCard from "../../_components/ProgramCard"
+ 
+ export const dynamic = "force-dynamic"
+@@ -136,7 +137,7 @@
+         .order("cohort")
+         .order("duration_days")
+     : { data: [] as DbProgramRow[] }
+-  const orderedPrograms = ((rows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
++  const orderedPrograms = await mapProgramsResolved((rows ?? []) as unknown as DbProgramRow[])
+ 
+   const faqJsonLd = {
+     "@context": "https://schema.org",
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/fitness-recovery-retreats-asia/page.tsx /opt/dit-platform/src/app/(public)/guides/fitness-recovery-retreats-asia/page.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/fitness-recovery-retreats-asia/page.tsx	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/guides/fitness-recovery-retreats-asia/page.tsx	2026-10-07 18:11:36.000000000 +0700
+@@ -1,7 +1,8 @@
+ import Link from "next/link"
+ import type { Metadata } from "next"
+ import { supabaseAdmin } from "@/lib/supabase-server"
+-import { mapProgram, type DbProgramRow } from "../../_lib/programMapping"
++import { type DbProgramRow } from "../../_lib/programMapping"
++import { mapProgramsResolved } from "../../_lib/programMappingResolved"
+ import ProgramCard from "../../_components/ProgramCard"
+ export const dynamic = "force-dynamic"
+ export const metadata: Metadata = {
+@@ -119,7 +120,7 @@
+         .order("cohort")
+         .order("duration_days")
+     : { data: [] as DbProgramRow[] }
+-  const orderedPrograms = ((rows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
++  const orderedPrograms = await mapProgramsResolved((rows ?? []) as unknown as DbProgramRow[])
+   const faqJsonLd = {
+     "@context": "https://schema.org",
+     "@type": "FAQPage",
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/koh-samui-koh-phangan-wellness-guide/page.tsx /opt/dit-platform/src/app/(public)/guides/koh-samui-koh-phangan-wellness-guide/page.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/koh-samui-koh-phangan-wellness-guide/page.tsx	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/guides/koh-samui-koh-phangan-wellness-guide/page.tsx	2026-10-07 18:11:36.000000000 +0700
+@@ -1,7 +1,8 @@
+ import Link from "next/link"
+ import type { Metadata } from "next"
+ import { supabaseAdmin } from "@/lib/supabase-server"
+-import { mapProgram, type DbProgramRow } from "../../_lib/programMapping"
++import { type DbProgramRow } from "../../_lib/programMapping"
++import { mapProgramsResolved } from "../../_lib/programMappingResolved"
+ import ProgramCard from "../../_components/ProgramCard"
+ 
+ export const dynamic = "force-dynamic"
+@@ -140,7 +141,7 @@
+     .eq("active", true)
+     .eq("status", "published")
+ 
+-  const programs = ((rows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
++  const programs = await mapProgramsResolved((rows ?? []) as unknown as DbProgramRow[])
+   const bySlug = new Map(programs.map((p) => [p.slug, p]))
+   const samuiPrograms = SAMUI_SLUGS.map((s) => bySlug.get(s)).filter((p): p is NonNullable<typeof p> => !!p)
+   const phanganPrograms = PHANGAN_SLUGS.map((s) => bySlug.get(s)).filter((p): p is NonNullable<typeof p> => !!p)
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/longevity-executive-health-retreats-asia/page.tsx /opt/dit-platform/src/app/(public)/guides/longevity-executive-health-retreats-asia/page.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/longevity-executive-health-retreats-asia/page.tsx	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/guides/longevity-executive-health-retreats-asia/page.tsx	2026-10-07 18:11:36.000000000 +0700
+@@ -1,7 +1,8 @@
+ import Link from "next/link"
+ import type { Metadata } from "next"
+ import { supabaseAdmin } from "@/lib/supabase-server"
+-import { mapProgram, type DbProgramRow } from "../../_lib/programMapping"
++import { type DbProgramRow } from "../../_lib/programMapping"
++import { mapProgramsResolved } from "../../_lib/programMappingResolved"
+ import ProgramCard from "../../_components/ProgramCard"
+ 
+ export const dynamic = "force-dynamic"
+@@ -136,7 +137,7 @@
+         .order("cohort")
+         .order("duration_days")
+     : { data: [] as DbProgramRow[] }
+-  const orderedPrograms = ((rows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
++  const orderedPrograms = await mapProgramsResolved((rows ?? []) as unknown as DbProgramRow[])
+ 
+   const faqJsonLd = {
+     "@context": "https://schema.org",
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/mental-clarity-retreats-asia/page.tsx /opt/dit-platform/src/app/(public)/guides/mental-clarity-retreats-asia/page.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/mental-clarity-retreats-asia/page.tsx	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/guides/mental-clarity-retreats-asia/page.tsx	2026-10-07 18:11:36.000000000 +0700
+@@ -1,7 +1,8 @@
+ import Link from "next/link"
+ import type { Metadata } from "next"
+ import { supabaseAdmin } from "@/lib/supabase-server"
+-import { mapProgram, type DbProgramRow } from "../../_lib/programMapping"
++import { type DbProgramRow } from "../../_lib/programMapping"
++import { mapProgramsResolved } from "../../_lib/programMappingResolved"
+ import ProgramCard from "../../_components/ProgramCard"
+ export const dynamic = "force-dynamic"
+ export const metadata: Metadata = {
+@@ -120,7 +121,7 @@
+         .order("cohort")
+         .order("duration_days")
+     : { data: [] as DbProgramRow[] }
+-  const orderedPrograms = ((rows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
++  const orderedPrograms = await mapProgramsResolved((rows ?? []) as unknown as DbProgramRow[])
+   const faqJsonLd = {
+     "@context": "https://schema.org",
+     "@type": "FAQPage",
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/metabolic-health-retreats-asia/page.tsx /opt/dit-platform/src/app/(public)/guides/metabolic-health-retreats-asia/page.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/metabolic-health-retreats-asia/page.tsx	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/guides/metabolic-health-retreats-asia/page.tsx	2026-10-07 18:11:36.000000000 +0700
+@@ -1,7 +1,8 @@
+ import Link from "next/link"
+ import type { Metadata } from "next"
+ import { supabaseAdmin } from "@/lib/supabase-server"
+-import { mapProgram, type DbProgramRow } from "../../_lib/programMapping"
++import { type DbProgramRow } from "../../_lib/programMapping"
++import { mapProgramsResolved } from "../../_lib/programMappingResolved"
+ import ProgramCard from "../../_components/ProgramCard"
+ export const dynamic = "force-dynamic"
+ export const metadata: Metadata = {
+@@ -106,7 +107,7 @@
+         .order("cohort")
+         .order("duration_days")
+     : { data: [] as DbProgramRow[] }
+-  const orderedPrograms = ((rows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
++  const orderedPrograms = await mapProgramsResolved((rows ?? []) as unknown as DbProgramRow[])
+   const faqJsonLd = {
+     "@context": "https://schema.org",
+     "@type": "FAQPage",
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/mile-yunnan-wellness-guide/page.tsx /opt/dit-platform/src/app/(public)/guides/mile-yunnan-wellness-guide/page.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/mile-yunnan-wellness-guide/page.tsx	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/guides/mile-yunnan-wellness-guide/page.tsx	2026-10-07 18:11:36.000000000 +0700
+@@ -1,7 +1,8 @@
+ import Link from "next/link"
+ import type { Metadata } from "next"
+ import { supabaseAdmin } from "@/lib/supabase-server"
+-import { mapProgram, type DbProgramRow } from "../../_lib/programMapping"
++import { type DbProgramRow } from "../../_lib/programMapping"
++import { mapProgramsResolved } from "../../_lib/programMappingResolved"
+ import ProgramCard from "../../_components/ProgramCard"
+ 
+ export const dynamic = "force-dynamic"
+@@ -152,7 +153,7 @@
+     .eq("active", true)
+     .eq("status", "published")
+ 
+-  const programs = ((rows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
++  const programs = await mapProgramsResolved((rows ?? []) as unknown as DbProgramRow[])
+   const bySlug = new Map(programs.map((p) => [p.slug, p]))
+   const quickResetPrograms = QUICK_RESET_SLUGS.map((s) => bySlug.get(s)).filter((p): p is NonNullable<typeof p> => !!p)
+   const executivePrograms = EXECUTIVE_SLUGS.map((s) => bySlug.get(s)).filter((p): p is NonNullable<typeof p> => !!p)
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/singapore-sentosa-wellness-guide/page.tsx /opt/dit-platform/src/app/(public)/guides/singapore-sentosa-wellness-guide/page.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/singapore-sentosa-wellness-guide/page.tsx	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/guides/singapore-sentosa-wellness-guide/page.tsx	2026-10-07 18:11:36.000000000 +0700
+@@ -1,7 +1,8 @@
+ import Link from "next/link"
+ import type { Metadata } from "next"
+ import { supabaseAdmin } from "@/lib/supabase-server"
+-import { mapProgram, type DbProgramRow } from "../../_lib/programMapping"
++import { type DbProgramRow } from "../../_lib/programMapping"
++import { mapProgramsResolved } from "../../_lib/programMappingResolved"
+ import ProgramCard from "../../_components/ProgramCard"
+ 
+ export const dynamic = "force-dynamic"
+@@ -105,7 +106,7 @@
+     .eq("active", true)
+     .eq("status", "published")
+ 
+-  const programs = ((rows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
++  const programs = await mapProgramsResolved((rows ?? []) as unknown as DbProgramRow[])
+   const bySlug = new Map(programs.map((p) => [p.slug, p]))
+   const orderedPrograms = DESTINATION_SLUGS.map((s) => bySlug.get(s)).filter((p): p is NonNullable<typeof p> => !!p)
+ 
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/sleep-reset-retreats-asia/page.tsx /opt/dit-platform/src/app/(public)/guides/sleep-reset-retreats-asia/page.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/sleep-reset-retreats-asia/page.tsx	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/guides/sleep-reset-retreats-asia/page.tsx	2026-10-07 18:11:36.000000000 +0700
+@@ -1,7 +1,8 @@
+ import Link from "next/link"
+ import type { Metadata } from "next"
+ import { supabaseAdmin } from "@/lib/supabase-server"
+-import { mapProgram, type DbProgramRow } from "../../_lib/programMapping"
++import { type DbProgramRow } from "../../_lib/programMapping"
++import { mapProgramsResolved } from "../../_lib/programMappingResolved"
+ import ProgramCard from "../../_components/ProgramCard"
+ 
+ export const dynamic = "force-dynamic"
+@@ -136,7 +137,7 @@
+         .order("cohort")
+         .order("duration_days")
+     : { data: [] as DbProgramRow[] }
+-  const orderedPrograms = ((rows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
++  const orderedPrograms = await mapProgramsResolved((rows ?? []) as unknown as DbProgramRow[])
+ 
+   const faqJsonLd = {
+     "@context": "https://schema.org",
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/wudang-mountain-wellness-guide/page.tsx /opt/dit-platform/src/app/(public)/guides/wudang-mountain-wellness-guide/page.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/guides/wudang-mountain-wellness-guide/page.tsx	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/guides/wudang-mountain-wellness-guide/page.tsx	2026-10-07 18:11:36.000000000 +0700
+@@ -1,7 +1,8 @@
+ import Link from "next/link"
+ import type { Metadata } from "next"
+ import { supabaseAdmin } from "@/lib/supabase-server"
+-import { mapProgram, type DbProgramRow } from "../../_lib/programMapping"
++import { type DbProgramRow } from "../../_lib/programMapping"
++import { mapProgramsResolved } from "../../_lib/programMappingResolved"
+ import ProgramCard from "../../_components/ProgramCard"
+ 
+ export const dynamic = "force-dynamic"
+@@ -127,7 +128,7 @@
+     .eq("active", true)
+     .eq("status", "published")
+ 
+-  const programs = ((rows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
++  const programs = await mapProgramsResolved((rows ?? []) as unknown as DbProgramRow[])
+   const bySlug = new Map(programs.map((p) => [p.slug, p]))
+   const orderedPrograms = DESTINATION_SLUGS.map((s) => bySlug.get(s)).filter((p): p is NonNullable<typeof p> => !!p)
+ 
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/_lib/programMappingResolved.ts /opt/dit-platform/src/app/(public)/_lib/programMappingResolved.ts
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/_lib/programMappingResolved.ts	1970-01-01 07:00:00.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/_lib/programMappingResolved.ts	2026-10-07 18:11:35.000000000 +0700
+@@ -0,0 +1,69 @@
++import "server-only"
++import { cache } from "react"
++import { supabasePublic } from "@/lib/supabase-public"
++import { getHeroContext, resolveProgramHero, type HeroSource } from "@/lib/hero"
++import { mapProgram, type DbProgramRow, type LandingProgram } from "./programMapping"
++
++// SINGLE point where a program's hero is resolved (cards, lists, detail page, og:image, JSON-LD all use it):
++//   program own -> its own (linked) property photo -> NEUTRAL country hero -> global fallback.
++// A photo of a property that is not linked to the program is never used (Cross-property hero = 0).
++const heroCtx = cache(getHeroContext)
++const VIDEO = /\.(mp4|mov|webm)(\?|$)/i
++
++type HeroRow = {
++  hero_image_url: string | null
++  program_properties?: Array<{ properties?: { id?: string; country?: string | null } | null }> | null
++}
++
++export async function resolveHeroes(rows: HeroRow[]): Promise<Array<{ url: string; source: HeroSource }>> {
++  const ids = Array.from(
++    new Set(
++      rows.flatMap((r) => (r.program_properties ?? []).map((pp) => pp.properties?.id).filter(Boolean) as string[]),
++    ),
++  )
++  const photos = new Map<string, string>()
++  const ents = new Map<string, string | null>()
++  if (ids.length) {
++    const [props, media] = await Promise.all([
++      supabasePublic.from("properties").select("id, image_url, entity_type").in("id", ids),
++      supabasePublic
++        .from("media_assets")
++        .select("property_id, public_url, is_featured, sort_order, asset_type")
++        .in("property_id", ids)
++        .eq("active", true)
++        .in("asset_type", ["hero", "gallery"])
++        .order("is_featured", { ascending: false })
++        .order("sort_order", { ascending: true }),
++    ])
++    for (const p of (props.data ?? []) as any[]) {
++      ents.set(p.id, p.entity_type ?? null)
++      if (p.image_url && !VIDEO.test(p.image_url)) photos.set(p.id, p.image_url)
++    }
++    for (const m of (media.data ?? []) as any[]) {
++      if (m.public_url && !VIDEO.test(m.public_url) && !photos.has(m.property_id)) photos.set(m.property_id, m.public_url)
++    }
++  }
++  const ctx = await heroCtx()
++  return rows.map((r) =>
++    resolveProgramHero(
++      {
++        hero_image_url: r.hero_image_url,
++        program_properties: (r.program_properties ?? []).map((pp) => ({
++          properties: pp.properties
++            ? {
++                image_url: (pp.properties.id && photos.get(pp.properties.id)) || null,
++                country: pp.properties.country ?? null,
++                entity_type: (pp.properties.id && ents.get(pp.properties.id)) || null,
++              }
++            : null,
++        })),
++      },
++      ctx,
++    ),
++  )
++}
++
++export async function mapProgramsResolved(rows: DbProgramRow[]): Promise<LandingProgram[]> {
++  const heroes = await resolveHeroes(rows as unknown as HeroRow[])
++  return rows.map((r, i) => ({ ...mapProgram(r), hero_image_url: heroes[i].url, heroSource: heroes[i].source }))
++}
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/_lib/programMapping.ts /opt/dit-platform/src/app/(public)/_lib/programMapping.ts
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/_lib/programMapping.ts	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/_lib/programMapping.ts	2026-10-07 18:11:35.000000000 +0700
+@@ -96,6 +96,7 @@
+   flag: string
+   country: string | null
+   hero_image_url: string | null
++  heroSource?: "own" | "property" | "destination" | "global"
+   contact_wa: string | null
+ }
+ 
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/page.tsx /opt/dit-platform/src/app/(public)/page.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/page.tsx	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/page.tsx	2026-10-07 18:11:36.000000000 +0700
+@@ -3,7 +3,9 @@
+ import { getSessionUser } from "@/lib/auth"
+ import { supabaseAdmin } from "@/lib/supabase-server"
+ import HomeView from "./_components/HomeView"
+-import { mapProgram, type DbProgramRow } from "./_lib/programMapping"
++import { getCatalogStats } from "@/lib/stats"
++import { type DbProgramRow } from "./_lib/programMapping"
++import { mapProgramsResolved } from "./_lib/programMappingResolved"
+ import type { Review } from "./_components/ReviewsSection"
+ 
+ export const dynamic = "force-dynamic"
+@@ -52,6 +54,7 @@
+     .order("featured", { ascending: false })
+     .order("created_at", { ascending: false })
+ 
+-  const programs = ((rows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
+-  return <HomeView programs={programs} reviews={(reviewRows ?? []) as Review[]} />
+-}
++  const programs = await mapProgramsResolved((rows ?? []) as unknown as DbProgramRow[])
++  const stats = await getCatalogStats()
++  return <HomeView programs={programs} reviews={(reviewRows ?? []) as Review[]} stats={stats} />
++}
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/programs/page.tsx /opt/dit-platform/src/app/(public)/programs/page.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/programs/page.tsx	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/programs/page.tsx	2026-10-07 18:11:36.000000000 +0700
+@@ -1,6 +1,7 @@
+ import { supabaseAdmin } from "@/lib/supabase-server"
+ import ProgramsListView from "./ProgramsListView"
+-import { mapProgram, type DbProgramRow } from "../_lib/programMapping"
++import { type DbProgramRow } from "../_lib/programMapping"
++import { mapProgramsResolved } from "../_lib/programMappingResolved"
+ import type { Metadata } from "next"
+ 
+ export const metadata: Metadata = {
+@@ -37,8 +38,9 @@
+     .order("cohort")
+     .order("duration_days")
+ 
+-  const programs = ((rows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
++  const programs = await mapProgramsResolved((rows ?? []) as unknown as DbProgramRow[])
+ 
++  const heroBySlug = new Map(programs.map((p) => [p.slug, p.hero_image_url]))
+   const jsonLd =
+     (rows ?? []).length > 0
+       ? {
+@@ -52,7 +54,7 @@
+               "@type": "Product",
+               name: r.name,
+               ...(r.summary ? { description: r.summary } : {}),
+-              ...(r.hero_image_url ? { image: r.hero_image_url } : {}),
++              ...(heroBySlug.get(r.slug) ? { image: heroBySlug.get(r.slug) } : {}),
+               ...(r.price_usd
+                 ? {
+                     offers: {
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/programs/[slug]/page.tsx /opt/dit-platform/src/app/(public)/programs/[slug]/page.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/programs/[slug]/page.tsx	2026-10-06 01:43:50.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/programs/[slug]/page.tsx	2026-10-07 18:11:36.000000000 +0700
+@@ -1,5 +1,6 @@
+ import { notFound } from "next/navigation"
+ import { supabaseAdmin } from "@/lib/supabase-server"
++import { resolveHeroes } from "../../_lib/programMappingResolved"
+ import { confirmCheckoutSession } from "@/lib/checkout-confirm"
+ import ProgramDetailView, { type ProgramDetail, type AccommodationItem } from "./ProgramDetailView"
+ import type { Metadata } from "next"
+@@ -23,7 +24,7 @@
+   const { slug } = await params
+   const { data } = await supabaseAdmin
+     .from("programs")
+-    .select("name, summary, hero_image_url, translations, program_properties(properties(island, country))")
++    .select("name, summary, hero_image_url, translations, program_properties(properties(id, island, country))")
+     .eq("slug", slug)
+     .eq("status", "published")
+     .eq("active", true)
+@@ -37,6 +38,8 @@
+     hero_image_url: string | null
+     program_properties: { properties: { island: string | null; country: string | null } | null }[]
+   }
++  const [metaHero] = await resolveHeroes([row as any])
++  row.hero_image_url = metaHero.url
+   const location = row.program_properties?.[0]?.properties
+   const locationLabel = location ? [location.island, location.country].filter(Boolean).join(", ") : null
+   const trEn = (((data as any).translations?.en) ?? {}) as { seo_title?: string; meta_description?: string }
+@@ -92,6 +95,8 @@
+   if (error || !data) notFound()
+ 
+   const program = data as unknown as ProgramDetail
++  const [pageHero] = await resolveHeroes([program as any])
++  program.hero_image_url = pageHero.url
+ 
+   const { data: reviewRows } = await supabaseAdmin
+     .from("reviews")
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/properties/[slug]/page.tsx /opt/dit-platform/src/app/(public)/properties/[slug]/page.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/properties/[slug]/page.tsx	2026-10-06 02:59:50.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/properties/[slug]/page.tsx	2026-10-07 18:11:36.000000000 +0700
+@@ -2,7 +2,8 @@
+ import Link from "next/link"
+ import { notFound, redirect } from "next/navigation"
+ import { supabaseAdmin } from "@/lib/supabase-server"
+-import { mapProgram, type DbProgramRow } from "../../_lib/programMapping"
++import { type DbProgramRow } from "../../_lib/programMapping"
++import { mapProgramsResolved } from "../../_lib/programMappingResolved"
+ import ProgramCard from "../../_components/ProgramCard"
+ import ReserveModal from "../../_components/ReserveModal"
+ import MediaGallery from "../../_components/MediaGallery"
+@@ -121,7 +122,7 @@
+     .eq("program_properties.property_id", property.id)
+     .order("sort_order")
+ 
+-  const programs = ((progRows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
++  const programs = await mapProgramsResolved((progRows ?? []) as unknown as DbProgramRow[])
+ 
+   const { data: mediaRows } = await supabaseAdmin
+     .from("media_assets")
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/tanya-samui/page.tsx /opt/dit-platform/src/app/(public)/tanya-samui/page.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/tanya-samui/page.tsx	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/tanya-samui/page.tsx	2026-10-07 18:11:36.000000000 +0700
+@@ -2,7 +2,8 @@
+ import Link from "next/link"
+ import type { Metadata } from "next"
+ import { supabaseAdmin } from "@/lib/supabase-server"
+-import { mapProgram, type DbProgramRow } from "../_lib/programMapping"
++import { type DbProgramRow } from "../_lib/programMapping"
++import { mapProgramsResolved } from "../_lib/programMappingResolved"
+ import ProgramCard from "../_components/ProgramCard"
+ import { ReviewCard, type Review } from "../_components/ReviewsSection"
+ import { Icon } from "../_components/Icon"
+@@ -141,7 +142,7 @@
+     .not("slug", "like", "mile-%")
+     .order("sort_order")
+ 
+-  const programs = ((progRows ?? []).filter((row: any) => (row.program_properties ?? []).some((pp: any) => ["tanya-core","bunya-clinic","tanya-wellbeing"].includes(pp.properties?.slug))) as unknown as DbProgramRow[]).map(mapProgram)
++  const programs = await mapProgramsResolved((progRows ?? []).filter((row: any) => (row.program_properties ?? []).some((pp: any) => ["tanya-core","bunya-clinic","tanya-wellbeing"].includes(pp.properties?.slug))) as unknown as DbProgramRow[])
+ 
+   const { data: reviewRows } = await supabaseAdmin
+     .from("reviews")
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/tracks/island-immersion/page.tsx /opt/dit-platform/src/app/(public)/tracks/island-immersion/page.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/tracks/island-immersion/page.tsx	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/tracks/island-immersion/page.tsx	2026-10-07 18:11:36.000000000 +0700
+@@ -1,7 +1,8 @@
+ import Link from "next/link"
+ import type { Metadata } from "next"
+ import { supabaseAdmin } from "@/lib/supabase-server"
+-import { mapProgram, type DbProgramRow } from "../../_lib/programMapping"
++import { type DbProgramRow } from "../../_lib/programMapping"
++import { mapProgramsResolved } from "../../_lib/programMappingResolved"
+ import ProgramCard from "../../_components/ProgramCard"
+ 
+ export const dynamic = "force-dynamic"
+@@ -119,7 +120,7 @@
+     .eq("active", true)
+     .eq("status", "published")
+ 
+-  const programs = ((rows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
++  const programs = await mapProgramsResolved((rows ?? []) as unknown as DbProgramRow[])
+   const bySlug = new Map(programs.map((p) => [p.slug, p]))
+   const orderedPrograms = TRACK_SLUGS.map((s) => bySlug.get(s)).filter((p): p is NonNullable<typeof p> => !!p)
+ 
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/tracks/mind-balance/page.tsx /opt/dit-platform/src/app/(public)/tracks/mind-balance/page.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/tracks/mind-balance/page.tsx	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/tracks/mind-balance/page.tsx	2026-10-07 18:11:36.000000000 +0700
+@@ -1,7 +1,8 @@
+ import Link from "next/link"
+ import type { Metadata } from "next"
+ import { supabaseAdmin } from "@/lib/supabase-server"
+-import { mapProgram, type DbProgramRow } from "../../_lib/programMapping"
++import { type DbProgramRow } from "../../_lib/programMapping"
++import { mapProgramsResolved } from "../../_lib/programMappingResolved"
+ import ProgramCard from "../../_components/ProgramCard"
+ 
+ export const dynamic = "force-dynamic"
+@@ -119,7 +120,7 @@
+     .eq("active", true)
+     .eq("status", "published")
+ 
+-  const programs = ((rows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
++  const programs = await mapProgramsResolved((rows ?? []) as unknown as DbProgramRow[])
+   const bySlug = new Map(programs.map((p) => [p.slug, p]))
+   const orderedPrograms = TRACK_SLUGS.map((s) => bySlug.get(s)).filter((p): p is NonNullable<typeof p> => !!p)
+ 
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/tracks/performance/page.tsx /opt/dit-platform/src/app/(public)/tracks/performance/page.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/tracks/performance/page.tsx	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/tracks/performance/page.tsx	2026-10-07 18:11:36.000000000 +0700
+@@ -1,7 +1,8 @@
+ import Link from "next/link"
+ import type { Metadata } from "next"
+ import { supabaseAdmin } from "@/lib/supabase-server"
+-import { mapProgram, type DbProgramRow } from "../../_lib/programMapping"
++import { type DbProgramRow } from "../../_lib/programMapping"
++import { mapProgramsResolved } from "../../_lib/programMappingResolved"
+ import ProgramCard from "../../_components/ProgramCard"
+ 
+ export const dynamic = "force-dynamic"
+@@ -111,7 +112,7 @@
+     .eq("active", true)
+     .eq("status", "published")
+ 
+-  const programs = ((rows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
++  const programs = await mapProgramsResolved((rows ?? []) as unknown as DbProgramRow[])
+   const bySlug = new Map(programs.map((p) => [p.slug, p]))
+   const orderedPrograms = TRACK_SLUGS.map((s) => bySlug.get(s)).filter((p): p is NonNullable<typeof p> => !!p)
+ 
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/tracks/reset-recovery/page.tsx /opt/dit-platform/src/app/(public)/tracks/reset-recovery/page.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/tracks/reset-recovery/page.tsx	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/tracks/reset-recovery/page.tsx	2026-10-07 18:11:36.000000000 +0700
+@@ -1,7 +1,8 @@
+ import Link from "next/link"
+ import type { Metadata } from "next"
+ import { supabaseAdmin } from "@/lib/supabase-server"
+-import { mapProgram, type DbProgramRow } from "../../_lib/programMapping"
++import { type DbProgramRow } from "../../_lib/programMapping"
++import { mapProgramsResolved } from "../../_lib/programMappingResolved"
+ import ProgramCard from "../../_components/ProgramCard"
+ 
+ export const dynamic = "force-dynamic"
+@@ -119,7 +120,7 @@
+     .eq("active", true)
+     .eq("status", "published")
+ 
+-  const programs = ((rows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
++  const programs = await mapProgramsResolved((rows ?? []) as unknown as DbProgramRow[])
+   const bySlug = new Map(programs.map((p) => [p.slug, p]))
+   const orderedPrograms = TRACK_SLUGS.map((s) => bySlug.get(s)).filter((p): p is NonNullable<typeof p> => !!p)
+ 
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/(public)/tracks/sport-chill/page.tsx /opt/dit-platform/src/app/(public)/tracks/sport-chill/page.tsx
+--- /tmp/tmp.eEYTxk02rl/src/app/(public)/tracks/sport-chill/page.tsx	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/app/(public)/tracks/sport-chill/page.tsx	2026-10-07 18:11:36.000000000 +0700
+@@ -1,7 +1,8 @@
+ import Link from "next/link"
+ import type { Metadata } from "next"
+ import { supabaseAdmin } from "@/lib/supabase-server"
+-import { mapProgram, type DbProgramRow } from "../../_lib/programMapping"
++import { type DbProgramRow } from "../../_lib/programMapping"
++import { mapProgramsResolved } from "../../_lib/programMappingResolved"
+ import ProgramCard from "../../_components/ProgramCard"
+ export const dynamic = "force-dynamic"
+ export const metadata: Metadata = {
+@@ -85,7 +86,7 @@
+     .in("slug", TRACK_SLUGS)
+     .eq("active", true)
+     .eq("status", "published")
+-  const programs = ((rows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
++  const programs = await mapProgramsResolved((rows ?? []) as unknown as DbProgramRow[])
+   const bySlug = new Map(programs.map((p) => [p.slug, p]))
+   const orderedPrograms = TRACK_SLUGS.map((s) => bySlug.get(s)).filter((p): p is NonNullable<typeof p> => !!p)
+   const faqJsonLd = {
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/sitemap-static.ts /opt/dit-platform/src/app/sitemap-static.ts
+--- /tmp/tmp.eEYTxk02rl/src/app/sitemap-static.ts	1970-01-01 07:00:00.000000000 +0700
++++ /opt/dit-platform/src/app/sitemap-static.ts	2026-10-07 18:11:35.000000000 +0700
+@@ -0,0 +1,41 @@
++// Generated from the previous static sitemap. Only non-entity pages; entity URLs come from Supabase (sitemap.ts).
++export const STATIC_ROUTES: Array<{ path: string; changefreq: "weekly" | "monthly"; priority: number }> = [
++  { path: "/", changefreq: "weekly", priority: 1.0 },
++  { path: "/start", changefreq: "monthly", priority: 0.9 },
++  { path: "/programs", changefreq: "weekly", priority: 0.9 },
++  { path: "/properties", changefreq: "weekly", priority: 0.9 },
++  { path: "/reviews", changefreq: "monthly", priority: 0.7 },
++  { path: "/about", changefreq: "monthly", priority: 0.6 },
++  { path: "/partners", changefreq: "monthly", priority: 0.6 },
++  { path: "/for-properties", changefreq: "monthly", priority: 0.8 },
++  { path: "/tanya-samui", changefreq: "monthly", priority: 0.8 },
++  { path: "/tanya-samui/accommodation", changefreq: "monthly", priority: 0.6 },
++  { path: "/tanya-samui/faq", changefreq: "monthly", priority: 0.5 },
++  { path: "/tanya-samui/wellness-menu", changefreq: "monthly", priority: 0.5 },
++  { path: "/guides/burnout-recovery-retreats-southeast-asia", changefreq: "monthly", priority: 0.7 },
++  { path: "/guides/sleep-reset-retreats-asia", changefreq: "monthly", priority: 0.7 },
++  { path: "/guides/metabolic-health-retreats-asia", changefreq: "monthly", priority: 0.7 },
++  { path: "/guides/mental-clarity-retreats-asia", changefreq: "monthly", priority: 0.7 },
++  { path: "/guides/fitness-recovery-retreats-asia", changefreq: "monthly", priority: 0.7 },
++  { path: "/guides/boost-energy-retreats-asia", changefreq: "monthly", priority: 0.7 },
++  { path: "/guides/anxiety-stress-recovery-retreats-asia", changefreq: "monthly", priority: 0.7 },
++  { path: "/guides/longevity-executive-health-retreats-asia", changefreq: "monthly", priority: 0.7 },
++  { path: "/tracks/reset-recovery", changefreq: "monthly", priority: 0.7 },
++  { path: "/tracks/performance", changefreq: "monthly", priority: 0.7 },
++  { path: "/tracks/mind-balance", changefreq: "monthly", priority: 0.7 },
++  { path: "/tracks/island-immersion", changefreq: "monthly", priority: 0.7 },
++  { path: "/tracks/sport-chill", changefreq: "monthly", priority: 0.7 },
++  { path: "/guides/wudang-mountain-wellness-guide", changefreq: "monthly", priority: 0.7 },
++  { path: "/guides/singapore-sentosa-wellness-guide", changefreq: "monthly", priority: 0.7 },
++  { path: "/guides/koh-samui-koh-phangan-wellness-guide", changefreq: "monthly", priority: 0.7 },
++  { path: "/guides/bali-wellness-guide", changefreq: "monthly", priority: 0.7 },
++  { path: "/guides/mile-yunnan-wellness-guide", changefreq: "monthly", priority: 0.7 },
++  { path: "/guides/boracay-wellness-guide", changefreq: "monthly", priority: 0.7 },
++  { path: "/destinations", changefreq: "weekly", priority: 0.9 },
++  { path: "/medical/china", changefreq: "monthly", priority: 0.9 },
++  { path: "/medical/china/guides/second-opinion-china", changefreq: "monthly", priority: 0.8 },
++  { path: "/medical/china/guides/cost-of-treatment-china", changefreq: "monthly", priority: 0.8 },
++  { path: "/medical/china/guides/how-to-arrange-treatment-china", changefreq: "monthly", priority: 0.8 },
++  { path: "/medical/china/guides/how-to-choose-hospital-china", changefreq: "monthly", priority: 0.8 },
++  { path: "/medical/china/guides/hospitals-china-international-patients", changefreq: "monthly", priority: 0.8 },
++]
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/app/sitemap.ts /opt/dit-platform/src/app/sitemap.ts
+--- /tmp/tmp.eEYTxk02rl/src/app/sitemap.ts	1970-01-01 07:00:00.000000000 +0700
++++ /opt/dit-platform/src/app/sitemap.ts	2026-10-07 18:11:35.000000000 +0700
+@@ -0,0 +1,49 @@
++import type { MetadataRoute } from "next"
++import { supabasePublic as supabaseAdmin } from "@/lib/supabase-public"  // anon + RLS, not service role
++import { STATIC_ROUTES } from "./sitemap-static"
++
++// Sitemap is generated from Supabase on every request: a published entity appears, an unpublished/archived one disappears.
++// STATIC_ROUTES holds only the non-entity pages (home, start, about, guides, tracks, ...).
++export const dynamic = "force-dynamic"
++
++const BASE = "https://dreamislands.org"
++
++function d(v?: string | null): Date | undefined {
++  return v ? new Date(v) : undefined
++}
++
++export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
++  const [progs, props, dests] = await Promise.all([
++    supabaseAdmin.from("programs").select("slug, updated_at").eq("active", true).eq("status", "published"),
++    supabaseAdmin.from("properties").select("slug, country, entity_type, updated_at").eq("active", true),
++    supabaseAdmin.from("destination_countries").select("slug, updated_at").eq("active", true),
++  ])
++
++  const out: MetadataRoute.Sitemap = STATIC_ROUTES.map((r) => ({
++    url: BASE + r.path,
++    changeFrequency: r.changefreq,
++    priority: r.priority,
++  }))
++
++  for (const g of (progs.data ?? []) as any[]) {
++    if (!g.slug) continue
++    out.push({ url: `${BASE}/programs/${g.slug}`, lastModified: d(g.updated_at), changeFrequency: "weekly", priority: 0.8 })
++  }
++  for (const p of (props.data ?? []) as any[]) {
++    if (!p.slug) continue
++    if (p.entity_type === "wellness_property") {
++      out.push({ url: `${BASE}/properties/${p.slug}`, lastModified: d(p.updated_at), changeFrequency: "weekly", priority: 0.7 })
++    } else if (p.entity_type === "hospital_clinic" && p.country === "China") {
++      out.push({ url: `${BASE}/medical/china/hospitals/${p.slug}`, lastModified: d(p.updated_at), changeFrequency: "monthly", priority: 0.6 })
++    }
++  }
++  for (const c of (dests.data ?? []) as any[]) {
++    if (!c.slug) continue
++    out.push({ url: `${BASE}/destinations/${c.slug}`, lastModified: d(c.updated_at), changeFrequency: "weekly", priority: 0.8 })
++  }
++
++  // de-duplicate by URL (entity routes win over anything listed statically)
++  const seen = new Map<string, MetadataRoute.Sitemap[number]>()
++  for (const e of out) seen.set(e.url, e)
++  return [...seen.values()]
++}
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/lib/hero.ts /opt/dit-platform/src/lib/hero.ts
+--- /tmp/tmp.eEYTxk02rl/src/lib/hero.ts	1970-01-01 07:00:00.000000000 +0700
++++ /opt/dit-platform/src/lib/hero.ts	2026-10-07 18:11:35.000000000 +0700
+@@ -0,0 +1,50 @@
++import "server-only"
++import { supabasePublic as supabaseAdmin } from "@/lib/supabase-public"  // anon + RLS, not service role
++
++// One hero rule for every locale / every listing:
++//   program.hero_image_url -> its own property photo -> NEUTRAL country hero -> global fallback
++// A photo of another property is never used as a program's visual (Cross-property hero must stay 0).
++// Resolved at render time, never copied into the entity.
++export const GLOBAL_FALLBACK_HERO =
++  process.env.NEXT_PUBLIC_GLOBAL_HERO ?? "https://dreamislands.ru/assets/img/og-image.webp"
++
++export type HeroSource = "own" | "property" | "destination" | "global"
++
++export type HeroContext = {
++  neutralByCountry: Record<string, string>
++}
++
++export async function getHeroContext(): Promise<HeroContext> {
++  const { data } = await supabaseAdmin
++    .from("destination_countries")
++    .select("country, hero_image_url, hero_is_neutral")
++    .eq("active", true)
++  const neutralByCountry: Record<string, string> = {}
++  for (const r of (data ?? []) as any[]) {
++    if (r.hero_is_neutral && r.hero_image_url) neutralByCountry[r.country] = r.hero_image_url
++  }
++  return { neutralByCountry }
++}
++
++type PropLike = { image_url?: string | null; country?: string | null; entity_type?: string | null }
++type ProgramLike = {
++  hero_image_url?: string | null
++  program_properties?: Array<{ properties?: PropLike | null }> | null
++}
++
++export function resolveProgramHero(g: ProgramLike, ctx: HeroContext): { url: string; source: HeroSource } {
++  if (g.hero_image_url) return { url: g.hero_image_url, source: "own" }
++  const props = (g.program_properties ?? []).map((pp) => pp.properties).filter(Boolean) as PropLike[]
++  // wellness properties first, same ordering as the RU generator
++  props.sort((a, b) => (a.entity_type === "wellness_property" ? 0 : 1) - (b.entity_type === "wellness_property" ? 0 : 1))
++  for (const p of props) if (p.image_url) return { url: p.image_url, source: "property" }
++  const country = props.find((p) => p.country)?.country
++  if (country && ctx.neutralByCountry[country]) return { url: ctx.neutralByCountry[country], source: "destination" }
++  return { url: GLOBAL_FALLBACK_HERO, source: "global" }
++}
++
++export function resolvePropertyHero(p: PropLike, ctx: HeroContext): { url: string; source: HeroSource } {
++  if (p.image_url) return { url: p.image_url, source: "property" }
++  if (p.country && ctx.neutralByCountry[p.country]) return { url: ctx.neutralByCountry[p.country], source: "destination" }
++  return { url: GLOBAL_FALLBACK_HERO, source: "global" }
++}
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/lib/matched-programs.ts /opt/dit-platform/src/lib/matched-programs.ts
+--- /tmp/tmp.eEYTxk02rl/src/lib/matched-programs.ts	2026-09-22 02:05:13.000000000 +0700
++++ /opt/dit-platform/src/lib/matched-programs.ts	2026-10-07 18:57:26.297629820 +0700
+@@ -1,5 +1,13 @@
+ import "server-only"
+ import { supabaseAdmin } from "./supabase-server"
++import { resolveHeroes } from "@/app/(public)/_lib/programMappingResolved"
++
++const MEDICAL_ENTITY_TYPES = new Set(["network_coordinator", "hospital_clinic"])
++
++/** A program is a medical pathway if any linked property is a medical network/clinic. */
++export function isMedicalPathway(row: any): boolean {
++  return (row?.program_properties ?? []).some((pp: any) => MEDICAL_ENTITY_TYPES.has(pp?.properties?.entity_type))
++}
+ 
+ /** Top published programs for a cohort, cheapest first — the "matched" set after the WS assessment. */
+ export async function fetchMatchedPrograms(cohort: number | null | undefined) {
+@@ -7,13 +15,16 @@
+     .from("programs")
+     .select(
+       "id, name, slug, summary, cohort, tier, duration_days, price_usd, outcomes, is_composite, hero_image_url, " +
+-        "program_properties(role, properties(name, island, country, contact_wa)), " +
++        "program_properties(role, properties(id, name, island, country, contact_wa, entity_type)), " +
+         "program_variants(duration_days, duration_nights, price_basic_usd, active)",
+     )
+     .eq("cohort", cohort ?? 1)
+     .eq("active", true)
+     .eq("status", "published")
+     .order("price_usd", { ascending: true })
+-    .limit(3)
+-  return data ?? []
++    .limit(40)
++  // Wellness top-3 only. Medical pathway programs are surfaced by a separate, intent-driven layer (not by price).
++  const rows = ((data ?? []) as any[]).filter((r) => !isMedicalPathway(r)).slice(0, 3)
++  const heroes = await resolveHeroes(rows)
++  return rows.map((r, i) => ({ ...r, hero_image_url: heroes[i].url }))
+ }
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/lib/stats.ts /opt/dit-platform/src/lib/stats.ts
+--- /tmp/tmp.eEYTxk02rl/src/lib/stats.ts	1970-01-01 07:00:00.000000000 +0700
++++ /opt/dit-platform/src/lib/stats.ts	2026-10-07 18:11:35.000000000 +0700
+@@ -0,0 +1,51 @@
++import "server-only"
++import { supabasePublic as supabaseAdmin } from "@/lib/supabase-public"  // anon + RLS, not service role
++
++// Single source for every public counter. Everything is derived from Supabase; nothing is hardcoded.
++// Semantics (see Event_Driven_Rebuild_SPEC.md):
++//  - programs   = published + active programs
++//  - properties = active wellness_property rows ("selected objects" on the wellness storefront)
++//  - clinics    = active hospital_clinic rows (reported separately, never mixed into `properties`)
++//  - countries  = distinct countries of active wellness properties
++export type CatalogStats = {
++  programs: number
++  properties: number
++  clinics: number
++  countries: number
++  china: { wellnessDestinations: number; clinics: number; programs: number }
++}
++
++export async function getCatalogStats(): Promise<CatalogStats> {
++  const [progRes, propRes] = await Promise.all([
++    supabaseAdmin
++      .from("programs")
++      .select("id, program_properties(properties(country, entity_type, active))")
++      .eq("active", true)
++      .eq("status", "published"),
++    supabaseAdmin.from("properties").select("id, country, entity_type").eq("active", true),
++  ])
++  const programs = (progRes.data ?? []) as any[]
++  const props = (propRes.data ?? []) as Array<{ id: string; country: string | null; entity_type: string }>
++
++  const wellness = props.filter((p) => p.entity_type === "wellness_property")
++  const clinics = props.filter((p) => p.entity_type === "hospital_clinic")
++  const countries = new Set(wellness.map((p) => p.country).filter(Boolean))
++
++  const chinaWellness = wellness.filter((p) => p.country === "China")
++  const chinaClinics = clinics.filter((p) => p.country === "China")
++  const chinaPrograms = programs.filter((g) =>
++    (g.program_properties ?? []).some((pp: any) => pp.properties?.country === "China"),
++  )
++
++  return {
++    programs: programs.length,
++    properties: wellness.length,
++    clinics: clinics.length,
++    countries: countries.size,
++    china: {
++      wellnessDestinations: chinaWellness.length,
++      clinics: chinaClinics.length,
++      programs: chinaPrograms.length,
++    },
++  }
++}
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/lib/supabase-public.ts /opt/dit-platform/src/lib/supabase-public.ts
+--- /tmp/tmp.eEYTxk02rl/src/lib/supabase-public.ts	1970-01-01 07:00:00.000000000 +0700
++++ /opt/dit-platform/src/lib/supabase-public.ts	2026-10-07 18:11:35.000000000 +0700
+@@ -0,0 +1,11 @@
++import "server-only"
++import { createClient } from "@supabase/supabase-js"
++
++// Anonymous (RLS-enforced) read client for PUBLIC catalog data: published programs, active properties,
++// active destination_countries, active media. No cookies, no service role.
++// Stage 1 code (stats, hero, sitemap, country pages) uses this and does NOT extend supabaseAdmin usage.
++// Existing supabaseAdmin usage on public pages is a separate security-cleanup task.
++const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "https://placeholder.supabase.co"
++const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "placeholder"
++
++export const supabasePublic = createClient(url, anonKey, { auth: { persistSession: false, autoRefreshToken: false } })
+diff -ruN '--exclude=*.bak*' /tmp/tmp.eEYTxk02rl/src/proxy.ts /opt/dit-platform/src/proxy.ts
+--- /tmp/tmp.eEYTxk02rl/src/proxy.ts	2026-10-06 02:59:50.000000000 +0700
++++ /opt/dit-platform/src/proxy.ts	2026-10-07 18:11:36.000000000 +0700
+@@ -29,6 +29,7 @@
+   "/how-wbs-works",
+   "/destinations",
+   "/medical",
++  "/sitemap.xml",
+ ]
+ 
+ const PANEL_HOSTS = new Set(["panel.dreamislands.org"])
+@@ -60,6 +61,7 @@
+   "/how-wbs-works",
+   "/destinations",
+   "/medical",
++  "/sitemap.xml",
+ ]
+ 
+ const PANEL_HOST_ALLOWED = [
