@@ -4,17 +4,22 @@ import { supabaseAdmin } from "@/lib/supabase-server"
 import Brand from "./Brand"
 import { Icon } from "./Icon"
 import { TRACKS } from "../_lib/programMapping"
+import { countryFromSlug, countrySlug } from "../_lib/countries"
+
+// Partners and staff sign in on the panel host, not the public site.
+const PANEL_LOGIN_URL = `${(process.env.NEXT_PUBLIC_PANEL_SITE_URL || "https://panel.dreamislands.org").replace(/\/$/, "")}/login`
 
 const COMPANY_LINKS = [
   { href: "/about", label: "About" },
   { href: "/start", label: "Get your WS" },
   { href: "mailto:hello@dreamislands.org", label: "Press kit", external: true },
+  { href: PANEL_LOGIN_URL, label: "Partner login", external: true },
 ]
 const CONTACT_LINKS = [
   { href: "https://wa.me/message/HOF2AFIBDYY5J1", label: "WhatsApp consult", external: true },
   { href: "mailto:hello@dreamislands.org", label: "hello@dreamislands.org", external: true },
   { href: "https://www.instagram.com/dreamislands_travel/", label: "Instagram", external: true },
-  { href: "https://t.me/", label: "Telegram", external: true },
+  { href: "https://t.me/+66811612662", label: "Telegram", external: true },
 ]
 const SOCIAL_LINKS = [
   { href: "https://www.instagram.com/dreamislands_travel/", label: "Instagram", icon: Icon.instagram },
@@ -59,7 +64,7 @@ export default async function Footer() {
     { href: "/properties", label: "Destinations" },
     { href: "/properties", label: "Properties" },
     { href: "/programs", label: "Programs" },
-    { href: "/#tracks", label: "Key Outcomes" },
+    { href: "/#outcomes", label: "Key Outcomes" },
     { href: "/guides/burnout-recovery-retreats-southeast-asia", label: "Burnout Recovery Guide" },
     { href: "/guides/sleep-reset-retreats-asia", label: "Sleep Reset Guide" },
     { href: "/guides/anxiety-stress-recovery-retreats-asia", label: "Anxiety & Stress Guide" },
@@ -128,7 +133,7 @@ export default async function Footer() {
           {countries.map((c) => (
             <Link
               key={c}
-              href="/properties"
+              href={countryFromSlug(countrySlug(c)) ? `/destinations/${countrySlug(c)}` : "/destinations"}
               style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "var(--ink-2)", fontSize: 14 }}
               className="footer-link"
             >
@@ -183,7 +188,7 @@ export default async function Footer() {
           <span>© {new Date().getFullYear()} Dream Islands Travel · WS v1</span>
           <span style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--ink-3)", fontSize: 12 }}>
             Secure payments powered by
-            <Image src="/stripe-logo.png" alt="Stripe" width={60} height={16} style={{ height: 16, width: "auto" }} />
+            <Image src="/stripe-logo.png" alt="Stripe" width={60} height={20} style={{ height: 20, width: "auto", borderRadius: 4 }} />
           </span>
         </div>
         <div style={{ display: "flex", gap: 18, flexWrap: "wrap" }}>

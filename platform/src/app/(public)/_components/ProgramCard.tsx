@@ -6,6 +6,19 @@ import ProgramImage from "./ProgramImage"
 
 type Variant = "rail" | "wide" | "featured"
 
+// Readable names for the outcome pictograms (shown as tooltip + alt text).
+const OUTCOME_ICON_LABELS: Record<string, string> = {
+  energy: "Energy",
+  sleep: "Sleep",
+  stress: "Stress & calm",
+  weight: "Weight",
+  ageing: "Healthy ageing",
+  longevity: "Longevity",
+  inflammation: "Inflammation",
+  clarity: "Mental clarity",
+  digestion: "Gut health",
+}
+
 export default function ProgramCard({
   program: p,
   variant = "rail",
@@ -28,10 +41,10 @@ export default function ProgramCard({
             }}
           />
           <div style={{ position: "absolute", top: 14, left: 14, display: "flex", gap: 6 }}>
-            <span className="tag" style={{ background: "rgba(255,255,255,.92)", color: "var(--ink)" }}>
+            <span className="tag" style={{ background: "rgba(255,255,255,.92)", color: "var(--accent-ink)" }}>
               {p.trackFull}
             </span>
-            <span className="tag" style={{ background: "rgba(255,255,255,.92)", color: "var(--ink-2)" }}>
+            <span className="tag" style={{ background: "rgba(255,255,255,.92)", color: "rgba(20,32,27,.72)" }}>
               {p.type}
             </span>
             {p.performanceSubtype && (
@@ -78,7 +91,7 @@ export default function ProgramCard({
             bottom: 10,
             left: 10,
             background: "rgba(255,255,255,.92)",
-            color: "var(--ink)",
+            color: "var(--accent-ink)",
             fontSize: 11,
           }}
         >
@@ -113,7 +126,14 @@ export default function ProgramCard({
         {outcomeIcons.length > 0 && (
           <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
             {outcomeIcons.map((icon) => (
-              <img key={icon} src={`/icons/outcomes/${icon}_448.png`} alt={icon} width={18} height={18} />
+              <img
+                key={icon}
+                src={`/icons/outcomes/${icon}_448.png`}
+                alt={OUTCOME_ICON_LABELS[icon] ?? icon}
+                title={OUTCOME_ICON_LABELS[icon] ?? icon}
+                width={18}
+                height={18}
+              />
             ))}
           </div>
         )}

@@ -32,7 +32,7 @@ export const HOW_IT_WORKS = [
   {
     n: "01",
     title: "Get your WS",
-    body: "22 questions, about 2 minutes. We score Movement, Recovery, Lifestyle Risk and Emotional Health on a 0–100 scale.",
+    body: "23 questions, about 2 minutes. We score Movement, Recovery, Lifestyle Risk and Emotional Health on a 0–100 scale.",
   },
   {
     n: "02",

@@ -416,12 +416,11 @@ export default async function AboutPage() {
         </div>
 
         <div
-          className="card"
+          className="card about-tanya"
           style={{
             padding: 20,
             marginBottom: 32,
             display: "grid",
-            gridTemplateColumns: "minmax(140px, 220px) 1fr",
             gap: 20,
             alignItems: "center",
           }}

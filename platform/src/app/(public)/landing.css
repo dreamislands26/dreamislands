@@ -41,9 +41,13 @@ body {
   --lean:         #9CAE5C;
 
   /* type */
-  --font-display: 'Optima', 'Palatino Linotype', 'Book Antiqua', serif;
-  --font-body:    'Aeroport', var(--font-dmsans), -apple-system, 'Segoe UI', sans-serif;
-  --font-mono:    "JetBrains Mono", ui-monospace, monospace;
+  /* accent = Optima, base = Aeroport, mono = Roboto Mono (brand spec).
+     Optima is a humanist sans: fall back to Belleza (same flared-stroke
+     character), never to Palatino/serif. The --font-* inputs are set by
+     next/font on <html> in src/app/layout.tsx. */
+  --font-display: 'Optima', 'Optima nova', var(--font-optima-fallback, 'Candara'), 'Candara', sans-serif;
+  --font-body:    'Aeroport', var(--font-dmsans, -apple-system), -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:    'Roboto Mono', var(--font-roboto-mono, ui-monospace), ui-monospace, monospace;
 
   /* spacing & shape */
   --r-sm: 8px;
@@ -94,6 +98,12 @@ body {
 }
 @media (min-width: 900px) {
   .shell { max-width: 1200px; padding: 0 48px; }
+}
+/* Tablet (600–899px): the 480px phone column left the page body a narrow
+   strip between a full-width header and footer. Use the same 20px gutter as
+   the header/footer instead. */
+@media (min-width: 600px) and (max-width: 899px) {
+  .shell { max-width: none; }
 }
 
 /* Page-specific in-page header ? hidden on desktop since topnav covers it */
@@ -149,12 +159,24 @@ body {
   .topnav-cta.btn-ghost { display: none; }
   .topnav-cta { padding: 8px 12px; font-size: 12px; white-space: nowrap; }
   .topnav-inner { flex-wrap: nowrap; gap: 8px; }
+  /* Mobile: logo left, actions, burger at the far right (was wedged between
+     the logo and "Log in"); logo stays on one line. */
+  .topnav-inner > .brand-link { margin-right: auto; font-size: 19px !important; }
+  .topnav-actions { gap: 10px !important; }
+  .topnav-menu-btn { order: 3; margin-right: -6px; }
+}
+/* Phones: keep the round logo mark only, so logo, "Log in", the CTA and the
+   burger fit on one line without the wordmark wrapping onto two. */
+@media (max-width: 430px) {
+  .topnav-inner > .brand-link span { display: none; }
 }
 
 .topnav-dropdown { position: relative; display: inline-flex; align-items: center; }
 .topnav-dropdown-trigger { font-size: 14px; color: var(--ink-2); letter-spacing: .01em; transition: color .2s; background: none; border: none; cursor: pointer; font-family: inherit; padding: 0; }
 .topnav-dropdown-trigger:hover, .topnav-dropdown-trigger.active { color: var(--ink); }
-.topnav-dropdown-menu { position: absolute; top: 100%; left: 0; margin-top: 14px; background: var(--bg); border: 1px solid color-mix(in oklab, var(--ink) 12%, transparent); border-radius: 12px; padding: 10px; min-width: 220px; display: flex; flex-direction: column; gap: 2px; box-shadow: 0 12px 32px -12px rgba(0,0,0,.4); }
+.topnav-dropdown-menu { position: absolute; top: calc(100% + 14px); left: 0; z-index: 60; background: var(--bg); border: 1px solid color-mix(in oklab, var(--ink) 12%, transparent); border-radius: 12px; padding: 10px; min-width: 220px; display: flex; flex-direction: column; gap: 2px; box-shadow: 0 12px 32px -12px rgba(0,0,0,.4); }
+/* invisible bridge over the 14px gap so the menu doesn't close on the way down */
+.topnav-dropdown-menu::before { content: ""; position: absolute; left: 0; right: 0; top: -16px; height: 16px; }
 .topnav-dropdown-menu a { font-size: 14px; color: var(--ink-2); padding: 8px 10px; border-radius: 8px; transition: background .15s, color .15s; }
 .topnav-dropdown-menu a:hover { background: var(--accent-soft); color: var(--ink); }
 .topnav-dropdown-divider { height: 1px; background: color-mix(in oklab, var(--ink) 12%, transparent); margin: 6px 4px; }
@@ -269,6 +291,10 @@ body {
   margin: 36px 0 18px;
   gap: 16px;
 }
+/* Headings are the accent face (Optima) site-wide. Many h1/h2 had no font
+   set and fell back to the body face in bold (e.g. the China block). */
+h1, h2 { font-family: var(--font-display); font-weight: 400; letter-spacing: -.01em; }
+
 .section-head h2 {
   margin: 0;
   font-family: var(--font-display);
@@ -344,12 +370,27 @@ body {
   overflow-x: auto;
   overflow-y: visible;
   scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--pad);
   padding: 16px var(--pad) 28px;
   margin: -16px calc(var(--pad) * -1) -16px;
   scrollbar-width: none;
 }
 .rail::-webkit-scrollbar { display: none; }
 .rail > * { scroll-snap-align: start; flex: 0 0 auto; }
+.rail-wrap { position: relative; }
+.rail-wrap.rail-more .rail { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 56px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 56px), transparent); }
+.rail-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 2;
+  width: 44px; height: 44px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--surface-2); color: var(--ink); font-size: 26px; line-height: 1;
+  border: 1px solid var(--line); box-shadow: var(--shadow-2);
+}
+.rail-arrow:hover { background: var(--accent); color: var(--accent-ink); }
+.rail-arrow[hidden] { display: none; }
+.rail-arrow-prev { left: -30px; }
+.rail-arrow-next { right: -30px; }
+@media (max-width: 899px) { .rail-arrow { display: none; } }
 
 /* ??? Site footer ??? */
 .site-footer {
@@ -363,7 +404,7 @@ body {
   .site-footer { padding: 80px 48px 56px; }
 }
 .footer-inner {
-  max-width: 1200px;
+  max-width: 1104px;
   margin: 0 auto;
   display: grid;
   gap: 40px;
@@ -373,7 +414,8 @@ body {
   .footer-inner { grid-template-columns: 1fr 1fr; }
 }
 @media (min-width: 1000px) {
-  .footer-inner { grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 56px; }
+  /* five blocks: brand + Explore, Outcomes, Company, Stay in touch — one row */
+  .footer-inner { grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr; gap: 40px; }
 }
 .footer-brand { max-width: 380px; }
 .footer-col .eyebrow { color: var(--ink-3); }
@@ -390,13 +432,13 @@ body {
 }
 .footer-link:hover { color: var(--accent); }
 .footer-locations {
-  max-width: 1200px;
+  max-width: 1104px;
   margin: 48px auto 0;
   padding-top: 32px;
   border-top: 1px solid var(--line-2);
 }
 .footer-legal {
-  max-width: 1200px;
+  max-width: 1104px;
   margin: 32px auto 0;
   padding-top: 32px;
   border-top: 1px solid var(--line-2);
@@ -410,7 +452,7 @@ body {
   .footer-legal-grid { grid-template-columns: repeat(3, 1fr); }
 }
 .footer-bottom {
-  max-width: 1200px;
+  max-width: 1104px;
   margin: 32px auto 0;
   padding-top: 24px;
   border-top: 1px solid var(--line-2);
@@ -692,3 +734,8 @@ body {
 @media (min-width: 900px) { .profile-card { padding: 32px; } }
 .profile-goal { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; color: var(--ink-2); }
 .profile-goal-dot { flex: 0 0 auto; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; margin-top: 1px; }
+
+/* About → Tanya Samui card: image + text side by side, stacked on phones
+   (the two columns used to push the text past the card edge at 390px). */
+.about-tanya { grid-template-columns: minmax(140px, 220px) 1fr; }
+@media (max-width: 599px) { .about-tanya { grid-template-columns: 1fr; } }

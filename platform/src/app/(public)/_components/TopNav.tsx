@@ -50,8 +50,13 @@ export default function TopNav({ programs = [] }: { programs?: { id: string; nam
       <button
         type="button"
         className={"topnav-dropdown-trigger" + (destActive ? " active" : "")}
-        onClick={() => setDestOpen((v) => !v)}
+        // Hover already opens the menu, so a click must not toggle it shut again
+        // (that made "Destinations" look dead on desktop). Click only opens;
+        // leaving the area or pressing Escape closes it.
+        onClick={() => setDestOpen(true)}
+        onKeyDown={(e) => e.key === "Escape" && setDestOpen(false)}
         aria-expanded={destOpen}
+        aria-haspopup="true"
       >
         Destinations
       </button>
@@ -94,7 +99,7 @@ export default function TopNav({ programs = [] }: { programs?: { id: string; nam
           <span />
           <span />
         </button>
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+        <div className="topnav-actions" style={{ display: "flex", alignItems: "center", gap: 14 }}>
           <AccountButton />
           <Link href="/start" className="btn btn-primary topnav-cta">
             Take Assessment

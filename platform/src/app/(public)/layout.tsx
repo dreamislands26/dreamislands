@@ -1,4 +1,3 @@
-import { DM_Sans } from "next/font/google"
 import TopNav from "./_components/TopNav"
 import Footer from "./_components/Footer"
 import WhatsAppFab from "./_components/WhatsAppFab"
@@ -7,12 +6,6 @@ import ConsentBanner from "./_components/ConsentBanner"
 import AuthProvider from "./_components/account/AuthProvider"
 import { supabaseAdmin } from "@/lib/supabase-server"
 import "./landing.css"
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-dmsans",
-  display: "swap",
-})
 export default async function PublicLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -23,7 +16,7 @@ export default async function PublicLayout({
     .eq("status", "published")
     .order("sort_order")
   return (
-    <div className={dmSans.variable} style={{ fontFamily: "var(--font-body)" }}>
+    <div style={{ fontFamily: "var(--font-body)" }}>
       <AuthProvider>
         <AttributionInit />
         <ConsentBanner />

@@ -4,6 +4,7 @@ import Image from "next/image"
 import { supabaseAdmin } from "@/lib/supabase-server"
 import { Icon } from "./Icon"
 import ProgramCard from "./ProgramCard"
+import Rail from "./Rail"
 import ReviewsSection, { type Review } from "./ReviewsSection"
 import InViewMotion from "./journey/InViewMotion"
 import { HeroRoute, BDARoute } from "./journey/JourneyRoute"
@@ -14,6 +15,7 @@ const TRACK_ICONS = {
   Performance: "/icons/pulse.png",
   Mind: "/icons/mindfulness.png",
   Immersion: "/icons/compass.png",
+  SportChill: "/icons/energy_448.png",
 } as const
 
 // Curated homepage picks — keep the rail short and intentional rather than
@@ -30,9 +32,11 @@ const FEATURED_SLUGS = [
   "weight-reset",
 ]
 
+// Program count is filled in from the live list at render time so it always
+// matches the "Explore all N programs" button (was a hardcoded 54 vs 62).
 const TRACTION_STATS = [
   { n: "300+", sub: "guests hosted" },
-  { n: "54", sub: "standardized programs" },
+  { n: "{programs}", sub: "standardized programs" },
   { n: "17", sub: "partner destinations" },
   { n: "7", sub: "Asian markets" },
   { n: "3,000+", sub: "community" },
@@ -110,7 +114,8 @@ type OutcomeCard = {
 export default async function HomeView({ programs, reviews }: { programs: LandingProgram[]; reviews: Review[] }) {
   const bySlug = new Map(programs.filter((p) => p.slug).map((p) => [p.slug as string, p]))
   const firstWa = programs.find((p) => p.contact_wa)?.contact_wa ?? null
-  const waHref = firstWa ? `https://wa.me/${firstWa.replace(/[^0-9]/g, "")}` : "https://wa.me/"
+  // Fall back to the company WhatsApp rather than a bare wa.me/ with no number.
+  const waHref = `https://wa.me/${(firstWa ?? "66811612662").replace(/[^0-9]/g, "")}`
   const featuredRail = (() => {
     const curated = FEATURED_SLUGS.map((s) => bySlug.get(s)).filter((p): p is LandingProgram => !!p)
     return curated.length >= 4 ? curated : programs.slice(0, 8)
@@ -138,7 +143,7 @@ export default async function HomeView({ programs, reviews }: { programs: Landin
     }))
 
   return (
-    <div className="page" style={{ paddingBottom: 120, position: "relative", overflow: "hidden" }}>
+    <div className="page" style={{ paddingBottom: 48, position: "relative", overflow: "hidden" }}>
       <div className="blob" style={{ width: 380, height: 380, background: "var(--accent-soft)", top: -120, right: -120 }} />
       <div className="blob" style={{ width: 320, height: 320, background: "var(--accent)", opacity: 0.12, top: 320, left: -160 }} />
 
@@ -160,7 +165,7 @@ export default async function HomeView({ programs, reviews }: { programs: Landin
               health. Dream Islands matches you with structured wellness programs across Asia based
               on the change you want to make.
             </p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 28 }}>
+            <div className="hero-ctas" style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 28 }}>
               <Link href="/programs" className="btn btn-primary btn-lg">
                 Find my program
                 <Icon.arrow width={18} height={18} />
@@ -227,8 +232,9 @@ export default async function HomeView({ programs, reviews }: { programs: Landin
                 </div>
               ) : (
                 <div className="outcome-actions">
+                  <div className="outcome-count">Programs coming soon</div>
                   <Link href={`/guides/${o.guideSlug}`} className="outcome-link outcome-link-primary">
-                    Related programs available <Icon.arrow width={14} height={14} />
+                    Read guide <Icon.arrow width={14} height={14} />
                   </Link>
                 </div>
               )}
@@ -294,7 +300,7 @@ export default async function HomeView({ programs, reviews }: { programs: Landin
           </div>
         </div>
         <div className="shell">
-          <div className="rail">
+          <Rail label="Featured programs">
             {featuredRail.map((p) => (
               <ProgramCard key={p.id} program={p} variant="rail" />
             ))}
@@ -303,7 +309,7 @@ export default async function HomeView({ programs, reviews }: { programs: Landin
                 <div className="body-sm">No programs published yet.</div>
               </div>
             )}
-          </div>
+          </Rail>
         </div>
       </section>
 
@@ -315,7 +321,7 @@ export default async function HomeView({ programs, reviews }: { programs: Landin
             <h2>Where you&apos;ll go.</h2>
           </div>
         </div>
-        <div className="rail" style={{ gap: 12 }}>
+        <Rail label="Destination photos" style={{ gap: 12 }}>
           {HOMEPAGE_PHOTOS.map((p) => (
             <div
               key={p.file}
@@ -331,11 +337,16 @@ export default async function HomeView({ programs, reviews }: { programs: Landin
               <Image src={p.url} alt={p.alt} fill sizes="220px" style={{ objectFit: "cover" }} />
             </div>
           ))}
-        </div>
+        </Rail>
       </section>
 
       {/* TANYA SAMUI FLAGSHIP */}
-      <section className='shell rise sec-tanya' style={{padding:'20px 0'}}><a href='/tanya-samui' className='card btn btn-primary' style={{display:'block',textAlign:'center',padding:'24px',fontSize:18,fontWeight:600}}>Explore Tanya Samui, Koh Samui &rarr;</a></section>
+      <section className="shell rise sec-tanya" style={{ paddingBlock: 20 }}>
+        {/* was "card btn btn-primary": .card's dark fill overrode the mint button */}
+        <Link href="/tanya-samui" className="btn btn-primary btn-lg" style={{ display: "flex", width: "100%", fontSize: 18, fontWeight: 600 }}>
+          Explore Tanya Samui, Koh Samui <Icon.arrow width={18} height={18} />
+        </Link>
+      </section>
 
       {/* HOW IT WORKS */}
       <section id="how-it-works" className="shell rise rise-3 sec-hiw" style={{ position: "relative", zIndex: 1, scrollMarginTop: 90 }}>
@@ -388,7 +399,7 @@ export default async function HomeView({ programs, reviews }: { programs: Landin
             </h2>
           </div>
         </div>
-        <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(2, 1fr)" }} className="track-grid">
+        <div className="track-grid">
           {TRACKS.map((t, i) => {
             const color = COHORT_LABELS[t.cohort]?.color ?? "var(--accent)"
             const num = String(i + 1).padStart(2, "0")
@@ -491,10 +502,10 @@ export default async function HomeView({ programs, reviews }: { programs: Landin
 
       {/* CHINA SPOTLIGHT */}
       {chinaRail.length > 0 && (
-        <section className="shell rise sec-china" style={{ position: "relative", zIndex: 1 }}>
+        <section className="shell rise sec-china" style={{ position: "relative", zIndex: 1, paddingTop: 56 }}>
           <div className="card" style={{ padding: "36px 28px" }}>
             <div className="eyebrow" style={{ marginBottom: 8 }}>Now open</div>
-            <h2 style={{ margin: "0 0 14px" }}>
+            <h2 style={{ margin: "0 0 14px", fontSize: "clamp(30px, 4vw, 44px)", lineHeight: 1.08 }}>
               China, a core <span className="display-italic">Dream Islands</span> destination.
             </h2>
             <p className="body" style={{ maxWidth: 640, marginBottom: 24, color: "var(--ink-2)" }}>
@@ -508,11 +519,11 @@ export default async function HomeView({ programs, reviews }: { programs: Landin
                 <Stat key={s.sub} n={s.n} sub={s.sub} />
               ))}
             </div>
-            <div className="rail" style={{ marginBottom: 26 }}>
+            <Rail label="China programs" style={{ marginBottom: 26 }}>
               {chinaRail.map((p) => (
                 <ProgramCard key={p.id} program={p} variant="rail" />
               ))}
-            </div>
+            </Rail>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <Link href="/properties" className="btn btn-primary">
                 Explore China properties <Icon.arrow width={14} height={14} />
@@ -530,17 +541,19 @@ export default async function HomeView({ programs, reviews }: { programs: Landin
         <div className="eyebrow" style={{ marginBottom: 16, textAlign: "center" }}>
           Trusted partner properties
         </div>
-        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: 40 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: 16 }}>
           {PARTNER_LOGOS.map((p) => (
-            <div key={p.file} style={{ position: "relative", width: 140, height: 56, opacity: 0.8 }}>
-              <Image src={p.url} alt={p.name} fill sizes="140px" style={{ objectFit: "contain" }} />
+            <div key={p.file} className="partner-logo">
+              <div style={{ position: "relative", width: "100%", height: "100%" }}>
+                <Image src={p.url} alt={p.name} fill sizes="160px" style={{ objectFit: "contain", mixBlendMode: "multiply" }} />
+              </div>
             </div>
           ))}
         </div>
       </section>
 
       {/* TRACTION */}
-      <section className="shell sec-traction" style={{ position: "relative", zIndex: 1, padding: "8px 0 8px" }}>
+      <section className="shell sec-traction" style={{ position: "relative", zIndex: 1, paddingBlock: 8 }}>
         <div className="card traction-card" style={{ padding: "30px 26px" }}>
           <div className="eyebrow" style={{ marginBottom: 14 }}>Dream Islands today</div>
           <div className="traction-grid">
@@ -555,7 +568,7 @@ export default async function HomeView({ programs, reviews }: { programs: Landin
                     marginBottom: 4,
                   }}
                 >
-                  {s.n}
+                  {s.n === "{programs}" ? programs.length : s.n}
                 </div>
                 <div className="body-sm" style={{ color: "var(--ink-2)" }}>{s.sub}</div>
               </div>
@@ -587,12 +600,12 @@ export default async function HomeView({ programs, reviews }: { programs: Landin
           <div style={{ position: "absolute", top: -40, right: -40, opacity: 0.25, pointerEvents: "none" }}>
             <Icon.flower width={200} height={200} />
           </div>
-          <div className="eyebrow" style={{ color: "rgba(255,255,255,.7)" }}>
+          <div className="eyebrow" style={{ color: "rgba(20,32,27,.7)", position: "relative" }}>
             The Dream Islands promise
           </div>
           <p
             className="display"
-            style={{ fontSize: "clamp(28px, 6vw, 44px)", margin: "16px 0 10px", maxWidth: 560 }}
+            style={{ fontSize: "clamp(28px, 6vw, 44px)", margin: "16px 0 10px", maxWidth: 560, position: "relative" }}
           >
             No guesswork. A clear baseline, a matched stay, a measurable shift.
           </p>
@@ -613,7 +626,7 @@ export default async function HomeView({ programs, reviews }: { programs: Landin
               target="_blank"
               rel="noreferrer"
               className="btn"
-              style={{ background: "transparent", color: "var(--accent-ink)", marginLeft: 8, border: "1px solid rgba(255,255,255,.4)" }}
+              style={{ background: "transparent", color: "var(--accent-ink)", marginLeft: 8, border: "1px solid rgba(20,32,27,.35)" }}
             >
               Or chat now <Icon.wa width={14} height={14} />
             </a>
@@ -622,10 +635,26 @@ export default async function HomeView({ programs, reviews }: { programs: Landin
       </section>
 
       <style>{`
+        /* Tracks: 2 columns on mobile with the odd fifth card spanning the
+           row; all five in one row on desktop (was 2 columns everywhere
+           because an inline style beat the media query). */
+        .track-grid { display: grid; gap: 12px; grid-template-columns: repeat(2, 1fr); }
+        .track-grid > :last-child:nth-child(odd) { grid-column: 1 / -1; }
         @media (min-width: 900px) {
           .hero-grid { grid-template-columns: 1.1fr 1fr; align-items: center; gap: 64px; padding-top: 32px; }
           .hiw-grid  { grid-template-columns: repeat(3, 1fr); }
-          .track-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; }
+          .track-grid { grid-template-columns: repeat(5, 1fr); gap: 16px; }
+          .track-grid > :last-child:nth-child(odd) { grid-column: auto; }
+        }
+        @media (max-width: 599px) {
+          .hero-ctas > .btn { flex: 1 1 100%; }
+        }
+        .partner-logo {
+          width: 150px; height: 84px; padding: 10px 16px;
+          background: #F4F4F2; border-radius: 12px;
+        }
+        @media (max-width: 599px) {
+          .partner-logo { width: calc(50% - 8px); height: 76px; }
         }
         .traction-grid {
           display: grid;
@@ -695,7 +724,10 @@ export default async function HomeView({ programs, reviews }: { programs: Landin
         .outcome-tile { display: flex; flex-direction: column; grid-column: span 12; }
         @media (max-width: 899px) {
           .outcome-tile { grid-column: span 12 !important; }
-          .outcome-field { gap: 40px; }
+          .outcome-field { gap: 32px; }
+          /* signature art was scaling to full width (~250px tall per card) */
+          .outcome-tile .sig { width: 120px; height: 52px; max-height: 52px; }
+          .outcome-name { margin-top: 10px; }
         }
         .sig { width: 100%; height: auto; display: block; overflow: visible; }
         .sig path, .sig circle {
@@ -752,7 +784,8 @@ export default async function HomeView({ programs, reviews }: { programs: Landin
           .bda-after { text-align: left; }
           .bda-after .bda-copy { margin-left: 0; }
           .jr-bda-desktop { display: none; }
-          .jr-bda-mobile { display: block; }
+          /* the mobile route line ran straight through the stage copy */
+          .jr-bda-mobile { display: none; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -787,10 +820,12 @@ export default async function HomeView({ programs, reviews }: { programs: Landin
            item restores the original stretch-then-cap-then-center behavior
            at every breakpoint (mobile and desktop alike). */
         .page > [class*="sec-"] { width: 100%; }
+        /* Same section order on every width — mobile used to push "Programs
+           built around real outcomes" to the very end, after the reviews. */
         .sec-hero{order:10} .sec-outcomes{order:20} .sec-bda{order:30}
-        .sec-destphotos{order:40} .sec-partners{order:50} .sec-tanya{order:60}
+        .sec-programs{order:40} .sec-destphotos{order:50} .sec-tanya{order:60}
         .sec-hiw{order:70} .sec-tracks{order:80} .sec-china{order:90}
-        .sec-reviews{order:100} .sec-traction{order:110} .sec-programs{order:120}
+        .sec-partners{order:100} .sec-traction{order:110} .sec-reviews{order:120}
         .sec-quote{order:130}
 
         @media (min-width: 900px) {

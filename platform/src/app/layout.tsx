@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Script from "next/script"
+import { Belleza, DM_Sans, Roboto_Mono } from "next/font/google"
 import "./globals.css"
 
 const SITE_NAME = "Dream Islands"
@@ -30,11 +31,20 @@ export const metadata: Metadata = {
   },
 }
 
+// Brand typography: accent = Optima, base = Aeroport, mono = Roboto Mono.
+// Optima and Aeroport are not web fonts, so each gets a close Google match as
+// fallback. The variables sit on <html> so the :root type tokens can resolve
+// them (they were previously on a nested div, which left --font-body empty and
+// the whole site rendering in Times New Roman).
+const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-dmsans", display: "swap" })
+const belleza = Belleza({ subsets: ["latin"], weight: "400", variable: "--font-optima-fallback", display: "swap" })
+const robotoMono = Roboto_Mono({ subsets: ["latin"], variable: "--font-roboto-mono", display: "swap" })
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${dmSans.variable} ${belleza.variable} ${robotoMono.variable}`}>
       <body>
         <Script
           id="consent-default"

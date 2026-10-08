@@ -13,7 +13,9 @@ export default function Brand({ size = 40, href = "/" }: { size?: number; href?:
         fontSize: 22,
         letterSpacing: "-.01em",
         color: "var(--ink)",
+        whiteSpace: "nowrap",
       }}
+      className="brand-link"
     >
       <Logo size={size} style={{ color: "var(--accent)" }} />
       <span>Dream Islands</span>
