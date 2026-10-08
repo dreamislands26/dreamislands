@@ -16,3 +16,6 @@ Thumbs.db
 
 # stack-specific ignores (build output, dependencies, caches) go below.
 # create-constitution adds them once the stack is known.
+
+# Telegram chat exports: local reference only, never committed
+specs/research/Telegram Desktop/
