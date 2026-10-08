@@ -1,6 +1,6 @@
 # Roadmap
 
-> Ordered queue of Enterprise Architecture workstreams (source: `DIT_Enterprise_Scope_Dmitry.docx`, 28 Jul 2026). Priority/Status/Owner synced from Notion — "DIT Task Tracker — Q3/Q4 2026" (Enterprise Architecture epic) as of 2026-08-07.
+> Ordered queue of Enterprise Architecture workstreams (source: `research/enterprise-scope.md`, 28 Jul 2026). Priority/Status/Owner synced from Notion — "DIT Task Tracker — Q3/Q4 2026" (Enterprise Architecture epic) as of 2026-08-07.
 
 **Next free feature number: 10**
 

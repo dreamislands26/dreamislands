@@ -16,7 +16,7 @@ Claude Code = speed, hypothesis testing, MVP (Supabase). Dmitry = architecture, 
 
 ## Source of truth
 
-- Scope brief (original): `DIT_Enterprise_Scope_Dmitry.docx`
+- Scope brief (original): `specs/research/enterprise-scope.md`
 - Task tracker: Notion — "DIT Task Tracker — Q3/Q4 2026" (Enterprise Architecture epic), workspace **dit**
 
 ## Outside the SDD process

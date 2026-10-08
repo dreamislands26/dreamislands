@@ -64,4 +64,4 @@ The MVP above validates the business model. The next phase is a production-grade
 - **Investor readiness** — architecture overview, scalability assumptions, security overview, data governance, AI architecture, roadmap — for due diligence.
 
 ---
-Sources: Notion (workspace **dit**) — "Dream Islands Travel (DIT)", "Dream Islands – Product Requirements Document (PRD v1)", "Infrastructure Stack"; `DIT_Enterprise_Scope_Dmitry.docx` (28 Jul 2026); Notion — "DIT Task Tracker — Q3/Q4 2026".
+Sources: Notion (workspace **dit**) — "Dream Islands Travel (DIT)", "Dream Islands – Product Requirements Document (PRD v1)", "Infrastructure Stack"; `research/enterprise-scope.md` (28 Jul 2026); Notion — "DIT Task Tracker — Q3/Q4 2026".
