@@ -1,0 +1,91 @@
+User-agent: GPTBot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /me
+Disallow: /partner
+Disallow: /login
+Disallow: /auth/callback
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /me
+Disallow: /partner
+Disallow: /login
+Disallow: /auth/callback
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /me
+Disallow: /partner
+Disallow: /login
+Disallow: /auth/callback
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /me
+Disallow: /partner
+Disallow: /login
+Disallow: /auth/callback
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /me
+Disallow: /partner
+Disallow: /login
+Disallow: /auth/callback
+
+User-agent: Claude-Web
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /me
+Disallow: /partner
+Disallow: /login
+Disallow: /auth/callback
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /me
+Disallow: /partner
+Disallow: /login
+Disallow: /auth/callback
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /me
+Disallow: /partner
+Disallow: /login
+Disallow: /auth/callback
+
+User-agent: CCBot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /me
+Disallow: /partner
+Disallow: /login
+Disallow: /auth/callback
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /me
+Disallow: /partner
+Disallow: /login
+Disallow: /auth/callback
+
+Sitemap: https://dreamislands.org/sitemap.xml

@@ -1,0 +1,57 @@
+﻿import { headers } from "next/headers"
+import { redirect } from "next/navigation"
+import { getSessionUser } from "@/lib/auth"
+import { supabaseAdmin } from "@/lib/supabase-server"
+import HomeView from "./_components/HomeView"
+import { mapProgram, type DbProgramRow } from "./_lib/programMapping"
+import type { Review } from "./_components/ReviewsSection"
+
+export const dynamic = "force-dynamic"
+
+const PANEL_HOSTS = new Set(["panel.dreamislands.org"])
+const PUBLIC_HOSTS = new Set(["dreamislands.org", "www.dreamislands.org"])
+
+export default async function Root() {
+  const host = ((await headers()).get("host") ?? "").toLowerCase().split(":")[0]
+  const isPanel = PANEL_HOSTS.has(host)
+  const isPublic = PUBLIC_HOSTS.has(host)
+
+  const user = await getSessionUser()
+
+  if (isPanel) {
+    if (!user) redirect("/login")
+    if (user.role === "admin") redirect("/admin")
+    if (user.role === "partner") redirect("/partner")
+    // Guests live on the public site, not the staff panel.
+    redirect(`${(process.env.NEXT_PUBLIC_PUBLIC_SITE_URL ?? "").replace(/\/$/, "")}/profile`)
+  }
+
+  if (!isPublic) {
+    if (user?.role === "admin") redirect("/admin")
+    if (user?.role === "partner") redirect("/partner")
+  }
+
+  const { data: rows } = await supabaseAdmin
+    .from("programs")
+    .select(
+      "id, name, slug, summary, cohort, tier, duration_days, price_usd, outcomes, is_composite, hero_image_url, " +
+        "program_properties(role, properties(id, name, island, country, contact_wa)), " +
+        "program_variants(duration_days, duration_nights, price_basic_usd, price_vip_usd, active)",
+    )
+    .eq("active", true)
+    .eq("status", "published")
+    .order("sort_order")
+    .order("cohort")
+    .order("duration_days")
+
+  const { data: reviewRows } = await supabaseAdmin
+    .from("reviews")
+    .select("*")
+    .eq("status", "published")
+    .in("visibility", ["both", "en"])
+    .order("featured", { ascending: false })
+    .order("created_at", { ascending: false })
+
+  const programs = ((rows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
+  return <HomeView programs={programs} reviews={(reviewRows ?? []) as Review[]} />
+}
