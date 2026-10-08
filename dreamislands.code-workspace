@@ -1,0 +1,15 @@
+{
+    "folders": [
+        {
+            "name": "dreamislands",
+            "path": "."
+        },
+        {
+            "name": "BCApps",
+            "path": "../BCApps"
+        }
+    ],
+    "settings": {
+        "github.copilot.chat.codeGeneration.useInstructionFiles": true
+    }
+}
