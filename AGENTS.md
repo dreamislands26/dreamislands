@@ -7,8 +7,10 @@ Keep it under 100 lines: it is read every time, so every line costs context.
 
 Production enterprise architecture for Dream Islands Travel (DIT) on Microsoft Business Central, built alongside the live Supabase MVP (panel.dreamislands.org). Read `specs/brief.md` for the full scope.
 
-The owner is **Dmitry Katson**. Anything the specs mark as an **owner decision** is put to
-the owner. An agent never settles it alone.
+Owners, for now: **Mark Semenov** owns the brief (`specs/brief.md`,
+`specs/research/interviews/`), **Oleg** owns `platform/`, **Dmitry Katson** owns everything
+else and the repo as a whole. An **owner decision** goes to the owner of that area; an
+agent never settles it alone.
 
 ## Division of responsibility
 

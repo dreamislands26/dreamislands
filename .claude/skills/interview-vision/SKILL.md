@@ -16,8 +16,8 @@ Two things are produced, both committed:
 | `specs/research/interviews/YYYY-MM-DD-mark-vision.md` | The raw record: every question and Mark's answer, word for word |
 | `specs/brief.md` | The structured brief, built only from that record |
 
-For this skill, Mark is the owner. The line in `AGENTS.md` that names Dmitry as owner
-applies to the technical design, not to this interview.
+Mark owns the brief (see the owners in `AGENTS.md`), so in this skill he is the owner.
+Dmitry owns the technical design and the rest of the repo.
 
 ## Rules that keep the vision Mark's
 

@@ -1,0 +1,6 @@
+# Who reviews what. The last matching line wins.
+# Dmitry: the repo as a whole. Mark: the brief. Oleg: the platform.
+*                              @DmitryKatson
+/specs/brief.md                @marksemenov8
+/specs/research/interviews/    @marksemenov8
+/platform/                     @olegoonline
