@@ -19,3 +19,6 @@ Thumbs.db
 
 # Telegram chat exports: local reference only, never committed
 specs/research/Telegram Desktop/
+
+# local drop folder of the 2026-10-08 production export: leftovers only, never committed
+/DIT CODE*/

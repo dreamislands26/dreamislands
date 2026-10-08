@@ -61,7 +61,7 @@ Status legend in the inventory: 🟢 live in MVP · 🟡 partial/manual · ⚪ n
 
 **Reference sources**
 
-- **As-is platform:** live Supabase portal source in `../platform` (Next.js; public site + panel (admin/partner/me) + API routes incl. `/api/intake`; 16 SQL migrations). Input for design, *not* a migrate-as-is source.
+- **As-is platform:** live Supabase portal source in `../platform/app` (Next.js; public site + panel (admin/partner/me) + API routes incl. `/api/intake`; 16 SQL migrations). Input for design, *not* a migrate-as-is source.
 - **BC ground truth:** `/Users/Shared/BCApps` (a shared clone beside this repo, opened as the `BCApps` folder of `dreamislands.code-workspace`; not a submodule) — Microsoft's open-source repo, ~36.5k AL files. Contains **Base Application** (`src/Layers/W1/BaseApp`) plus country layers (`src/Layers/<CC>/BaseApp`), **System Application** (Email, Azure Function, Recurrence Schedule…), **Business Foundation** (No. Series, Audit Codes, Permissions), **APIV1/APIV2** apps (the standard API pages), native **Agent** apps (AgentDesignExperience, AgentSamples, SalesOrderAgent, PayablesAgent, ExpenseAgent), and W1 add-ons. All BC claims in this document should be checked here. *(The BC MCP server itself is not in this repo — it is a service-side component; verify separately.)*
 
 ---

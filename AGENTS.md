@@ -21,9 +21,11 @@ Claude Code = speed, hypothesis testing, MVP (Supabase). Dmitry = architecture, 
 
 ## Outside the SDD process
 
-`platform/` is the live website (dreamislands.org and its panel), brought in from
-`olegoonline/dit-platform`. The loop and the Rules below do not apply to it. Work there
-follows `platform/AGENTS.md` only: no specs, roadmap rows or changelog entries for it.
+`platform/` is the live website (dreamislands.org and its panel): the app in
+`platform/app/`, its tooling in `platform/tools/`, the static RU generators in
+`platform/legacy/ru/`. The loop and the Rules below do not apply to it. Work there
+follows `platform/README.md` and `platform/app/AGENTS.md` only: no specs, roadmap rows
+or changelog entries for it.
 The one rule that still holds in `platform/` is **never commit secrets**.
 
 ## Governing documents
