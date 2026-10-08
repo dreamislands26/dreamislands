@@ -2,7 +2,8 @@ import Image from "next/image"
 import Link from "next/link"
 import type { Metadata } from "next"
 import { supabaseAdmin } from "@/lib/supabase-server"
-import { mapProgram, type DbProgramRow } from "../_lib/programMapping"
+import { type DbProgramRow } from "../_lib/programMapping"
+import { mapProgramsResolved } from "../_lib/programMappingResolved"
 import ProgramCard from "../_components/ProgramCard"
 import { ReviewCard, type Review } from "../_components/ReviewsSection"
 import { Icon } from "../_components/Icon"
@@ -141,7 +142,7 @@ export default async function TanyaSamuiHub() {
     .not("slug", "like", "mile-%")
     .order("sort_order")
 
-  const programs = ((progRows ?? []).filter((row: any) => (row.program_properties ?? []).some((pp: any) => ["tanya-core","bunya-clinic","tanya-wellbeing"].includes(pp.properties?.slug))) as unknown as DbProgramRow[]).map(mapProgram)
+  const programs = await mapProgramsResolved((progRows ?? []).filter((row: any) => (row.program_properties ?? []).some((pp: any) => ["tanya-core","bunya-clinic","tanya-wellbeing"].includes(pp.properties?.slug))) as unknown as DbProgramRow[])
 
   const { data: reviewRows } = await supabaseAdmin
     .from("reviews")

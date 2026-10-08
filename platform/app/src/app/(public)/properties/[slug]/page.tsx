@@ -2,12 +2,24 @@ import Image from "next/image"
 import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
 import { supabaseAdmin } from "@/lib/supabase-server"
-import { mapProgram, type DbProgramRow } from "../../_lib/programMapping"
+import { type DbProgramRow } from "../../_lib/programMapping"
+import { mapProgramsResolved } from "../../_lib/programMappingResolved"
 import ProgramCard from "../../_components/ProgramCard"
 import ReserveModal from "../../_components/ReserveModal"
 import MediaGallery from "../../_components/MediaGallery"
 import type { Metadata } from "next"
 import { dataLayerScript } from "../../_lib/track"
+import { canonicalPathForDbSlug, MEDICAL_SITE } from "@/lib/medical-routes"
+
+function trimMeta(input: string, max = 155): string {
+  const t = input.replace(/\s+/g, " ").trim()
+  if (t.length <= max) return t
+  const cut = t.slice(0, max)
+  const i = Math.max(cut.lastIndexOf(". "), cut.lastIndexOf("; "))
+  if (i > 80) return cut.slice(0, i + 1)
+  return cut.slice(0, cut.lastIndexOf(" ")).replace(/[,;:]$/, "") + "..."
+}
+
 
 export async function generateMetadata({
   params,
@@ -17,7 +29,7 @@ export async function generateMetadata({
   const { slug } = await params
   const { data } = await supabaseAdmin
     .from("properties")
-    .select("name, island, country, description, image_url")
+    .select("name, island, country, description, image_url, translations")
     .eq("slug", slug)
     .eq("active", true)
     .maybeSingle()
@@ -32,16 +44,18 @@ export async function generateMetadata({
     image_url: string | null
   }
   const location = [row.island, row.country].filter(Boolean).join(", ")
-  const title = location ? `${row.name.trim()} - ${location}` : row.name.trim()
-  const description = row.description ?? `${row.name.trim()}, a verified wellness property on Dream Islands.`
+  const trEn = (((data as any).translations?.en) ?? {}) as { seo_title?: string; meta_description?: string }
+  const seoTitle = trEn.seo_title ? String(trEn.seo_title).replace(/\s*\|\s*Dream Islands\s*$/i, "") : null
+  const title = seoTitle ?? (location ? `${row.name.trim()} - ${location}` : row.name.trim())
+  const description = trimMeta(trEn.meta_description ?? row.description ?? `${row.name.trim()}, a verified wellness property on Dream Islands.`)
   return {
     title,
     description,
-    alternates: { canonical: `/properties/${slug}` },
+    alternates: { canonical: canonicalPathForDbSlug(slug) },
     openGraph: {
       title: `${title} | Dream Islands`,
       description,
-      url: `https://dreamislands.org/properties/${slug}`,
+      url: `${MEDICAL_SITE}${canonicalPathForDbSlug(slug)}`,
       images: row.image_url ? [{ url: row.image_url }] : undefined,
     },
     twitter: {
@@ -89,7 +103,7 @@ export default async function PropertyDetailPage({
 
   const { data: property } = await supabaseAdmin
     .from("properties")
-    .select("id, name, slug, island, country, cohort_tags, certified, description, image_url, contact_wa, active")
+    .select("id, name, slug, island, country, cohort_tags, certified, description, image_url, contact_wa, active, translations, entity_type")
     .eq("slug", slug)
     .eq("active", true)
     .maybeSingle()
@@ -108,11 +122,11 @@ export default async function PropertyDetailPage({
     .eq("program_properties.property_id", property.id)
     .order("sort_order")
 
-  const programs = ((progRows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
+  const programs = await mapProgramsResolved((progRows ?? []) as unknown as DbProgramRow[])
 
   const { data: mediaRows } = await supabaseAdmin
     .from("media_assets")
-    .select("public_url, alt_ru, title_ru, asset_type, is_featured, sort_order")
+    .select("public_url, alt_en, alt_ru, title_ru, asset_type, is_featured, sort_order")
     .eq("property_id", property.id)
     .eq("active", true)
     .eq("asset_type", "gallery")
@@ -120,24 +134,30 @@ export default async function PropertyDetailPage({
 
   const galleryImages = ((mediaRows ?? []) as unknown as Array<{
     public_url: string
-    alt_ru: string | null
+    alt_en?: string | null; alt_ru: string | null
     title_ru: string | null
   }>)
     .filter((m) => m.public_url && m.public_url.startsWith("http"))
-    .map((m) => ({ url: m.public_url, alt: m.alt_ru || m.title_ru || property.name.trim() }))
+    .map((m) => ({ url: m.public_url, alt: m.alt_en || m.alt_ru || m.title_ru || property.name.trim() }))
 
+  const isMedicalProp = ((property as any).entity_type === "hospital_clinic") || ((property as any).entity_type === "network_coordinator")
   const flag = property.country ? (COUNTRY_FLAGS[property.country] ?? "") : ""
   const waHref = property.contact_wa
     ? `https://wa.me/${property.contact_wa.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hi! I'd like to know more about ${property.name.trim()}.`)}`
     : "https://wa.me/message/HOF2AFIBDYY5J1"
 
+  const videos: { youtube_id: string; title_en?: string }[] = Array.isArray((property as any).translations?.videos)
+    ? (property as any).translations.videos
+    : []
+
+  const jsonLdType = (property as any).entity_type === "hospital_clinic" ? "Hospital" : (property as any).entity_type === "network_coordinator" ? "Organization" : "LodgingBusiness"
   const propertyJsonLd = {
     "@context": "https://schema.org",
-    "@type": "LodgingBusiness",
+    "@type": jsonLdType,
     name: property.name.trim(),
     description: property.description ?? undefined,
     image: property.image_url ?? undefined,
-    url: `https://dreamislands.org/properties/${property.slug}`,
+    url: `${MEDICAL_SITE}${canonicalPathForDbSlug(property.slug)}`,
     address: {
       "@type": "PostalAddress",
       addressLocality: property.island ?? undefined,
@@ -148,6 +168,25 @@ export default async function PropertyDetailPage({
   return (
     <div className="page" style={{ paddingBottom: 100 }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(propertyJsonLd) }} />
+      {videos.map((v) => (
+        <script
+          key={"vo-" + v.youtube_id}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "VideoObject",
+              name: `${v.title_en ?? property.name.trim()} | ${property.name.trim()}`,
+              description: `${v.title_en ?? "Video"} at ${property.name.trim()}${property.island ? ", " + property.island : ""}${property.country ? ", " + property.country : ""}.`,
+              thumbnailUrl: [`https://i.ytimg.com/vi/${v.youtube_id}/hqdefault.jpg`],
+              uploadDate: "2026-10-06T00:00:00+00:00",
+              contentUrl: `https://youtu.be/${v.youtube_id}`,
+              embedUrl: `https://www.youtube.com/embed/${v.youtube_id}`,
+              publisher: { "@type": "Organization", name: "Dream Islands", url: "https://dreamislands.org" },
+            }),
+          }}
+        />
+      ))}
       {slug === "mile-wellness-resort" && (
         <script
           type="application/ld+json"
@@ -215,6 +254,20 @@ export default async function PropertyDetailPage({
         )}
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 48 }}>
+          {isMedicalProp && programs.length === 0 && (
+            <ReserveModal
+              programs={[{
+                id: "",
+                name: `Case review - ${property.name.trim()}`,
+                property_id: property.id,
+                property_name: property.name,
+                destination_country: property.country ?? undefined,
+                case_mode: true,
+              }]}
+              triggerLabel="Submit Your Case"
+              triggerClassName="btn btn-primary"
+            />
+          )}
           {programs.length > 0 && (
             <ReserveModal
               programs={programs.map((p) => ({
@@ -223,8 +276,9 @@ export default async function PropertyDetailPage({
                 property_id: property.id,
                 property_name: property.name,
                 destination_country: property.country ?? undefined,
+                case_mode: isMedicalProp,
               }))}
-              triggerLabel="Reserve a program here"
+              triggerLabel={isMedicalProp ? "Submit Your Case" : "Reserve a program here"}
               triggerClassName="btn btn-primary"
             />
           )}
@@ -250,6 +304,29 @@ export default async function PropertyDetailPage({
           </div>
         )}
 
+        {videos.length > 0 && (
+          <div style={{ margin: "40px 0" }}>
+            <h2 style={{ fontSize: 22, marginBottom: 16 }}>Watch</h2>
+            <div style={{ display: "grid", gap: 16, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
+              {videos.map((v) => (
+                <div key={v.youtube_id}>
+                  <div style={{ position: "relative", paddingBottom: "56.25%", height: 0, overflow: "hidden", borderRadius: 14 }}>
+                    <iframe
+                      src={`https://www.youtube.com/embed/${v.youtube_id}`}
+                      title={v.title_en ?? property.name.trim()}
+                      loading="lazy"
+                      style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: 0 }}
+                      allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    />
+                  </div>
+                  <div style={{ fontSize: 14, marginTop: 8 }}>{v.title_en}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="section-head">
           <div>
             <div className="eyebrow" style={{ marginBottom: 8 }}>
@@ -266,7 +343,7 @@ export default async function PropertyDetailPage({
             ))}
           </div>
         ) : (
-          <p className="body">No published programs at this property yet.</p>
+          <p className="body">{isMedicalProp ? "Submit your case: our team reviews it, recommends the suitable provider and programme, and confirms scope and price before any booking." : "No published programs at this property yet."}</p>
         )}
       </section>
     </div>

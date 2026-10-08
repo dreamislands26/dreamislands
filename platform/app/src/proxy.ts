@@ -28,6 +28,8 @@ const PUBLIC_PATHS = [
   "/wellness-baseline-score",
   "/how-wbs-works",
   "/destinations",
+  "/medical",
+  "/sitemap.xml",
 ]
 
 const PANEL_HOSTS = new Set(["panel.dreamislands.org"])
@@ -58,6 +60,8 @@ const PUBLIC_HOST_ALLOWED = [
   "/wellness-baseline-score",
   "/how-wbs-works",
   "/destinations",
+  "/medical",
+  "/sitemap.xml",
 ]
 
 const PANEL_HOST_ALLOWED = [

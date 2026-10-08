@@ -9,6 +9,7 @@ type ReserveProgram = {
   property_id?: string
   property_name?: string
   destination_country?: string
+  case_mode?: boolean
 }
 type Variant = {
   id: string
@@ -46,6 +47,7 @@ export default function ReserveModal({
   const [contact, setContact] = useState("")
   const [arrival, setArrival] = useState("")
   const [pax, setPax] = useState(1)
+  const [caseSummary, setCaseSummary] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [requestSubmitted, setRequestSubmitted] = useState(false)
@@ -93,8 +95,9 @@ export default function ReserveModal({
   // Two explicit states, driven purely by whether the program has an active,
   // priced variant — never a manual toggle. Checkout activates automatically
   // the moment a variant gets a valid duration + price_basic_thb.
-  const isPriced = variantsLoaded && variants.length > 0
-  const isUnpriced = variantsLoaded && variants.length === 0
+  const caseMode = !!selectedProgramMeta?.case_mode
+  const isPriced = !caseMode && variantsLoaded && variants.length > 0
+  const isUnpriced = caseMode || (variantsLoaded && variants.length === 0)
   const fullPrice = selectedVariant?.price_basic_thb ?? null
   const depositAmount = fullPrice != null ? Math.round(fullPrice * (DEPOSIT_PCT / 100)) : null
   const remainingBalance = fullPrice != null && depositAmount != null ? fullPrice - depositAmount : null
@@ -128,18 +131,19 @@ export default function ReserveModal({
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!programId) { setError("Pick a program"); return }
+    if (!programId && !caseMode) { setError("Pick a program"); return }
     if (isPriced && !variantId) { setError("Pick a program length"); return }
     if (!name.trim()) { setError("Enter your name"); return }
     if (!contact.trim()) { setError("Enter an email or WhatsApp number"); return }
-    if (!arrival) { setError("Pick an arrival date"); return }
+    if (!arrival && !caseMode) { setError("Pick an arrival date"); return }
+    if (caseMode && caseSummary.trim().length < 10) { setError("Please describe your case in a few sentences"); return }
     setSubmitting(true)
     setError(null)
     try {
       const isEmail = contact.includes("@")
       const attribution = getAttribution()
       const sharedFields = {
-        program_id: programId,
+        program_id: programId || undefined,
         arrival,
         pax,
         guest_name: name,
@@ -161,6 +165,8 @@ export default function ReserveModal({
         : {
             ...sharedFields,
             source_page: typeof window !== "undefined" ? window.location.pathname : undefined,
+            request_type: caseMode ? "medical_case" : undefined,
+            case_summary: caseMode ? caseSummary.trim() : undefined,
           }
       const res = await fetch("/api/bookings/public", {
         method: "POST",
@@ -242,7 +248,7 @@ export default function ReserveModal({
                 marginBottom: 16,
               }}
             >
-              <div className="eyebrow">{isUnpriced ? "Request availability" : "Reserve dates"}</div>
+              <div className="eyebrow">{caseMode ? "Submit your case" : isUnpriced ? "Request availability" : "Reserve dates"}</div>
               <button
                 type="button"
                 onClick={close}
@@ -273,8 +279,7 @@ export default function ReserveModal({
                   }}
                 >
                   Thanks{name ? `, ${name}` : ""} — we've received your request for{" "}
-                  <strong>{selectedProgramName}</strong>. We don't have live pricing for these dates yet;
-                  our team will follow up by email or WhatsApp with availability and pricing shortly.
+                  <strong>{selectedProgramName}</strong>. {caseMode ? "Our case-review team will contact you by email or WhatsApp to confirm a suitable programme and its cost before any booking. No payment is taken now." : "We don't have live pricing for these dates yet; our team will follow up by email or WhatsApp with availability and pricing shortly."}
                 </div>
                 <button type="button" className="btn btn-primary btn-block" onClick={close}>
                   Close
@@ -307,8 +312,7 @@ export default function ReserveModal({
                       lineHeight: 1.5,
                     }}
                   >
-                    We don't have live pricing for this program yet. Tell us your dates and we'll get back
-                    to you with availability and pricing — no payment needed now.
+                    {caseMode ? "Tell us briefly about your case. Our team reviews it, confirms a suitable programme and cost, and only then proceeds to booking. No payment is taken now." : "We don't have live pricing for this program yet. Tell us your dates and we'll get back to you with availability and pricing — no payment needed now."}
                   </div>
                 )}
                 {!isUnpriced && (
@@ -353,8 +357,8 @@ export default function ReserveModal({
                   <input className="field" type="text" value={contact} onChange={(e) => setContact(e.target.value)} required />
                 </label>
                 <label>
-                  <div className="eyebrow" style={{ marginBottom: 6 }}>Arrival</div>
-                  <input className="field" type="date" value={arrival} min={today} onChange={(e) => setArrival(e.target.value)} required />
+                  <div className="eyebrow" style={{ marginBottom: 6 }}>{caseMode ? "Preferred arrival (optional)" : "Arrival"}</div>
+                  <input className="field" type="date" value={arrival} min={today} onChange={(e) => setArrival(e.target.value)} required={!caseMode} />
                 </label>
                 <label>
                   <div className="eyebrow" style={{ marginBottom: 6 }}>Guests</div>
@@ -368,6 +372,20 @@ export default function ReserveModal({
                     required
                   />
                 </label>
+                {caseMode && (
+                  <label>
+                    <div className="eyebrow" style={{ marginBottom: 6 }}>Your case</div>
+                    <textarea
+                      className="field"
+                      rows={5}
+                      maxLength={4000}
+                      value={caseSummary}
+                      onChange={(e) => setCaseSummary(e.target.value)}
+                      placeholder="What you need (consultation, second opinion, examination, surgery), main diagnosis or symptoms, preferred city or hospital, languages. Please do not include passport or ID numbers."
+                      required
+                    />
+                  </label>
+                )}
                 {isPriced && selectedVariant && fullPrice != null && depositAmount != null && remainingBalance != null && (
                   <div
                     style={{
@@ -426,7 +444,7 @@ export default function ReserveModal({
                   </>
                 ) : (
                   <button type="submit" className="btn btn-primary btn-block btn-lg" disabled={submitting || loadingVariants}>
-                    {submitting ? "Sending…" : "Request availability and pricing"}
+                    {submitting ? "Sending…" : (caseMode ? "Submit Your Case" : "Request availability and pricing")}
                   </button>
                 )}
                 <button type="button" className="btn btn-ghost btn-block" onClick={close}>Cancel</button>

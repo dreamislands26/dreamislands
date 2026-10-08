@@ -4,22 +4,17 @@ import { supabaseAdmin } from "@/lib/supabase-server"
 import Brand from "./Brand"
 import { Icon } from "./Icon"
 import { TRACKS } from "../_lib/programMapping"
-import { countryFromSlug, countrySlug } from "../_lib/countries"
-
-// Partners and staff sign in on the panel host, not the public site.
-const PANEL_LOGIN_URL = `${(process.env.NEXT_PUBLIC_PANEL_SITE_URL || "https://panel.dreamislands.org").replace(/\/$/, "")}/login`
 
 const COMPANY_LINKS = [
   { href: "/about", label: "About" },
   { href: "/start", label: "Get your WS" },
   { href: "mailto:hello@dreamislands.org", label: "Press kit", external: true },
-  { href: PANEL_LOGIN_URL, label: "Partner login", external: true },
 ]
 const CONTACT_LINKS = [
   { href: "https://wa.me/message/HOF2AFIBDYY5J1", label: "WhatsApp consult", external: true },
   { href: "mailto:hello@dreamislands.org", label: "hello@dreamislands.org", external: true },
   { href: "https://www.instagram.com/dreamislands_travel/", label: "Instagram", external: true },
-  { href: "https://t.me/+66811612662", label: "Telegram", external: true },
+  { href: "https://t.me/", label: "Telegram", external: true },
 ]
 const SOCIAL_LINKS = [
   { href: "https://www.instagram.com/dreamislands_travel/", label: "Instagram", icon: Icon.instagram },
@@ -64,7 +59,7 @@ export default async function Footer() {
     { href: "/properties", label: "Destinations" },
     { href: "/properties", label: "Properties" },
     { href: "/programs", label: "Programs" },
-    { href: "/#outcomes", label: "Key Outcomes" },
+    { href: "/#tracks", label: "Key Outcomes" },
     { href: "/guides/burnout-recovery-retreats-southeast-asia", label: "Burnout Recovery Guide" },
     { href: "/guides/sleep-reset-retreats-asia", label: "Sleep Reset Guide" },
     { href: "/guides/anxiety-stress-recovery-retreats-asia", label: "Anxiety & Stress Guide" },
@@ -76,7 +71,6 @@ export default async function Footer() {
     { href: "/guides/mile-yunnan-wellness-guide", label: "Mile, Yunnan Guide" },
     { href: "/guides/boracay-wellness-guide", label: "Boracay Guide" },
     { href: "/partners", label: "Partnership / B2B / MICE" },
-    { href: "/for-properties", label: "For Wellness Properties" },
   ]
 
   return (
@@ -133,7 +127,7 @@ export default async function Footer() {
           {countries.map((c) => (
             <Link
               key={c}
-              href={countryFromSlug(countrySlug(c)) ? `/destinations/${countrySlug(c)}` : "/destinations"}
+              href="/properties"
               style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "var(--ink-2)", fontSize: 14 }}
               className="footer-link"
             >
@@ -170,7 +164,16 @@ export default async function Footer() {
           </div>
           <div>
             <div style={{ fontWeight: 600, color: "var(--ink-2)", marginBottom: 8 }}>Contacts</div>
-            <div className="body-sm" style={{ marginBottom: 4 }}>AI assistant, 24/7</div>
+            <div className="body-sm" style={{ marginBottom: 4 }}>
+              <a
+                href="https://app.cura.so/chat/kn70gxkd9bph2tb4gvff3h710586z991"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-link"
+              >
+                Talk to agent
+              </a>
+            </div>
             <div className="body-sm" style={{ marginBottom: 4 }}>
               WhatsApp / Telegram{" "}
               <a href="https://wa.me/66811612662" target="_blank" rel="noreferrer" className="footer-link">
@@ -188,7 +191,7 @@ export default async function Footer() {
           <span>© {new Date().getFullYear()} Dream Islands Travel · WS v1</span>
           <span style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--ink-3)", fontSize: 12 }}>
             Secure payments powered by
-            <Image src="/stripe-logo.png" alt="Stripe" width={60} height={20} style={{ height: 20, width: "auto", borderRadius: 4 }} />
+            <Image src="/stripe-logo.png" alt="Stripe" width={60} height={16} style={{ height: 16, width: "auto" }} />
           </span>
         </div>
         <div style={{ display: "flex", gap: 18, flexWrap: "wrap" }}>

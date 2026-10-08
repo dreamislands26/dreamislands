@@ -96,6 +96,7 @@ export type LandingProgram = {
   flag: string
   country: string | null
   hero_image_url: string | null
+  heroSource?: "own" | "property" | "destination" | "global"
   contact_wa: string | null
 }
 

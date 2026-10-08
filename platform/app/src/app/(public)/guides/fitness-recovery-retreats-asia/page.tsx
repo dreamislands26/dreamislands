@@ -1,7 +1,8 @@
 import Link from "next/link"
 import type { Metadata } from "next"
 import { supabaseAdmin } from "@/lib/supabase-server"
-import { mapProgram, type DbProgramRow } from "../../_lib/programMapping"
+import { type DbProgramRow } from "../../_lib/programMapping"
+import { mapProgramsResolved } from "../../_lib/programMappingResolved"
 import ProgramCard from "../../_components/ProgramCard"
 export const dynamic = "force-dynamic"
 export const metadata: Metadata = {
@@ -119,7 +120,7 @@ export default async function RebuildYourBodyGuidePage() {
         .order("cohort")
         .order("duration_days")
     : { data: [] as DbProgramRow[] }
-  const orderedPrograms = ((rows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
+  const orderedPrograms = await mapProgramsResolved((rows ?? []) as unknown as DbProgramRow[])
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",

@@ -284,7 +284,14 @@ function MatchedCard({
       <div style={{ padding: "18px 18px 20px", display: "flex", flexDirection: "column", gap: 12, flex: 1 }}>
         <div>
           <h3 style={{ margin: "0 0 6px", fontSize: 18, fontWeight: 600, color: "var(--ink)" }}>{p.name}</h3>
-          {p.summary && <p className="body-sm" style={{ margin: 0, color: "var(--ink-2)" }}>{p.summary}</p>}
+          {p.summary && (
+            <p
+              className="body-sm"
+              style={{ margin: 0, color: "var(--ink-2)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}
+            >
+              {p.summary}
+            </p>
+          )}
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span className="body-sm">{p.duration_days} days</span>

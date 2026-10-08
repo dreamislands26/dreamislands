@@ -1,9 +1,22 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { supabaseAdmin } from "@/lib/supabase-server"
-import { mapProgram, type DbProgramRow } from "../../_lib/programMapping"
+import { type DbProgramRow } from "../../_lib/programMapping"
+import { mapProgramsResolved } from "../../_lib/programMappingResolved"
 import ProgramCard from "../../_components/ProgramCard"
-import { COUNTRY_FLAGS, countryFromSlug } from "../../_lib/countries"
+import { COUNTRY_FLAGS } from "../../_lib/countries"
+import { supabasePublic } from "@/lib/supabase-public"
+
+// destination_countries is the source of truth for which countries exist and for their slugs.
+async function countryFromDb(slug: string): Promise<string | null> {
+  const { data } = await supabasePublic
+    .from("destination_countries")
+    .select("country")
+    .eq("slug", slug.toLowerCase())
+    .eq("active", true)
+    .maybeSingle()
+  return (data?.country as string | undefined) ?? null
+}
 import type { Metadata } from "next"
 import { dataLayerScript } from "../../_lib/track"
 
@@ -13,7 +26,7 @@ export async function generateMetadata({
   params: Promise<{ country: string }>
 }): Promise<Metadata> {
   const { country: slug } = await params
-  const country = countryFromSlug(slug)
+  const country = await countryFromDb(slug)
   if (country == null) {
     return { title: "Destination not found" }
   }
@@ -48,20 +61,30 @@ export default async function DestinationCountryPage({
   params: Promise<{ country: string }>
 }) {
   const { country: slug } = await params
-  const country = countryFromSlug(slug)
+  const country = await countryFromDb(slug)
   if (country == null) {
     notFound()
   }
 
-  const { data: propRows } = await supabaseAdmin
+  // Properties block = wellness properties only. Clinics (hospital_clinic) are a separate entity type.
+  const { data: propRows } = await supabasePublic
     .from("properties")
     .select("id, name, slug, island, description, certified")
     .eq("active", true)
+    .eq("entity_type", "wellness_property")
     .eq("country", country)
     .neq("name", "")
     .order("name")
 
   const properties = (propRows ?? []) as PropertyRow[]
+
+  const { count: clinicCountRaw } = await supabasePublic
+    .from("properties")
+    .select("id", { count: "exact", head: true })
+    .eq("active", true)
+    .eq("entity_type", "hospital_clinic")
+    .eq("country", country)
+  const clinicCount = clinicCountRaw ?? 0
 
   const { data: progRows } = await supabaseAdmin
     .from("programs")
@@ -75,7 +98,7 @@ export default async function DestinationCountryPage({
     .eq("status", "published")
     .order("sort_order")
 
-  const allPrograms = ((progRows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
+  const allPrograms = await mapProgramsResolved((progRows ?? []) as unknown as DbProgramRow[])
   const programs = allPrograms.filter((p) => p.country === country)
 
   const jsonLd = {
@@ -138,6 +161,13 @@ export default async function DestinationCountryPage({
             </Link>
           ))}
         </div>
+
+        {country === "China" && clinicCount > 0 && (
+          <p className="body-sm" style={{ marginBottom: 48 }}>
+            {clinicCount} partner {clinicCount === 1 ? "hospital" : "hospitals"} in China:{" "}
+            <Link href="/medical/china" style={{ color: "inherit", textDecoration: "underline" }}>Medical in China</Link>
+          </p>
+        )}
 
         {programs.length > 0 && (
           <>

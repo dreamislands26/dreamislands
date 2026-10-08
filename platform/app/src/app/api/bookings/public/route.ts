@@ -29,6 +29,9 @@ type PublicBookingPayload = {
   // Availability/pricing-request fallback contract (ReserveModal.tsx, no
   // priced variant available — variant_id absent, guest_name present)
   source_page?: string
+  // Medical case intake (ReserveModal case mode): no checkout, no program required
+  request_type?: string
+  case_summary?: string
 }
 
 const cors = {
@@ -79,6 +82,11 @@ export async function POST(req: Request) {
   // New deposit-checkout flow (ReserveModal.tsx sends variant_id) — takes priority.
   if (body.variant_id) {
     return handleDepositCheckout(req, body)
+  }
+
+  // Medical case intake (Submit Your Case) - must come before the availability fallback.
+  if (!body.user_id && body.request_type === "medical_case") {
+    return handleMedicalCase(req, body)
   }
 
   // Availability/pricing-request fallback (ReserveModal.tsx, program has no
@@ -459,6 +467,142 @@ async function handleAvailabilityRequest(req: Request, body: PublicBookingPayloa
     pax,
     sourcePage: body.source_page ?? null,
   })
+
+  return NextResponse.json({ success: true, booking: { id: booking.id } }, { headers: cors })
+}
+
+function escHtml(v: string): string {
+  return v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+}
+
+// Medical case intake: stores the case durably, takes no payment, never opens checkout.
+// The free-text case description is kept ONLY in bookings.inquiry_context (not e-mailed).
+async function handleMedicalCase(req: Request, body: PublicBookingPayload) {
+  const programId = (body.program_id ?? "").trim() || null
+  const propertyId = (body.property_id ?? "").trim() || null
+  const guestName = (body.guest_name ?? "").trim()
+  const guestEmail = (body.guest_email ?? "").trim() || null
+  const guestWhatsapp = (body.guest_whatsapp ?? "").trim() || null
+  const caseSummary = (body.case_summary ?? "").trim()
+  const arrival = (body.arrival ?? "").trim()
+  const pax = Number(body.pax ?? 1)
+
+  if (!guestName) return bad("guest_name required")
+  if (!guestEmail && !guestWhatsapp) return bad("guest_email or guest_whatsapp required")
+  if (caseSummary.length < 10) return bad("case_summary required")
+  if (caseSummary.length > 4000) return bad("case_summary too long")
+  if (arrival && !ISO_DATE.test(arrival)) return bad("arrival must be YYYY-MM-DD")
+  if (!Number.isInteger(pax) || pax < 1 || pax > 20) return bad("pax must be 1-20")
+
+  let programName: string | null = null
+  if (programId) {
+    const { data: program } = await supabaseAdmin
+      .from("programs")
+      .select("id, name, active")
+      .eq("id", programId)
+      .maybeSingle()
+    if (!program || !program.active) return bad("unknown or inactive program_id", 404)
+    programName = program.name
+  }
+  let propertyName: string | null = body.property_name ?? null
+  if (propertyId) {
+    const { data: prop } = await supabaseAdmin
+      .from("properties")
+      .select("id, name, active")
+      .eq("id", propertyId)
+      .maybeSingle()
+    if (!prop || !prop.active) return bad("unknown or inactive property_id", 404)
+    propertyName = prop.name
+  }
+
+  const { data: guestUser, error: guestErr } = await supabaseAdmin
+    .from("users")
+    .insert({
+      name: guestName,
+      email: guestEmail,
+      whatsapp: guestWhatsapp,
+      country: body.destination_country ?? null,
+      source: "website_medical_case",
+    })
+    .select("id")
+    .single()
+  if (guestErr || !guestUser) return bad(guestErr?.message ?? "could not create guest record")
+
+  const inquiryContext = {
+    kind: "medical_case",
+    status_note: "case_review_pending",
+    case_summary: caseSummary,
+    program_id: programId,
+    program_name: programName,
+    property_id: propertyId,
+    property_name: propertyName,
+    destination_country: body.destination_country ?? null,
+    source_page: body.source_page ?? null,
+    guest_contact: { email: guestEmail, whatsapp: guestWhatsapp },
+    attribution: {
+      market_country: body.market_country ?? null,
+      traffic_channel: body.traffic_channel ?? null,
+      utm_source: body.utm_source ?? null,
+      utm_medium: body.utm_medium ?? null,
+      utm_campaign: body.utm_campaign ?? null,
+      ga_client_id: body.ga_client_id ?? null,
+      session_id: body.session_id ?? null,
+    },
+  }
+
+  const { data: booking, error: bookingErr } = await supabaseAdmin
+    .from("bookings")
+    .insert({
+      user_id: guestUser.id,
+      program_id: programId,
+      arrival: arrival || null,
+      pax,
+      status: "inquiry",
+      payment_status: "unpaid",
+      source: "website_medical_case",
+      inquiry_context: inquiryContext,
+    })
+    .select("id")
+    .single()
+  if (bookingErr || !booking) return bad(bookingErr?.message ?? "could not create booking")
+
+  logFunnelEvent({
+    event_name: "medical_case_submitted",
+    ga_client_id: body.ga_client_id || null,
+    session_id: body.session_id || null,
+    user_id: guestUser.id,
+    booking_id: booking.id,
+    market_country: body.market_country || null,
+    destination_country: body.destination_country || null,
+    property_id: propertyId,
+    program_id: programId,
+    utm_source: body.utm_source || null,
+    utm_medium: body.utm_medium || null,
+    utm_campaign: body.utm_campaign || null,
+    traffic_channel: body.traffic_channel || null,
+  })
+
+  void (async () => {
+    try {
+      const origin = new URL(req.url).origin
+      const partnerEmails = propertyId ? await partnerEmailsForProperties([propertyId]) : []
+      const recipients = Array.from(new Set([...adminInbox(), ...partnerEmails]))
+      if (recipients.length === 0) return
+      const subject = `New medical case: ${programName ?? propertyName ?? "general"}`
+      const html =
+        `<p>New medical case submitted on the website.</p>` +
+        `<p><strong>Guest:</strong> ${escHtml(guestName)}<br/>` +
+        `<strong>Contact:</strong> ${escHtml(guestEmail ?? guestWhatsapp ?? "")}<br/>` +
+        `<strong>Provider/page:</strong> ${escHtml(propertyName ?? "-")}<br/>` +
+        `<strong>Program:</strong> ${escHtml(programName ?? "not selected (case review decides)")}<br/>` +
+        `<strong>Source page:</strong> ${escHtml(body.source_page ?? "-")}</p>` +
+        `<p>The case description is stored in the admin panel only: <a href="${origin}/admin/bookings">${origin}/admin/bookings</a></p>`
+      const text = `New medical case from ${guestName} (${guestEmail ?? guestWhatsapp ?? ""}). Provider: ${propertyName ?? "-"}. Open ${origin}/admin/bookings to review.`
+      await sendEmail({ to: recipients, subject, html, text, tag: "medical_case" } as any)
+    } catch (err) {
+      console.error("[handleMedicalCase] notify failed:", err)
+    }
+  })()
 
   return NextResponse.json({ success: true, booking: { id: booking.id } }, { headers: cors })
 }

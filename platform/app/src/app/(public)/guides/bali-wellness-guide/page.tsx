@@ -1,7 +1,8 @@
 import Link from "next/link"
 import type { Metadata } from "next"
 import { supabaseAdmin } from "@/lib/supabase-server"
-import { mapProgram, type DbProgramRow } from "../../_lib/programMapping"
+import { type DbProgramRow } from "../../_lib/programMapping"
+import { mapProgramsResolved } from "../../_lib/programMappingResolved"
 import ProgramCard from "../../_components/ProgramCard"
 
 export const dynamic = "force-dynamic"
@@ -121,7 +122,7 @@ export default async function BaliDestinationGuidePage() {
     .eq("active", true)
     .eq("status", "published")
 
-  const programs = ((rows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
+  const programs = await mapProgramsResolved((rows ?? []) as unknown as DbProgramRow[])
   const bySlug = new Map(programs.map((p) => [p.slug, p]))
   const udaraPrograms = UDARA_SLUGS.map((s) => bySlug.get(s)).filter((p): p is NonNullable<typeof p> => !!p)
   const mokkaPrograms = MOKKA_SLUGS.map((s) => bySlug.get(s)).filter((p): p is NonNullable<typeof p> => !!p)

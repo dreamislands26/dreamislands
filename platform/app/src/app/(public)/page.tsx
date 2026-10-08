@@ -3,7 +3,9 @@ import { redirect } from "next/navigation"
 import { getSessionUser } from "@/lib/auth"
 import { supabaseAdmin } from "@/lib/supabase-server"
 import HomeView from "./_components/HomeView"
-import { mapProgram, type DbProgramRow } from "./_lib/programMapping"
+import { getCatalogStats } from "@/lib/stats"
+import { type DbProgramRow } from "./_lib/programMapping"
+import { mapProgramsResolved } from "./_lib/programMappingResolved"
 import type { Review } from "./_components/ReviewsSection"
 
 export const dynamic = "force-dynamic"
@@ -52,6 +54,7 @@ export default async function Root() {
     .order("featured", { ascending: false })
     .order("created_at", { ascending: false })
 
-  const programs = ((rows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
-  return <HomeView programs={programs} reviews={(reviewRows ?? []) as Review[]} />
+  const programs = await mapProgramsResolved((rows ?? []) as unknown as DbProgramRow[])
+  const stats = await getCatalogStats()
+  return <HomeView programs={programs} reviews={(reviewRows ?? []) as Review[]} stats={stats} />
 }

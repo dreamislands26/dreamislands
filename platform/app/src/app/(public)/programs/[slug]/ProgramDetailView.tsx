@@ -13,6 +13,7 @@ type Property = {
   island: string | null
   country: string | null
   contact_wa: string | null
+  entity_type?: string | null
 }
 type Variant = {
   id: string
@@ -160,9 +161,12 @@ export default function ProgramDetailView({
   const cohort = COHORT_LABELS[program.cohort] ?? { name: "Reset", fullName: "Reset & Recovery", color: "var(--accent)" }
   const properties = program.program_properties.map((pp) => pp.properties).filter(Boolean)
   const primaryProperty = properties[0] ?? null
+  const isMedical = properties.some(
+    (p) => !!p && (p.entity_type === "hospital_clinic" || p.entity_type === "network_coordinator"),
+  )
   const firstWa = properties.find((p) => p?.contact_wa)?.contact_wa ?? null
   const waHref = firstWa
-    ? `https://wa.me/${firstWa.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hi! I'd like to book "${program.name}".`)}`
+    ? `https://wa.me/${firstWa.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(isMedical ? `Hi! I have a question about "${program.name}" before submitting my case.` : `Hi! I'd like to book "${program.name}".`)}`
     : "https://wa.me/message/HOF2AFIBDYY5J1"
   const variants = useMemo(
     () => program.program_variants.filter((v) => v.active).sort((a, b) => a.sort_order - b.sort_order),
@@ -266,10 +270,10 @@ export default function ProgramDetailView({
         <div style={{ display: "grid", gap: 28 }} className="detail-hero">
           <div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 16 }}>
-              <span className="tag" style={{ background: cohort.color, color: "white" }}>
+              {isMedical ? (<span className="tag" style={{ background: "var(--accent-deep)", color: "white" }}>Medical coordination</span>) : (<span className="tag" style={{ background: cohort.color, color: "white" }}>
                 {cohort.fullName}
-              </span>
-              {program.tier && <span className="tag tag-outline">{program.tier}</span>}
+              </span>)}
+              {program.tier && !isMedical && <span className="tag tag-outline">{program.tier}</span>}
               {program.is_composite && (
                 <span className="tag" style={{ background: "var(--accent-soft)", color: "var(--accent-deep)" }}>
                   Composite
@@ -300,12 +304,13 @@ export default function ProgramDetailView({
                   property_id: primaryProperty?.id,
                   property_name: primaryProperty?.name,
                   destination_country: primaryProperty?.country ?? undefined,
+                case_mode: isMedical,
                 }]}
-                triggerLabel="Reserve dates"
+                triggerLabel={isMedical ? "Submit Your Case" : "Reserve dates"}
                 triggerClassName="btn btn-primary btn-lg"
               />
               <a className="btn btn-ghost btn-lg" href={waHref} target="_blank" rel="noreferrer">
-                <Icon.wa width={16} height={16} /> Book on WhatsApp
+                <Icon.wa width={16} height={16} /> {isMedical ? "Ask a coordinator on WhatsApp" : "Book on WhatsApp"}
               </a>
               <Link className="btn btn-ghost btn-lg" href="/start">
                 Take the assessment
@@ -377,7 +382,7 @@ export default function ProgramDetailView({
                     style={{ padding: 22, display: "flex", flexDirection: "column", gap: 6 }}
                   >
                     <div style={{ fontWeight: 600, fontSize: 16, color: "var(--ink)" }}>{v.label}</div>
-                    <div className="body-sm">{v.duration_days} days · {v.duration_nights} nights</div>
+                    {!isMedical && (<div className="body-sm">{v.duration_days} days · {v.duration_nights} nights</div>)}
                     <div
                       style={{
                         fontFamily: "var(--font-display)",
@@ -494,10 +499,10 @@ export default function ProgramDetailView({
         {optional.length > 0 && (
           <div style={{ marginBottom: 40 }}>
             <h2 style={{ margin: "0 0 8px", fontFamily: "var(--font-display)", fontSize: 32, fontWeight: 400, color: "var(--ink)" }}>
-              Optional upgrades
+              {isMedical ? "Optional medical services & add-ons" : "Optional upgrades"}{/* MEDUI */}
             </h2>
             <p className="body" style={{ marginBottom: 16, color: "var(--ink-3)" }}>
-              Available à-la-carte during your stay.
+              {isMedical ? "Quoted per case after case review." : "Available à-la-carte during your stay."}
             </p>
             <div className="service-grid">
               {optional.map((l) => (
@@ -511,6 +516,9 @@ export default function ProgramDetailView({
                       </div>
                     )}
                   </div>
+                  {l.services.price_usd == null && isMedical && (
+                    <div style={{ fontWeight: 600, color: "var(--ink-3)", fontSize: 13 }}>Quoted per case</div>
+                  )}
                   {l.services.price_usd != null && (
                     <div style={{ fontWeight: 600, color: "var(--ink)" }}>
                       ${Number(l.services.price_usd).toLocaleString(undefined, { maximumFractionDigits: 0 })}
@@ -589,7 +597,7 @@ export default function ProgramDetailView({
           </div>
         )}
         {/* CONTRAINDICATIONS */}
-        {program.contraindications && (
+        {program.contraindications && program.contraindications.trim() !== "" && (
           <div className="card" style={{ padding: 20, marginBottom: 40 }}>
             <button
               type="button"
@@ -636,13 +644,13 @@ export default function ProgramDetailView({
             <Icon.flower width={170} height={170} />
           </div>
           <div className="eyebrow" style={{ color: "rgba(255,255,255,.75)" }}>
-            Ready to book?
+            {isMedical ? "Submit Your Case for Review" : "Ready to book?"}
           </div>
           <h3
             className="display"
             style={{ fontSize: "clamp(24px, 5vw, 36px)", margin: "10px 0 20px", maxWidth: 520 }}
           >
-            <span className="display-italic">Talk to a human.</span> We&apos;ll lock in dates and pre-arrival prep.
+            {isMedical ? (<><span className="display-italic">Case review first.</span> We confirm the provider, scope and price with you before any booking.</>) : (<><span className="display-italic">Talk to a human.</span> We&apos;ll lock in dates and pre-arrival prep.</>)}
           </h3>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <ReserveModal
@@ -652,8 +660,9 @@ export default function ProgramDetailView({
                 property_id: primaryProperty?.id,
                 property_name: primaryProperty?.name,
                 destination_country: primaryProperty?.country ?? undefined,
+                case_mode: isMedical,
               }]}
-              triggerLabel="Reserve dates"
+              triggerLabel={isMedical ? "Submit Your Case" : "Reserve dates"}
               triggerClassName="btn"
               triggerStyle={{ background: "var(--accent-ink)", color: "var(--accent-deep)" }}
             />

@@ -9,6 +9,7 @@ import ReviewsSection, { type Review } from "./ReviewsSection"
 import InViewMotion from "./journey/InViewMotion"
 import { HeroRoute, BDARoute } from "./journey/JourneyRoute"
 import OutcomeSignature from "./journey/OutcomeSignature"
+import type { CatalogStats } from "@/lib/stats"
 
 const TRACK_ICONS = {
   Reset: "/icons/leaf.png",
@@ -32,16 +33,7 @@ const FEATURED_SLUGS = [
   "weight-reset",
 ]
 
-// Program count is filled in from the live list at render time so it always
-// matches the "Explore all N programs" button (was a hardcoded 54 vs 62).
-const TRACTION_STATS = [
-  { n: "300+", sub: "guests hosted" },
-  { n: "{programs}", sub: "standardized programs" },
-  { n: "17", sub: "partner destinations" },
-  { n: "7", sub: "Asian markets" },
-  { n: "3,000+", sub: "community" },
-  { n: "70+", sub: "travel partners" },
-] as const
+// Homepage counters come from getCatalogStats() (Supabase). No hardcoded inventory or marketing claims.
 
 // China rail — spans all three destinations (Xi'an, Wudang, Mile) plus the
 // Better Migrate hospital network, across all four tracks and a wide price band.
@@ -53,11 +45,6 @@ const CHINA_SLUGS = [
   "wudang-7-day-tai-chi-longevity",
   "bm-package-a-outpatient-fast-track",
 ]
-const CHINA_STATS = [
-  { n: "3", sub: "wellness destinations" },
-  { n: "9", sub: "partner hospitals" },
-  { n: "17", sub: "China programs" },
-] as const
 
 const ECOSYSTEM_BASE = "https://xbzrtofanbrahasxbisf.supabase.co/storage/v1/object/public/ecosystem"
 const HOMEPAGE_PHOTOS = [
@@ -111,7 +98,18 @@ type OutcomeCard = {
   count: number
 }
 
-export default async function HomeView({ programs, reviews }: { programs: LandingProgram[]; reviews: Review[] }) {
+export default async function HomeView({ programs, reviews, stats }: { programs: LandingProgram[]; reviews: Review[]; stats: CatalogStats }) {
+  const TRACTION_STATS = [
+    { n: String(stats.programs), sub: "standardized programs" },
+    { n: String(stats.countries), sub: "Asian markets" },
+    { n: String(stats.properties), sub: "wellness properties" },
+    { n: String(stats.clinics), sub: "partner hospitals" },
+  ]
+  const CHINA_STATS = [
+    { n: String(stats.china.wellnessDestinations), sub: "wellness destinations" },
+    { n: String(stats.china.clinics), sub: "partner hospitals" },
+    { n: String(stats.china.programs), sub: "China programs" },
+  ]
   const bySlug = new Map(programs.filter((p) => p.slug).map((p) => [p.slug as string, p]))
   const firstWa = programs.find((p) => p.contact_wa)?.contact_wa ?? null
   // Fall back to the company WhatsApp rather than a bare wa.me/ with no number.
@@ -568,7 +566,7 @@ export default async function HomeView({ programs, reviews }: { programs: Landin
                     marginBottom: 4,
                   }}
                 >
-                  {s.n === "{programs}" ? programs.length : s.n}
+                  {s.n}
                 </div>
                 <div className="body-sm" style={{ color: "var(--ink-2)" }}>{s.sub}</div>
               </div>

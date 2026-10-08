@@ -1,6 +1,7 @@
 import { supabaseAdmin } from "@/lib/supabase-server"
 import ProgramsListView from "./ProgramsListView"
-import { mapProgram, type DbProgramRow } from "../_lib/programMapping"
+import { type DbProgramRow } from "../_lib/programMapping"
+import { mapProgramsResolved } from "../_lib/programMappingResolved"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -37,8 +38,9 @@ export default async function ProgramsListPage({
     .order("cohort")
     .order("duration_days")
 
-  const programs = ((rows ?? []) as unknown as DbProgramRow[]).map(mapProgram)
+  const programs = await mapProgramsResolved((rows ?? []) as unknown as DbProgramRow[])
 
+  const heroBySlug = new Map(programs.map((p) => [p.slug, p.hero_image_url]))
   const jsonLd =
     (rows ?? []).length > 0
       ? {
@@ -52,7 +54,7 @@ export default async function ProgramsListPage({
               "@type": "Product",
               name: r.name,
               ...(r.summary ? { description: r.summary } : {}),
-              ...(r.hero_image_url ? { image: r.hero_image_url } : {}),
+              ...(heroBySlug.get(r.slug) ? { image: heroBySlug.get(r.slug) } : {}),
               ...(r.price_usd
                 ? {
                     offers: {

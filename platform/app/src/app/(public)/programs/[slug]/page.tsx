@@ -1,9 +1,20 @@
 import { notFound } from "next/navigation"
 import { supabaseAdmin } from "@/lib/supabase-server"
+import { resolveHeroes } from "../../_lib/programMappingResolved"
 import { confirmCheckoutSession } from "@/lib/checkout-confirm"
 import ProgramDetailView, { type ProgramDetail, type AccommodationItem } from "./ProgramDetailView"
 import type { Metadata } from "next"
 import { dataLayerScript } from "../../_lib/track"
+
+function trimMeta(input: string, max = 155): string {
+  const t = input.replace(/\s+/g, " ").trim()
+  if (t.length <= max) return t
+  const cut = t.slice(0, max)
+  const i = Math.max(cut.lastIndexOf(". "), cut.lastIndexOf("; "))
+  if (i > 80) return cut.slice(0, i + 1)
+  return cut.slice(0, cut.lastIndexOf(" ")).replace(/[,;:]$/, "") + "..."
+}
+
 
 export async function generateMetadata({
   params,
@@ -13,7 +24,7 @@ export async function generateMetadata({
   const { slug } = await params
   const { data } = await supabaseAdmin
     .from("programs")
-    .select("name, summary, hero_image_url, program_properties(properties(island, country))")
+    .select("name, summary, hero_image_url, translations, program_properties(properties(id, island, country))")
     .eq("slug", slug)
     .eq("status", "published")
     .eq("active", true)
@@ -27,10 +38,14 @@ export async function generateMetadata({
     hero_image_url: string | null
     program_properties: { properties: { island: string | null; country: string | null } | null }[]
   }
+  const [metaHero] = await resolveHeroes([row as any])
+  row.hero_image_url = metaHero.url
   const location = row.program_properties?.[0]?.properties
   const locationLabel = location ? [location.island, location.country].filter(Boolean).join(", ") : null
-  const title = locationLabel ? `${row.name} - ${locationLabel}` : row.name
-  const description = row.summary ?? `${row.name}, a wellness program offered through Dream Islands.`
+  const trEn = (((data as any).translations?.en) ?? {}) as { seo_title?: string; meta_description?: string }
+  const seoTitle = trEn.seo_title ? String(trEn.seo_title).replace(/\s*\|\s*Dream Islands\s*$/i, "") : null
+  const title = seoTitle ?? (locationLabel ? `${row.name} - ${locationLabel}` : row.name)
+  const description = trimMeta(trEn.meta_description ?? row.summary ?? `${row.name}, a wellness program offered through Dream Islands.`)
   return {
     title,
     description,
@@ -67,7 +82,7 @@ export default async function ProgramDetailPage({
     .select(
       "id, name, slug, cohort, tier, summary, goal, target_guest, how_we_achieve, guest_feels, " +
         "included_services, contraindications, hero_image_url, outcomes, is_composite, " +
-        "program_properties(role, properties(id, name, slug, island, country, contact_wa)), " +
+        "program_properties(role, properties(id, name, slug, island, country, contact_wa, entity_type)), " +
         "program_variants(id, label, duration_days, duration_nights, price_basic_usd, price_vip_usd, active, sort_order), " +
         "program_schedule_items(id, day_no, start_time, end_time, title, description, kind, sort_order), " +
         "program_services(is_included, sort_order, services(id, name, slug, category, description, price_usd, duration_min))",
@@ -80,6 +95,8 @@ export default async function ProgramDetailPage({
   if (error || !data) notFound()
 
   const program = data as unknown as ProgramDetail
+  const [pageHero] = await resolveHeroes([program as any])
+  program.hero_image_url = pageHero.url
 
   const { data: reviewRows } = await supabaseAdmin
     .from("reviews")
@@ -119,27 +136,27 @@ export default async function ProgramDetailPage({
   let galleryImages: { url: string; alt: string }[] = []
   const { data: programMedia } = await supabaseAdmin
     .from("media_assets")
-    .select("public_url, alt_ru, title_ru")
+    .select("public_url, alt_en, alt_ru, title_ru")
     .eq("program_id", program.id)
     .eq("active", true)
     .eq("asset_type", "gallery")
     .order("sort_order")
 
   if (programMedia && programMedia.length > 0) {
-    galleryImages = (programMedia as unknown as Array<{ public_url: string; alt_ru: string | null; title_ru: string | null }>)
+    galleryImages = (programMedia as unknown as Array<{ public_url: string; alt_en?: string | null; alt_ru: string | null; title_ru: string | null }>)
       .filter((m) => m.public_url && m.public_url.startsWith("http"))
-      .map((m) => ({ url: m.public_url, alt: m.alt_ru || m.title_ru || program.name }))
+      .map((m) => ({ url: m.public_url, alt: m.alt_en || m.alt_ru || m.title_ru || program.name }))
   } else if (propertyIds.length > 0) {
     const { data: propMedia } = await supabaseAdmin
       .from("media_assets")
-      .select("public_url, alt_ru, title_ru")
+      .select("public_url, alt_en, alt_ru, title_ru")
       .in("property_id", propertyIds)
       .eq("active", true)
       .eq("asset_type", "gallery")
       .order("sort_order")
-    galleryImages = ((propMedia ?? []) as unknown as Array<{ public_url: string; alt_ru: string | null; title_ru: string | null }>)
+    galleryImages = ((propMedia ?? []) as unknown as Array<{ public_url: string; alt_en?: string | null; alt_ru: string | null; title_ru: string | null }>)
       .filter((m) => m.public_url && m.public_url.startsWith("http"))
-      .map((m) => ({ url: m.public_url, alt: m.alt_ru || m.title_ru || program.name }))
+      .map((m) => ({ url: m.public_url, alt: m.alt_en || m.alt_ru || m.title_ru || program.name }))
   }
 
   const activeVariants = (program.program_variants ?? []).filter((v) => v.active)
