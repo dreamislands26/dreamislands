@@ -188,6 +188,7 @@ Status legend in the inventory: 🟢 live in MVP · 🟡 partial/manual · ⚪ n
 - **AI agents:**
 - **Decisions:**
 - **Open questions:**
+  - **Input (Mark, team chat, 21 Aug 2026) — supply sources to cover:** DIT-managed (as-is: the team creates properties, programs, services, content and commercial terms); partner self-service through the Partner Platform; external connectivity (rates, availability, inventory via PMS / CRS / channel manager / GDS); hybrid (content and programs from DIT or the partner, availability and rates external). All converge on one canonical chain **Property → Program → Offer → Availability**. Ingestion is separate from distribution.
 
 ## P-04 Capacity & availability management
 
@@ -208,6 +209,7 @@ Status legend in the inventory: 🟢 live in MVP · 🟡 partial/manual · ⚪ n
 - **AI agents:**
 - **Decisions:**
 - **Open questions:**
+  - **Input (Mark, team chat, 21 Aug 2026):** availability and rates may come from external systems (PMS / CRS / channel manager / GDS) or be hybrid — see [P-03](#p-03-catalog--program-management). GDS / PMS / CRS / channel-manager connectivity and dynamic rate/availability sharing are a separate future workstream.
 
 ---
 
@@ -252,6 +254,8 @@ Status legend in the inventory: 🟢 live in MVP · 🟡 partial/manual · ⚪ n
 - **AI agents:**
 - **Decisions:**
 - **Open questions:**
+  - **Blocked on** the system boundary (draft D-09, [X-1](#x-1-architecture-overview)) and the guest loop definition owed by Oleg: Baseline → Goal → Match → Journey → Check-ins → Outcome → Progress → New Baseline → Next Journey. Product behaviour first, architecture second (Mark, team chat, 21 Aug 2026).
+  - **Cura (open, Mark, team chat, 21 Aug 2026):** Cura is the customer-facing conversational layer today, not a system of record. Decide: does it stay the production conversational layer, serve only some markets/channels, or get replaced by an own / Microsoft agent runtime? Where do identity, memory, guest context, WBS/matching data and conversation history live, independent of the conversational layer?
 
 ## P-07 Matching & recommendation
 
@@ -272,6 +276,7 @@ Status legend in the inventory: 🟢 live in MVP · 🟡 partial/manual · ⚪ n
 - **AI agents:**
 - **Decisions:**
 - **Open questions:**
+  - **Blocked on** the system boundary (draft D-09) and the guest loop definition — see [P-06](#p-06-guest-intake--wbs-assessment).
 
 ## P-08 Sales pipeline & CRM
 
@@ -316,6 +321,7 @@ Status legend in the inventory: 🟢 live in MVP · 🟡 partial/manual · ⚪ n
 - **AI agents:**
 - **Decisions:**
 - **Open questions:**
+  - **Input (Mark, team chat, 21 Aug 2026) — distribution:** one normalized supply is sold through DIT B2C, concierge / AI, B2B agents, white-label, an external API and distribution/connectivity partners. The external API is a product capability → [X-3](#x-3-api--mcp-registry).
 
 ## P-10 Guest payments — deposit, balance, refunds
 
@@ -335,7 +341,9 @@ Status legend in the inventory: 🟢 live in MVP · 🟡 partial/manual · ⚪ n
 - **API / MCP:**
 - **AI agents:**
 - **Decisions:**
-- **Open questions:** balance collection process undefined (deposit → rest: when, how, where?); currency policy (USD display / THB charge / multi-country)
+- **Open questions:**
+  - ~~Balance collection process undefined (deposit → rest: when, how, where?)~~ **As-is answered** (Mark, team chat, 21 Aug 2026) — the deposit is Stripe Checkout, automated; the balance after the deposit is **not collected** and there is no workflow. **To design here:** balance due date, payment link / autopay, reminders, non-payment and cancellation logic.
+  - Currency policy (USD display / THB charge / multi-country) — **partly answered** (Mark, team chat, 21 Aug 2026): today the currency is set per property/program. The SG entity's base currency (→ [P-13](#p-13-accounting--reporting)) and the guest's transaction currency are separate questions. Multi-currency policy still to decide.
 
 ## P-11 Commission calculation & settlement
 
@@ -356,6 +364,8 @@ Status legend in the inventory: 🟢 live in MVP · 🟡 partial/manual · ⚪ n
 - **AI agents:**
 - **Decisions:**
 - **Open questions:**
+  - **As-is (Mark, team chat, 21 Aug 2026):** live in Supabase — `commercial_terms` (terms), `booking_financials` (economics), `booking_payment_transactions` (payment events). The calculation logic is not to be reinvented.
+  - What migrates or syncs to BC, and from which point is BC the financial system of record? (raised by Mark)
 
 ## P-12 Partner payouts
 
@@ -375,7 +385,9 @@ Status legend in the inventory: 🟢 live in MVP · 🟡 partial/manual · ⚪ n
 - **API / MCP:**
 - **AI agents:**
 - **Decisions:**
-- **Open questions:** payout execution undefined (schedule, method, reconciliation — ask Mark)
+- **Open questions:**
+  - ~~Payout execution undefined (schedule, method, reconciliation — ask Mark)~~ **As-is answered** (Mark, team chat, 21 Aug 2026) — **not implemented**: economics and commission are calculated, but the payout execution layer is missing (amount payable → trigger → execution → reconciliation).
+  - **Still owed by Mark:** the business rules — schedule, payment rails, reconciliation, cancellations/refunds.
 
 ## P-13 Accounting & reporting
 
@@ -396,6 +408,8 @@ Status legend in the inventory: 🟢 live in MVP · 🟡 partial/manual · ⚪ n
 - **AI agents:**
 - **Decisions:**
 - **Open questions:**
+  - **Base currency — working hypothesis (Mark, team chat, 21 Aug 2026):** SGD for the SG entity; customer and partner transactions are multi-currency (THB / SGD / USD / IDR / local). One SG company + multi-country vendors + vendor currency per partner (D-04) is confirmed as the right direction. Final confirmation after SG incorporation and accounting setup.
+  - **Dimension slot allocation** (parked from [P-01](#p-01-partner-acquisition--onboarding)) — candidates (Mark, team chat, 21 Aug 2026): *global:* Destination/Country, Business Line / Product Category; *analytical:* Partner Type, Program Category, Acquisition Channel, Cohort, possibly Customer / Source Market. Not fixed: decide the 2 global + 6 shortcut slots by what must reach the ledger.
 
 ---
 
@@ -440,6 +454,8 @@ Status legend in the inventory: 🟢 live in MVP · 🟡 partial/manual · ⚪ n
 - **AI agents:**
 - **Decisions:**
 - **Open questions:**
+  - **Blocked on** the system boundary (draft D-09) and the guest loop definition — see [P-06](#p-06-guest-intake--wbs-assessment).
+  - **Data anomaly to check (team chat, 20 Sep 2026):** one booking has a post-trip WS recorded while its status is still `active`. Does the status update lag outcome capture, or is post-WS collected before the stay is marked completed?
 
 ## P-16 Post-trip outcomes & follow-up
 
@@ -460,6 +476,9 @@ Status legend in the inventory: 🟢 live in MVP · 🟡 partial/manual · ⚪ n
 - **AI agents:**
 - **Decisions:**
 - **Open questions:**
+  - **Blocked on** the system boundary (draft D-09) and the guest loop definition — see [P-06](#p-06-guest-intake--wbs-assessment).
+  - **As-is (Mark, team chat, 16 Sep 2026):** pre/post WS exists for 7 guests; 30/60/90-day outcomes are **not collected**.
+  - **Input (Mark, team chat, 16 Sep 2026) — wellness data architecture to design:** Guest Wellness Profile, Journey, Observation/Signal, Assessment, Program Intervention, Outcome; plus consent, retention, partner permissions, anonymization and connected sources (Apple Health, WHOOP, Strava).
 
 ## P-17 Repeat & retention
 
@@ -480,6 +499,7 @@ Status legend in the inventory: 🟢 live in MVP · 🟡 partial/manual · ⚪ n
 - **AI agents:**
 - **Decisions:**
 - **Open questions:**
+  - **Blocked on** the system boundary (draft D-09) and the guest loop definition — see [P-06](#p-06-guest-intake--wbs-assessment).
 
 ---
 
@@ -504,6 +524,7 @@ Status legend in the inventory: 🟢 live in MVP · 🟡 partial/manual · ⚪ n
 - **AI agents:**
 - **Decisions:**
 - **Open questions:**
+  - **Input (Mark, team chat, 16 Sep 2026) — product framing:** one wellness data layer with two views — the guest's *My Wellness Journey* and the partner's *Program & Guest Insights* — separated by views and permissions, not two products.
 
 ---
 
@@ -584,6 +605,15 @@ Component inventory — role, and the processes that put it there.
 | Payment layer | — | _pending P-10_ |
 | Analytics | — | _pending P-05/P-13_ |
 
+### System boundary — draft, to agree before P-06 / P-07
+
+> **Draft D-09 — not agreed.** Source: Mark, team chat, 21 Aug 2026. Edit before treating it as a decision. Until then the diagram above describes P-01 only.
+
+- **Business Central** is the enterprise / transactional backbone: partners, contracts, bookings, finance, commissions, payouts, accounting.
+- **DIT proprietary layer, outside BC:** WBS, guest wellness profile, matching / recommendation, journey and check-ins, outcomes, longitudinal wellness data, and the AI logic on top of them. It iterates independently of BC: it is the core product IP and data moat.
+- The BC-centric pattern of P-01 is **not** carried into P-06, P-07, P-15, P-16, P-17 by default.
+- The core AI / data architecture is **vendor-agnostic**: the conversational layer (Cura today, Microsoft or another later) is replaceable without losing DIT's intelligence and data layer.
+
 ## X-2 Entity map
 
 Every entity touched, its kind, and where it was decided.
@@ -597,7 +627,7 @@ Every entity touched, its kind, and where it was decided.
 | **Dimension `PARTNERTYPE`** | setup data | [P-01](#p-01-partner-acquisition--onboarding) · D-07 | Default Dimension on Vendor; Contact holds a Dimension Value lookup |
 | **Email Scenario** | standard enum, extended | [P-01](#p-01-partner-acquisition--onboarding) · D-05 | One value per partner status |
 
-⚠ **Open, cross-cutting:** dimension slot allocation — 2 global + 6 shortcut available. Candidates so far: Partner Type ([P-01](#p-01-partner-acquisition--onboarding)), plus likely Destination/Country, Cohort, Program Category. Decide before creating further dimensions → [P-13](#p-13-accounting--reporting).
+⚠ **Open, cross-cutting:** dimension slot allocation — 2 global + 6 shortcut available. Candidates so far: Partner Type ([P-01](#p-01-partner-acquisition--onboarding)), plus likely Destination/Country, Cohort, Program Category. Decide before creating further dimensions → [P-13](#p-13-accounting--reporting). Mark's candidates (Mark, team chat, 21 Aug 2026): *global* Destination/Country, Business Line / Product Category; *analytical* Partner Type, Program Category, Acquisition Channel, Cohort, possibly Customer / Source Market.
 
 ## X-3 API & MCP registry
 
@@ -606,6 +636,8 @@ Every entity touched, its kind, and where it was decided.
 | **`ditPartnerContacts`** | Contact (standard + PTE fields) | Partner Intake agent (via MCP); Partner Portal | custom API page — **required**, standard APIV2 pages are `Extensible = false` | [P-01](#p-01-partner-acquisition--onboarding) · D-03 |
 | `APIV2 - Contacts` | Contact (standard fields) | generic read consumers | standard, read-side | [P-01](#p-01-partner-acquisition--onboarding) |
 | Vendor read | Vendor | Partner Portal provisioning | TBD — detail in [P-18](#p-18-partner-dashboard--reporting) | [P-01](#p-01-partner-acquisition--onboarding) |
+
+**Input (Mark, team chat, 21 Aug 2026):** the external API is a product capability, not only the Portal ↔ BC interface — authentication, permissions, versioning, partner-level access; later it exposes inventory, programs, availability, booking and matching to outside consumers (B2B agents, white-label, connectivity partners).
 
 ## X-4 Security & compliance
 
@@ -644,3 +676,4 @@ Starting frame from the scope doc (6 phases); processes are assigned as their ta
 | **D-06** | Inbound applications **truly open**; abuse control at the portal edge | [P-01](#p-01-partner-acquisition--onboarding) |
 | **D-07** | **Partner Type is a Dimension**, not an enum — Default Dimension on Vendor, Dimension Value lookup on Contact | [P-01](#p-01-partner-acquisition--onboarding) |
 | **D-08** | Email transport = standard **Microsoft 365 connector** | [P-01](#p-01-partner-acquisition--onboarding) |
+| D-09 (draft, not agreed) | System boundary: BC = transactional backbone; WBS, wellness profile, matching, check-ins and outcomes live in a DIT layer outside BC | [X-1](#x-1-architecture-overview) |
