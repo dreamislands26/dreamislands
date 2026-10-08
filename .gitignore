@@ -1,2 +1,18 @@
 .DS_Store
 **/.DS_Store
+
+# secrets: never commit these. If the stack uses env files, keep names only in a tracked .env.example
+.env
+.env.*
+!.env.example
+
+# local agent state (machine-specific paths and permissions)
+.claude/settings.local.json
+.claude/worktrees/
+
+# os / editor noise
+Thumbs.db
+*.swp
+
+# stack-specific ignores (build output, dependencies, caches) go below.
+# create-constitution adds them once the stack is known.

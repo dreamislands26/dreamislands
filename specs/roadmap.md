@@ -2,6 +2,8 @@
 
 > Ordered queue of Enterprise Architecture workstreams (source: `DIT_Enterprise_Scope_Dmitry.docx`, 28 Jul 2026). Priority/Status/Owner synced from Notion — "DIT Task Tracker — Q3/Q4 2026" (Enterprise Architecture epic) as of 2026-08-07.
 
+**Next free feature number: 10**
+
 | # | Workstream | Delivers | Priority | Status | Owner | Notes |
 |---|---|---|---|---|---|---|
 | 1 | **Enterprise Architecture** | High-level architecture diagram, component responsibilities, integration map, data ownership across BC + Supabase + AI + Portals + Booking + CRM + Analytics + Payments + Auth + API. | P0 | Not started | Dmitry | Notion note: starts after Microsoft migration kickoff. Spec folder not created yet — see `tech-design.md#1-enterprise-architecture`, being worked on directly for now. |
@@ -14,11 +16,27 @@
 | 8 | **Technical Debt Review** | Audit of MVP: what stays, what's rewritten, what becomes a microservice, what belongs in BC vs. Supabase. | P2 | Not started | Dmitry | Notion: "Technical Debt Audit." |
 | 9 | **Investor Readiness** | Architecture overview, scalability assumptions, security overview, data governance, AI architecture, roadmap — packaged for due diligence. | — | Not started | Dmitry | Not yet a separate Notion task; feeds the VC/Investor epic's pitch deck v3 and data room work. |
 
+### Status values
+
+| Status | Means |
+|---|---|
+| `planned` | In the queue, no spec yet |
+| `specced` | The three documents exist; waiting for owner approval, or approved and not started |
+| `in progress` | Being implemented on its `spec/NN-slug` branch |
+| `done` | Acceptance criteria proven, reachable in the product, merged |
+| `partial` | Merged but incomplete; written `partial: <exactly what is missing>` |
+| `blocked` | Next in the queue and cannot start; written `blocked: <on what or whom>`. Goes back to `planned` when the blocker clears |
+| `dropped` | Removed or replaced; written `dropped <date>: <reason>`, or `dropped <date>: superseded by #NN` |
+
+Rows are never deleted and numbers are never reused, so gaps in the numbering are normal.
+While a feature is on its branch, its status change is on that branch too:
+`git branch --list 'spec/*'` shows what is in flight.
+
 ---
 
 ## Current approach
 
-Working directly in `tech-design.md`, one workstream section at a time, before creating per-workstream `specs/YYYY-MM-DD-workstream-slug/` folders (requirements.md + plan.md + acceptance.md). Those folders get created once a workstream's design is concrete enough to spec — see `AGENTS.md` for the full SDD loop.
+Working directly in `tech-design.md`, one workstream section at a time, before creating per-workstream `specs/features/NN-slug/` folders (requirements.md + plan.md + acceptance.md). Those folders get created once a workstream's design is concrete enough to spec — see `AGENTS.md` for the full SDD loop.
 
 ## Definition of "workstream done"
 

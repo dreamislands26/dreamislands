@@ -1,6 +1,6 @@
 # Technical Design — DIT Enterprise Platform
 
-> Process-first design. Every process below gets classified (external / internal), then designed: how it's automated, which system it lives in, whether PTE objects are required, what's exposed via API/MCP, which AI agents touch it. Decisions are numbered (D-xx) so specs can cite them. Discovery material lives in `tech-design-draft.md`.
+> Process-first design. Every process below gets classified (external / internal), then designed: how it's automated, which system it lives in, whether PTE objects are required, what's exposed via API/MCP, which AI agents touch it. Decisions are numbered (D-xx) so specs can cite them. Discovery material lives in `research/process-discovery.md`.
 
 ## Table of Contents
 
