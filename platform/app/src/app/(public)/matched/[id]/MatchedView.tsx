@@ -239,10 +239,10 @@ function SaveReportLine() {
   )
 }
 
-type MedicalItem = { id: string; name: string; slug?: string; summary?: string | null; duration_days?: number }
+export type MedicalItem = { id: string; name: string; slug?: string; summary?: string | null; duration_days?: number }
 
 /** Shown instead of unrelated programmes when nothing fits the guest's focus (e.g. Beauty & Aesthetics). */
-function NoCloseMatch({ focus }: { focus: string | null }) {
+export function NoCloseMatch({ focus }: { focus: string | null }) {
   const wa =
     "https://wa.me/66811612662?text=" +
     encodeURIComponent(`Hi! I took the Wellness Journey${focus ? ` (${focus})` : ""} and would like help finding a suitable programme.`)
@@ -261,7 +261,7 @@ function NoCloseMatch({ focus }: { focus: string | null }) {
 }
 
 /** Separate from the wellness picks. No prices, no Reserve: medical coordination never competes with wellness programmes. */
-function MedicalSupport({ items }: { items: MedicalItem[] }) {
+export function MedicalSupport({ items }: { items: MedicalItem[] }) {
   return (
     <div className="card" style={{ padding: 28, marginTop: 40 }}>
       <div className="eyebrow" style={{ marginBottom: 8 }}>Medical support / Clinical pathway</div>

@@ -13,6 +13,7 @@ import { Icon } from "../_components/Icon"
 import { track } from "../_lib/track"
 import SaveResultBlock from "./SaveResultBlock"
 import MatchedPrograms, { type MatchedProgram } from "../_components/MatchedPrograms"
+import { NoCloseMatch, MedicalSupport, type MedicalItem } from "../matched/[id]/MatchedView"
 
 const ALL_QUESTIONS = WBS_QUESTIONS.filter(
   (q): q is Extract<WbsQuestion, { type: "choice" }> | Extract<WbsQuestion, { type: "height_weight" }> =>
@@ -33,6 +34,8 @@ export default function AssessmentView() {
   const [score, setScore] = useState<WbsResult | null>(null)
   const [matchedId, setMatchedId] = useState<string | null>(null)
   const [matchedPrograms, setMatchedPrograms] = useState<MatchedProgram[]>([])
+  const [noMatch, setNoMatch] = useState(false)
+  const [medicalPathway, setMedicalPathway] = useState<MedicalItem[]>([])
   const [savedToProfile, setSavedToProfile] = useState(false)
 
   const scrollerRef = useRef<HTMLDivElement>(null)
@@ -124,6 +127,8 @@ export default function AssessmentView() {
       setScore(result)
       setMatchedId(json.user.id)
       setMatchedPrograms((json.matched_programs ?? []) as MatchedProgram[])
+      setNoMatch(json.no_close_match === true)
+      setMedicalPathway((json.medical_pathway ?? []) as MedicalItem[])
       setSavedToProfile(!!json.saved_to_profile)
       setPhase("done")
       track("wbs_complete", { wbs_score: result.total, cohort: result.cohort })
@@ -390,7 +395,8 @@ export default function AssessmentView() {
                 alreadySaved={savedToProfile}
               />
 
-              {matchedId && (
+              {matchedId && noMatch && <NoCloseMatch focus={score.focus} />}
+              {matchedId && !noMatch && (
                 <div style={{ marginTop: 40 }}>
                   <MatchedPrograms
                     userId={matchedId}
@@ -410,6 +416,7 @@ export default function AssessmentView() {
                   />
                 </div>
               )}
+              {matchedId && medicalPathway.length > 0 && <MedicalSupport items={medicalPathway} />}
             </div>
           )}
         </div>
