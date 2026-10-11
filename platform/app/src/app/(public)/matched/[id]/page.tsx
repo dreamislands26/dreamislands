@@ -91,6 +91,7 @@ export default async function MatchedPage({
       rankingVersion={bundle.version}
       noMatch={bundle.noMatch}
       medicalPathway={bundle.medicalPathway}
+      preventiveLane={bundle.lane}
     />
   )
 }

@@ -13,7 +13,7 @@ import { Icon } from "../_components/Icon"
 import { track } from "../_lib/track"
 import SaveResultBlock from "./SaveResultBlock"
 import MatchedPrograms, { type MatchedProgram } from "../_components/MatchedPrograms"
-import { NoCloseMatch, MedicalSupport, type MedicalItem } from "../matched/[id]/MatchedView"
+import { NoCloseMatch, MedicalSupport, PreventiveLane, type MedicalItem, type LaneItem } from "../matched/[id]/MatchedView"
 
 const ALL_QUESTIONS = WBS_QUESTIONS.filter(
   (q): q is Extract<WbsQuestion, { type: "choice" }> | Extract<WbsQuestion, { type: "height_weight" }> =>
@@ -36,6 +36,7 @@ export default function AssessmentView() {
   const [matchedPrograms, setMatchedPrograms] = useState<MatchedProgram[]>([])
   const [noMatch, setNoMatch] = useState(false)
   const [medicalPathway, setMedicalPathway] = useState<MedicalItem[]>([])
+  const [preventiveLane, setPreventiveLane] = useState<LaneItem[]>([])
   const [savedToProfile, setSavedToProfile] = useState(false)
 
   const scrollerRef = useRef<HTMLDivElement>(null)
@@ -129,6 +130,7 @@ export default function AssessmentView() {
       setMatchedPrograms((json.matched_programs ?? []) as MatchedProgram[])
       setNoMatch(json.no_close_match === true)
       setMedicalPathway((json.medical_pathway ?? []) as MedicalItem[])
+      setPreventiveLane((json.preventive_lane ?? []) as LaneItem[])
       setSavedToProfile(!!json.saved_to_profile)
       setPhase("done")
       track("wbs_complete", { wbs_score: result.total, cohort: result.cohort })
@@ -416,6 +418,7 @@ export default function AssessmentView() {
                   />
                 </div>
               )}
+              {matchedId && preventiveLane.length > 0 && <PreventiveLane items={preventiveLane} />}
               {matchedId && medicalPathway.length > 0 && <MedicalSupport items={medicalPathway} />}
             </div>
           )}

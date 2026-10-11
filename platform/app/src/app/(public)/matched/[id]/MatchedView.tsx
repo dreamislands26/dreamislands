@@ -31,6 +31,7 @@ export default function MatchedView({
   rankingVersion,
   noMatch,
   medicalPathway,
+  preventiveLane,
 }: {
   userId: string
   name: string | null
@@ -43,6 +44,7 @@ export default function MatchedView({
   rankingVersion?: string
   noMatch?: boolean
   medicalPathway?: MedicalItem[]
+  preventiveLane?: LaneItem[]
 }) {
   const cohortLabel = cohort != null ? COHORT_LABELS[cohort] : null
   const hasFlag = flags.cvd || flags.cancer
@@ -176,6 +178,7 @@ export default function MatchedView({
         </div>
         )}
 
+        {preventiveLane && preventiveLane.length > 0 && <PreventiveLane items={preventiveLane} />}
         {medicalPathway && medicalPathway.length > 0 && <MedicalSupport items={medicalPathway} />}
 
         <SaveReportLine />
@@ -236,6 +239,40 @@ function SaveReportLine() {
         </>
       )}
     </p>
+  )
+}
+
+export type LaneItem = { id: string; name: string; slug?: string; summary?: string | null; duration_days?: number }
+
+/** Verified medical_wellness programmes, shown apart from the wellness picks (Longevity focus only). Screening language, no wellness claims. */
+export function PreventiveLane({ items }: { items: LaneItem[] }) {
+  return (
+    <div className="card" style={{ padding: 28, marginTop: 40 }}>
+      <div className="eyebrow" style={{ marginBottom: 8 }}>Preventive health programmes · medically led</div>
+      <p className="body" style={{ marginBottom: 16 }}>
+        These programmes include a medical consultation and clinical elements such as diagnostics or IV therapy. They are not
+        general wellness stays, and suitability is reviewed with you before booking.
+      </p>
+      <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 16 }}>
+        {items.map((m) => (
+          <li key={m.id} style={{ color: "var(--ink)" }}>
+            <strong>{m.name}</strong>
+            {m.duration_days ? <span className="body-sm" style={{ color: "var(--ink-3)" }}> · {m.duration_days} days</span> : null}
+            {m.summary && (
+              <div
+                className="body-sm"
+                style={{ color: "var(--ink-2)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}
+              >
+                {m.summary}
+              </div>
+            )}
+            {m.slug && (
+              <Link href={`/programs/${m.slug}`} className="btn btn-ghost" style={{ marginTop: 8, fontSize: 14 }}>View programme</Link>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
   )
 }
 
