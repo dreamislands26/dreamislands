@@ -88,6 +88,9 @@ export default async function MatchedPage({
       subScores={subScores}
       flags={flags}
       programs={programs as unknown as MatchedProgram[]}
+      rankingVersion={bundle.version}
+      noMatch={bundle.noMatch}
+      medicalPathway={bundle.medicalPathway}
     />
   )
 }

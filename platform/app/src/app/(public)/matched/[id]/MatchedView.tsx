@@ -28,6 +28,9 @@ export default function MatchedView({
   subScores,
   flags,
   programs,
+  rankingVersion,
+  noMatch,
+  medicalPathway,
 }: {
   userId: string
   name: string | null
@@ -37,6 +40,9 @@ export default function MatchedView({
   subScores: SubScores
   flags: { cvd?: boolean; cancer?: boolean }
   programs: MatchedProgram[]
+  rankingVersion?: string
+  noMatch?: boolean
+  medicalPathway?: MedicalItem[]
 }) {
   const cohortLabel = cohort != null ? COHORT_LABELS[cohort] : null
   const hasFlag = flags.cvd || flags.cancer
@@ -139,6 +145,9 @@ export default function MatchedView({
           </div>
         </div>
 
+        {noMatch ? (
+          <NoCloseMatch focus={focus} />
+        ) : (
         <div style={{ marginTop: 48 }}>
           <MatchedPrograms
             userId={userId}
@@ -159,12 +168,15 @@ export default function MatchedView({
                   <span className="display-italic">{programs.length === 1 ? "programme" : "programmes"}</span>.
                 </h2>
                 <p className="body" style={{ marginBottom: 24 }}>
-                  Top picks in your cohort, sorted by entry price.
+                  {rankingVersion === "v1" ? "Top picks for your goal, ranked by fit with your answers." : "Top picks in your cohort, sorted by entry price."}
                 </p>
               </>
             }
           />
         </div>
+        )}
+
+        {medicalPathway && medicalPathway.length > 0 && <MedicalSupport items={medicalPathway} />}
 
         <SaveReportLine />
       </section>
@@ -224,6 +236,56 @@ function SaveReportLine() {
         </>
       )}
     </p>
+  )
+}
+
+type MedicalItem = { id: string; name: string; slug?: string; summary?: string | null; duration_days?: number }
+
+/** Shown instead of unrelated programmes when nothing fits the guest's focus (e.g. Beauty & Aesthetics). */
+function NoCloseMatch({ focus }: { focus: string | null }) {
+  const wa =
+    "https://wa.me/66811612662?text=" +
+    encodeURIComponent(`Hi! I took the Wellness Journey${focus ? ` (${focus})` : ""} and would like help finding a suitable programme.`)
+  return (
+    <div className="card" style={{ padding: 28, marginTop: 48 }}>
+      <div className="eyebrow" style={{ marginBottom: 8 }}>No close match yet</div>
+      <h2 style={{ margin: "0 0 10px", fontFamily: "var(--font-display)", fontSize: 30, fontWeight: 400, color: "var(--ink)" }}>
+        We don&apos;t have a programme that fits this focus yet.
+      </h2>
+      <p className="body" style={{ marginBottom: 20 }}>
+        Rather than show you something unrelated, our coordinator will review your answers and suggest options.
+      </p>
+      <a className="btn btn-primary" href={wa} target="_blank" rel="noreferrer">Talk to a coordinator</a>
+    </div>
+  )
+}
+
+/** Separate from the wellness picks. No prices, no Reserve: medical coordination never competes with wellness programmes. */
+function MedicalSupport({ items }: { items: MedicalItem[] }) {
+  return (
+    <div className="card" style={{ padding: 28, marginTop: 40 }}>
+      <div className="eyebrow" style={{ marginBottom: 8 }}>Medical support / Clinical pathway</div>
+      <p className="body" style={{ marginBottom: 16 }}>
+        Your answers include health information that may call for a medical review. This is not a diagnosis. If you have
+        a diagnosis or a treatment question, you can send your case to our medical coordination team in China.
+      </p>
+      <ul style={{ listStyle: "none", margin: "0 0 20px", padding: 0, display: "grid", gap: 10 }}>
+        {items.map((m) => (
+          <li key={m.id} style={{ color: "var(--ink)" }}>
+            <strong>{m.name}</strong>
+            {m.summary && (
+              <div
+                className="body-sm"
+                style={{ color: "var(--ink-2)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}
+              >
+                {m.summary}
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
+      <Link href="/medical/china" className="btn btn-primary">Submit Your Case</Link>
+    </div>
   )
 }
 
