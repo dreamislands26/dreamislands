@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation"
 import { supabaseAdmin } from "@/lib/supabase-server"
-import { fetchMatchedPrograms } from "@/lib/matched-programs"
+import { fetchMatchedBundle } from "@/lib/matched-programs"
 import MatchedView, { type MatchedProgram } from "./MatchedView"
 
 export const dynamic = "force-dynamic"
@@ -40,13 +40,22 @@ export default async function MatchedPage({
 
   const { data: assessment } = await supabaseAdmin
     .from("assessments")
-    .select("score, sub_body, sub_recovery, sub_metabolic, sub_mind, sub_risk, focus, intent, confidence")
+    .select("score, sub_body, sub_recovery, sub_metabolic, sub_mind, sub_risk, focus, intent, confidence, duration_days")
     .eq("user_id", id)
     .order("completed_at", { ascending: false })
     .limit(1)
     .maybeSingle()
 
-  const programs = await fetchMatchedPrograms(user.cohort)
+  const rawForRank = (user.raw_payload ?? {}) as any
+  const bundle = await fetchMatchedBundle(user.cohort, {
+    focus: assessment?.focus ?? rawForRank.focus ?? rawForRank.recommendation ?? null,
+    intent: assessment?.intent ?? rawForRank.intent ?? null,
+    durationDays: assessment?.duration_days ?? null,
+    subRisk: assessment?.sub_risk ?? null,
+    medicalSignal:
+      rawForRank.medical_review_required === true || rawForRank.flags?.cvd === true || rawForRank.flags?.cancer === true,
+  })
+  const programs = bundle.programs
 
   const raw = (user.raw_payload ?? {}) as RawPayload
 

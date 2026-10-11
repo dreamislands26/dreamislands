@@ -7,7 +7,7 @@ import { normalizeEmail } from "@/lib/guest-auth"
 import { reportDimensions } from "@/lib/guest-cabinet"
 import { QUIZ_COOKIE, quizCookieOptions, quizCookieValue } from "@/lib/quiz-cookie"
 import { supabaseServer } from "@/lib/supabase-server"
-import { fetchMatchedPrograms } from "@/lib/matched-programs"
+import { fetchMatchedBundle } from "@/lib/matched-programs"
 
 type IntakePayload = {
   name?: string | null
@@ -153,7 +153,17 @@ export async function POST(req: Request) {
       await supabaseAdmin.from("medical_flags").insert(flagRows)
     }
 
-    const programs = await fetchMatchedPrograms(payload.cohort)
+    const bundle = await fetchMatchedBundle(payload.cohort, {
+      focus: payload.focus ?? null,
+      intent: payload.intent ?? null,
+      durationDays: payload.recommended_duration ?? null,
+      subRisk: payload.sub_risk ?? null,
+      medicalSignal:
+        payload.medical_review_required === true ||
+        (payload.medical_flags?.length ?? 0) > 0 ||
+        /medical/i.test(payload.source ?? ""),
+    })
+    const programs = bundle.programs
 
     const inbox = adminInbox()
     if (inbox.length > 0) {
@@ -212,7 +222,7 @@ export async function POST(req: Request) {
     }
 
     const res = NextResponse.json(
-      { success: true, user, assessment, matched_programs: programs, saved_to_profile: savedToProfile },
+      { success: true, user, assessment, matched_programs: programs, medical_pathway: bundle.medicalPathway, no_close_match: bundle.noMatch, ranking_version: bundle.version, saved_to_profile: savedToProfile },
       { headers: cors },
     )
     // Lets a sign-in within 7 days claim this result (see quiz-cookie).
