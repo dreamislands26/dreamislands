@@ -1,6 +1,7 @@
 # Ranking Model v1 — gate package (report, rules, weights, simulation)
 
-Date: 2026-10-11. Status: for approval. Nothing here is applied to Supabase or production. The 08.10 temporary protection (no medical programs in the WS top-3) stays until v1 passes simulation and smoke.
+Date: 2026-10-11. Status: gate APPROVED 2026-10-11. Schema migration and hypothesis population are applied in Supabase (see `Ranking_v1_01_migration.sql`, `Ranking_v1_04_population.sql`). Production ranking is NOT switched: the frontend does not read the new tables yet. The 08.10 temporary protection (no medical programs in the WS top-3) stays until v1 passes the six-case smoke behind a feature flag.
+Decisions: detox / weight / aesthetics are goals/outcomes under `preventive_longevity`; `aesthetic-reset` has no automatic ICP; the 6 `medical_wellness` programs stay `medical_level_verified=false` until human/source confirmation; WS focus -> goal/outcome -> eligibility -> ICP/trigger scoring (not via legacy track).
 Companion files: `Ranking_v1_01_migration.sql`, `Ranking_v1_02_classification_matrix.csv` (62 rows).
 
 ## 0. Three findings that change the plan
