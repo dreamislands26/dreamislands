@@ -132,7 +132,9 @@ function score(row: any, f: { name: string; profile: FocusProfile }, ctx: GuestC
   for (const o of row.program_outcomes ?? []) {
     if (!p.outcomes.includes(o.outcome_slug)) continue
     goalAny = true
-    const v = (o.weight === "primary" ? 1 : 0.6) * conf(o.verified)
+    // The guest's first listed outcome is the primary one (1.0); the rest count 0.6. Program weight: primary 1.0, secondary 0.6.
+    const posFactor = p.outcomes.indexOf(o.outcome_slug) === 0 ? 1 : 0.6
+    const v = (o.weight === "primary" ? 1 : 0.6) * posFactor * conf(o.verified)
     if (v > goalFrac) {
       goalFrac = v
       goalMatch = `${o.weight} outcome ${o.outcome_slug}`
@@ -239,6 +241,7 @@ export async function rankPrograms(ctx: GuestCtx): Promise<RankingResult | null>
 
   // E1 done by query. E2 medical gate (fail closed):
   const eligible = rows.filter((r) => {
+    if ((r.program_properties ?? []).length === 0) return false // E1: must have a linked property to send the guest to
     if (isMedicalProperty(r)) return false // legacy safety net stays on
     if (r.medical_level === "wellness") return true
     if (r.medical_level === "medical_wellness") {
