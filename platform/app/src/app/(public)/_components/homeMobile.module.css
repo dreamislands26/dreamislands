@@ -87,7 +87,7 @@
 /* Promise */
 .promise { border-radius: var(--ds-r-xl-plus); background: var(--ds-surface-container-lowest); padding: 2rem 1.5rem 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
 .promiseTight { gap: 1rem; }
-.promiseIcon { font-size: 2rem; color: var(--ds-primary); font-variation-settings: "wght" 300; }
+.promiseIcon.promiseIcon { font-size: 2rem; color: var(--ds-primary); font-variation-settings: "wght" 300; }
 .promiseText { display: flex; flex-direction: column; gap: 0.5rem; }
 .promiseAccent { color: #26c568; }
 .promiseBody { font: 400 1rem/1.5rem var(--ds-font-body); color: rgba(28, 38, 42, 0.9); }
@@ -132,7 +132,7 @@
 .cnGreen { position: absolute; left: 0; right: 0; top: 9.625rem; bottom: 0; background: linear-gradient(180deg, rgba(96, 187, 137, 0) 0, rgba(96, 187, 137, 0.72) 9.6875rem); }
 .cnText, .cnRow, .cnActions { position: relative; z-index: 1; }
 .cnText { display: flex; flex-direction: column; gap: 0.75rem; padding: 0 1rem; }
-.cnText h2, .cnText p { color: #fff; }
+.cnText.cnText h2, .cnText.cnText p { color: #fff; } /* doubled: beats .ds-root h2 whatever the CSS order */
 .cnKicker { font: 400 0.875rem/1.25rem var(--ds-font-body); color: rgba(255, 255, 255, 0.7) !important; }
 .cnStats { display: flex; gap: 0.25rem; flex-wrap: wrap; opacity: 0.8; }
 .cnStats > span { padding: 0.125rem 0.5rem; border-radius: 1.25rem; background: rgba(0, 0, 0, 0.4); font: 500 0.8125rem/1.125rem var(--ds-font-body); white-space: nowrap; }
