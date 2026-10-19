@@ -1,7 +1,7 @@
 import "server-only"
 import { supabaseAdmin } from "./supabase-server"
 import { resolveHeroes } from "@/app/(public)/_lib/programMappingResolved"
-import { rankPrograms, RANKING_VERSION, type GuestCtx } from "./ranking-v1"
+import { rankPrograms, RANKING_VERSION, type GuestCtx, type RankingResult } from "./ranking-v1"
 
 export type { GuestCtx }
 
@@ -16,6 +16,7 @@ export type MatchedBundle = {
   programs: any[]
   noMatch: boolean
   medicalPathway: any[]
+  lane: any[]
   version: string
 }
 
@@ -40,6 +41,58 @@ async function legacyMatched(cohort: number | null | undefined) {
 }
 
 /**
+ * Explainability log: one journey_search per assessment (linked to the guest and the assessment),
+ * one journey_match per shown program with score components and the `why` payload.
+ * Never throws: logging must not break the guest's result.
+ */
+async function logRanking(ctx: GuestCtx, r: RankingResult) {
+  try {
+    if (!ctx.userId) return
+    const { data: s, error } = await supabaseAdmin
+      .from("journey_search")
+      .insert({
+        user_id: ctx.userId,
+        assessment_id: ctx.assessmentId ?? null,
+        duration_min: ctx.durationDays ?? null,
+        duration_max: ctx.durationDays ?? null,
+        party_size: 1,
+      })
+      .select("id")
+      .single()
+    if (error || !s) {
+      console.error("[ranking-v1] journey_search insert failed", error?.message)
+      return
+    }
+    const shown = [
+      ...r.programs.map((p, i) => ({ p, rank: i + 1, lane: false })),
+      ...r.lane.map((p) => ({ p, rank: null as number | null, lane: true })),
+    ]
+    if (!shown.length) return
+    const rows = shown.map(({ p, rank, lane }) => {
+      const k = p.ranking.components
+      return {
+        search_id: s.id,
+        program_id: p.id,
+        goal_fit: Math.round(k.goal),
+        evidence_fit: Math.round(k.evidence),
+        destination_fit: 0,
+        duration_fit: Math.round(k.constraint),
+        rank,
+        intent_fit: k.intent,
+        trigger_fit: k.trigger,
+        score: p.ranking.score,
+        ranking_version: p.ranking.version,
+        why: { ...p.ranking.why, lane, components: k, focus_resolved: r.focus },
+      }
+    })
+    const { error: mErr } = await supabaseAdmin.from("journey_match").insert(rows)
+    if (mErr) console.error("[ranking-v1] journey_match insert failed", mErr.message)
+  } catch (e) {
+    console.error("[ranking-v1] logging failed", e)
+  }
+}
+
+/**
  * Matching entry point. Ranking v1 runs only when RANKING_V1=1 AND a guest context is supplied;
  * any error or unknown focus falls back to the legacy path.
  */
@@ -53,13 +106,14 @@ export async function fetchMatchedBundle(
       if (r) {
         const heroes = await resolveHeroes(r.programs as any[])
         const programs = r.programs.map((p, i) => ({ ...p, hero_image_url: heroes[i].url }))
-        return { programs, noMatch: r.noMatch, medicalPathway: r.medicalPathway, version: RANKING_VERSION }
+        if (ctx.log) await logRanking(ctx, r)
+        return { programs, noMatch: r.noMatch, medicalPathway: r.medicalPathway, lane: r.lane, version: RANKING_VERSION }
       }
     } catch (e) {
       console.error("[ranking-v1] failed, using legacy matcher", e)
     }
   }
-  return { programs: await legacyMatched(cohort), noMatch: false, medicalPathway: [], version: "legacy" }
+  return { programs: await legacyMatched(cohort), noMatch: false, medicalPathway: [], lane: [], version: "legacy" }
 }
 
 /** Backwards-compatible: returns just the programs. */

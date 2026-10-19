@@ -32,6 +32,14 @@ export type MatchedProgram = {
     price_basic_usd: number
     active: boolean
   }>
+  ranking?: RankingInfo
+}
+
+type RankingInfo = {
+  version: string
+  score: number
+  cta: string
+  why?: { matched_on?: string[]; notes?: string[]; confidence?: string }
 }
 
 /** Program cards with inline "Reserve dates" — shared by /matched/[id] and the assessment result. */
@@ -293,6 +301,7 @@ function MatchedCard({
             </p>
           )}
         </div>
+        <WhyThisMatches ranking={p.ranking} />
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span className="body-sm">{p.duration_days} days</span>
           <span style={{ fontWeight: 600, color: "var(--ink)" }}>from ${Number(minPrice).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
@@ -316,3 +325,32 @@ function MatchedCard({
   )
 }
 
+function humanize(slug: string) {
+  const s = slug.replace(/-/g, " ")
+  return s.charAt(0).toUpperCase() + s.slice(1)
+}
+
+/** Only data-backed reasons are shown (outcomes, goals, reviews). ICP/trigger fit is still hypothesis and stays internal. */
+function WhyThisMatches({ ranking }: { ranking?: RankingInfo }) {
+  if (!ranking) return null
+  const lines: string[] = []
+  for (const m of ranking.why?.matched_on ?? []) {
+    let x: RegExpMatchArray | null
+    if ((x = m.match(/^(primary|secondary) outcome (.+)$/))) lines.push(`Targets ${humanize(x[2]).toLowerCase()}`)
+    else if ((x = m.match(/^goal (.+)$/))) lines.push(`Fits your ${x[1]} goal`)
+    else if (/published review/.test(m)) lines.push(m.replace("published review", "guest review"))
+  }
+  const hasScreening = (ranking.why?.notes ?? []).some((n) => n.startsWith("screening note"))
+  if (!lines.length && !hasScreening) return null
+  return (
+    <div style={{ borderTop: "1px solid var(--surface-2)", paddingTop: 10 }}>
+      <div className="eyebrow" style={{ marginBottom: 4 }}>Why this matches</div>
+      {lines.length > 0 && <div className="body-sm" style={{ color: "var(--ink-2)" }}>{lines.join(" · ")}</div>}
+      {hasScreening && (
+        <div className="body-sm" style={{ color: "var(--ink-3)", marginTop: 4 }}>
+          Contraindications are listed for this programme; our team reviews suitability with you before booking.
+        </div>
+      )}
+    </div>
+  )
+}
