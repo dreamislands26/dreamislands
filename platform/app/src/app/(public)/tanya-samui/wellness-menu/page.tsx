@@ -55,7 +55,7 @@ export default async function TanyaWellnessMenuPage() {
         </h1>
         <p className="body-lg" style={{ marginBottom: 40, maxWidth: 700 }}>
           {services.length} treatments across massage, holistic practice, aesthetics, medical diagnostics and IV
-          therapy — bookable on their own or layered onto any program.
+          therapy — bookable on their own or layered onto any programme.
         </p>
 
         {categories.map((cat) => (
@@ -81,7 +81,7 @@ export default async function TanyaWellnessMenuPage() {
         ))}
 
         <Link href="/tanya-samui#programs" className="btn btn-primary">
-          Browse programs at Tanya Samui
+          Browse programmes at Tanya Samui
         </Link>
       </section>
     </div>

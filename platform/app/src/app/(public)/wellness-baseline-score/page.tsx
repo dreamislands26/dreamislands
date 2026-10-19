@@ -3,11 +3,11 @@ import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Wellbeing & Wellness Score (WS)",
-  description: "The Wellbeing & Wellness Score (WS) is Dream Islands proprietary 0-100 wellness assessment, combining Body, Recovery, Metabolic Health and Mind subscales to personalize your retreat program.",
+  description: "The Wellbeing & Wellness Score (WS) is Dream Islands proprietary 0-100 wellness assessment, combining Body, Recovery, Metabolic Health and Mind subscales to personalize your retreat programme.",
   alternates: { canonical: "/wellness-baseline-score" },
   openGraph: {
     title: "Wellbeing & Wellness Score (WS) | Dream Islands",
-    description: "A proprietary 0-100 wellness assessment used to personalize your retreat program.",
+    description: "A proprietary 0-100 wellness assessment used to personalize your retreat programme.",
     url: "https://dreamislands.org/wellness-baseline-score",
   },
 }
@@ -19,7 +19,7 @@ export default function WbsPage() {
     "@id": "https://dreamislands.org/wellness-baseline-score#term",
     name: "Wellbeing & Wellness Score (WS)",
     alternateName: "WS",
-    description: "A proprietary 0-100 wellness assessment developed by Dream Islands, combining four weighted subscales - Body, Recovery, Metabolic Health, and Mind - plus a Risk factor, used to personalize wellness travel program recommendations.",
+    description: "A proprietary 0-100 wellness assessment developed by Dream Islands, combining four weighted subscales - Body, Recovery, Metabolic Health, and Mind - plus a Risk factor, used to personalize wellness travel programme recommendations.",
     inDefinedTermSet: {
       "@type": "DefinedTermSet",
       name: "Dream Islands Wellness Methodology",
@@ -38,7 +38,7 @@ export default function WbsPage() {
         </h1>
         <p className="body-lg" style={{ marginBottom: 40, maxWidth: 700 }}>
           WS is a 0-100 score calculated from a short self-reported assessment, used to personalize
-          which program and duration we recommend. It is not a medical diagnosis - Dream Islands is a
+          which programme and duration we recommend. It is not a medical diagnosis - Dream Islands is a
           Destination Marketing Organization, not a medical institution.
         </p>
 
@@ -61,7 +61,7 @@ export default function WbsPage() {
           <p className="body-sm">
             Each score comes with a confidence rating (40-95) that drops slightly for every not sure
             answer. Certain answers - a cancer history, heavy alcohol use, or a very low subscale score -
-            automatically flag your assessment for medical review before any program is confirmed.
+            automatically flag your assessment for medical review before any programme is confirmed.
           </p>
         </div>
 

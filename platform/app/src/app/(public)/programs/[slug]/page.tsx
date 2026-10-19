@@ -2,7 +2,8 @@ import { notFound } from "next/navigation"
 import { supabaseAdmin } from "@/lib/supabase-server"
 import { resolveHeroes } from "../../_lib/programMappingResolved"
 import { confirmCheckoutSession } from "@/lib/checkout-confirm"
-import ProgramDetailView, { type ProgramDetail, type AccommodationItem } from "./ProgramDetailView"
+import ProgramView, { type ProgramDetail, type AccommodationItem, type ProgramReview } from "./ProgramView"
+import { enOnly, loadPrograms } from "../../_lib/catalog"
 import type { Metadata } from "next"
 import { dataLayerScript } from "../../_lib/track"
 
@@ -30,7 +31,7 @@ export async function generateMetadata({
     .eq("active", true)
     .maybeSingle()
   if (!data) {
-    return { title: "Program not found" }
+    return { title: "Programme not found" }
   }
   const row = data as unknown as {
     name: string
@@ -45,7 +46,7 @@ export async function generateMetadata({
   const trEn = (((data as any).translations?.en) ?? {}) as { seo_title?: string; meta_description?: string }
   const seoTitle = trEn.seo_title ? String(trEn.seo_title).replace(/\s*\|\s*Dream Islands\s*$/i, "") : null
   const title = seoTitle ?? (locationLabel ? `${row.name} - ${locationLabel}` : row.name)
-  const description = trimMeta(trEn.meta_description ?? row.summary ?? `${row.name}, a wellness program offered through Dream Islands.`)
+  const description = trimMeta(trEn.meta_description ?? row.summary ?? `${row.name}, a wellness programme offered through Dream Islands.`)
   return {
     title,
     description,
@@ -83,7 +84,7 @@ export default async function ProgramDetailPage({
       "id, name, slug, cohort, tier, summary, goal, target_guest, how_we_achieve, guest_feels, " +
         "included_services, contraindications, hero_image_url, outcomes, is_composite, " +
         "program_properties(role, properties(id, name, slug, island, country, contact_wa, entity_type)), " +
-        "program_variants(id, label, duration_days, duration_nights, price_basic_usd, price_vip_usd, active, sort_order), " +
+        "program_variants(id, label, duration_days, duration_nights, price_basic_usd, price_vip_usd, price_basic_thb, active, sort_order), " +
         "program_schedule_items(id, day_no, start_time, end_time, title, description, kind, sort_order), " +
         "program_services(is_included, sort_order, services(id, name, slug, category, description, price_usd, duration_min))",
     )
@@ -212,11 +213,25 @@ export default async function ProgramDetailPage({
         }
       : {}),
   }
+  type ReviewRow = { id: string; guest_name: string | null; guest_title: string | null; country: string | null; text_en: string | null; rating: number | null; created_at: string | null }
+  const reviewsForView: ProgramReview[] = (programReviews as ReviewRow[])
+    .filter((r) => r.text_en)
+    .map((r) => ({
+      id: String(r.id),
+      name: enOnly(r.guest_name) ?? "Guest",
+      meta: [enOnly(r.guest_title), enOnly(r.country)].filter(Boolean).join(", ") || null,
+      text: r.text_en as string,
+      rating: Number(r.rating) || 5,
+      date: r.created_at,
+    }))
+  const allPrograms = await loadPrograms()
+  const related = allPrograms.filter((p) => p.id !== program.id && (primaryProperty ? p.propertyIds.includes(primaryProperty.id) : p.cohort === program.cohort))
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script dangerouslySetInnerHTML={{ __html: dataLayerScript("view_program", { program_id: program.id, program_name: program.name, property_id: primaryProperty?.id, property_name: primaryProperty?.name, destination_country: primaryProperty?.country }) }} />
-      <ProgramDetailView program={program} accommodations={accommodations} confirmedBooking={confirmedBooking} galleryImages={galleryImages} reviews={programReviews} />
+      <ProgramView program={program} accommodations={accommodations} confirmedBooking={confirmedBooking} galleryImages={galleryImages} reviews={reviewsForView} related={related} />
     </>
   )
 }

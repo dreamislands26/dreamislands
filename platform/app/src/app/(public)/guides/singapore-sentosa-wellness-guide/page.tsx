@@ -10,12 +10,12 @@ export const dynamic = "force-dynamic"
 export const metadata: Metadata = {
   title: "Wellness Travel Guide: Singapore & Sentosa",
   description:
-    "A practical guide to wellness travel in Singapore and Sentosa — zero-travel-friction executive resets and sport recovery programs for SG/HK/KL professionals, what a program actually involves, typical duration and price, and real matched programs.",
+    "A practical guide to wellness travel in Singapore and Sentosa — zero-travel-friction executive resets and sport recovery programmes for SG/HK/KL professionals, what a programme actually involves, typical duration and price, and real matched programmes.",
   alternates: { canonical: "/guides/singapore-sentosa-wellness-guide" },
   openGraph: {
     title: "Wellness Travel Guide: Singapore & Sentosa | Dream Islands",
     description:
-      "Executive resets and sport recovery in Singapore and Sentosa — what to expect, programme types, duration, price and real matched programs.",
+      "Executive resets and sport recovery in Singapore and Sentosa — what to expect, programme types, duration, price and real matched programmes.",
     url: "https://dreamislands.org/guides/singapore-sentosa-wellness-guide",
   },
 }
@@ -28,10 +28,10 @@ const WHY_SINGAPORE = [
 ]
 
 const WHAT_IT_INVOLVES = [
-  "For the Como Shambala programs: a medical-grade executive burnout reset with biometric baseline and a structured sleep protocol",
-  "For the Village Hotel Sentosa programs: running tracks, monitored open-water swimming and sports festivals, with structured recovery sessions built in",
+  "For the Como Shambala programmes: a medical-grade executive burnout reset with biometric baseline and a structured sleep protocol",
+  "For the Village Hotel Sentosa programmes: running tracks, monitored open-water swimming and sports festivals, with structured recovery sessions built in",
   "Urban, city-adjacent settings rather than a remote nature retreat — the trade-off for zero travel friction",
-  "A full follow-up plan on the longer programs, not just a few structured days",
+  "A full follow-up plan on the longer programmes, not just a few structured days",
 ]
 
 type ProgrammeType = {
@@ -77,20 +77,20 @@ const DESTINATION_SLUGS = [
 
 const FAQS = [
   {
-    q: "Is a Singapore-based program actually different from flying to Thailand or Bali?",
+    q: "Is a Singapore-based programme actually different from flying to Thailand or Bali?",
     a: "Yes, mainly in trade-offs. You get zero travel friction and a genuinely medical-grade or structured urban setting, but a more compact, city-adjacent environment rather than a remote nature retreat. For SG/HK/KL professionals who can't take two weeks away, that trade-off is usually the point.",
   },
   {
-    q: "What's the difference between the Como Shambala and Village Hotel Sentosa programs?",
-    a: "Como Shambala's Executive Burnout Reset programs are medical-grade, focused on stress recovery with a biometric baseline and sleep protocol. Village Hotel Sentosa's Sport & Chill programs are built around active recovery — running, open-water swimming, structured spa recovery — for people whose reset is more physical than clinical.",
+    q: "What's the difference between the Como Shambala and Village Hotel Sentosa programmes?",
+    a: "Como Shambala's Executive Burnout Reset programmes are medical-grade, focused on stress recovery with a biometric baseline and sleep protocol. Village Hotel Sentosa's Sport & Chill programmes are built around active recovery — running, open-water swimming, structured spa recovery — for people whose reset is more physical than clinical.",
   },
   {
     q: "Do I need to be based in Singapore to book one of these?",
-    a: "No, but the format is specifically designed to minimize travel friction for people already in the region — Singapore, Hong Kong, Kuala Lumpur and similar. If you're traveling further, a longer program elsewhere in Asia may make more sense given the flight time either way.",
+    a: "No, but the format is specifically designed to minimize travel friction for people already in the region — Singapore, Hong Kong, Kuala Lumpur and similar. If you're traveling further, a longer programme elsewhere in Asia may make more sense given the flight time either way.",
   },
   {
-    q: "Are these programs a substitute for ongoing medical or psychiatric care?",
-    a: "No. The biometric baseline and sleep protocol in the Como Shambala programs are a structured wellness reset, not medical treatment or diagnosis. Dream Islands is a Destination Marketing Organization, not a medical institution, and this is not medical advice.",
+    q: "Are these programmes a substitute for ongoing medical or psychiatric care?",
+    a: "No. The biometric baseline and sleep protocol in the Como Shambala programmes are a structured wellness reset, not medical treatment or diagnosis. Dream Islands is a Destination Marketing Organization, not a medical institution, and this is not medical advice.",
   },
 ]
 
@@ -132,14 +132,14 @@ export default async function SingaporeDestinationGuidePage() {
         </h1>
         <p className="body-lg" style={{ marginBottom: 20, maxWidth: 700 }}>
           Zero travel friction for SG/HK/KL professionals. Here's why people choose Singapore for a reset
-          specifically, what a program actually involves, and which real programs match.
+          specifically, what a programme actually involves, and which real programmes match.
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 8 }}>
           <Link href="/start" className="btn btn-primary btn-lg">
             Get your WS →
           </Link>
           <Link href="/tracks/reset-recovery" className="btn btn-ghost btn-lg">
-            Browse Reset & Recovery programs
+            Browse Reset & Recovery programmes
           </Link>
         </div>
       </section>
@@ -162,7 +162,7 @@ export default async function SingaporeDestinationGuidePage() {
       {/* WHAT IT INVOLVES */}
       <section className="shell" style={{ paddingTop: 24 }}>
         <div className="card" style={{ padding: 28 }}>
-          <h2 style={{ fontSize: 20, marginBottom: 14 }}>What a Singapore program actually involves</h2>
+          <h2 style={{ fontSize: 20, marginBottom: 14 }}>What a Singapore programme actually involves</h2>
           <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: 10 }}>
             {WHAT_IT_INVOLVES.map((c) => (
               <li key={c} className="body-sm" style={{ display: "flex", gap: 10 }}>
@@ -182,7 +182,7 @@ export default async function SingaporeDestinationGuidePage() {
       <section className="shell" style={{ paddingTop: 56 }}>
         <div className="section-head">
           <div>
-            <div className="eyebrow" style={{ marginBottom: 8 }}>All Singapore &amp; Sentosa programs</div>
+            <div className="eyebrow" style={{ marginBottom: 8 }}>All Singapore &amp; Sentosa programmes</div>
             <h2>Comparing your <span className="display-italic">options</span>.</h2>
           </div>
         </div>
@@ -214,8 +214,8 @@ export default async function SingaporeDestinationGuidePage() {
         <section className="shell" style={{ paddingTop: 56 }}>
           <div className="section-head">
             <div>
-              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programs</div>
-              <h2>Actual Singapore &amp; Sentosa <span className="display-italic">programs</span>.</h2>
+              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programmes</div>
+              <h2>Actual Singapore &amp; Sentosa <span className="display-italic">programmes</span>.</h2>
             </div>
           </div>
           <div className="rail">
@@ -239,7 +239,7 @@ export default async function SingaporeDestinationGuidePage() {
         >
           <div className="eyebrow" style={{ color: "rgba(255,255,255,.7)" }}>Not sure which one fits?</div>
           <p className="display" style={{ fontSize: "clamp(24px, 5vw, 36px)", margin: "12px 0 20px", maxWidth: 560 }}>
-            <span className="display-italic">Free WS</span>, matched program, real humans on WhatsApp.
+            <span className="display-italic">Free WS</span>, matched programme, real humans on WhatsApp.
           </p>
           <Link href="/start" className="btn" style={{ background: "var(--accent-ink)", color: "var(--accent-deep)" }}>
             Get your WS →

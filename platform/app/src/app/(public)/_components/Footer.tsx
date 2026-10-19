@@ -58,7 +58,7 @@ export default async function Footer() {
   const exploreLinks: Link[] = [
     { href: "/properties", label: "Destinations" },
     { href: "/properties", label: "Properties" },
-    { href: "/programs", label: "Programs" },
+    { href: "/programs", label: "Programmes" },
     { href: "/#tracks", label: "Key Outcomes" },
     { href: "/guides/burnout-recovery-retreats-southeast-asia", label: "Burnout Recovery Guide" },
     { href: "/guides/sleep-reset-retreats-asia", label: "Sleep Reset Guide" },

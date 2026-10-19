@@ -10,12 +10,12 @@ export const dynamic = "force-dynamic"
 export const metadata: Metadata = {
   title: "Wellness Travel Guide: Bali",
   description:
-    "A practical guide to wellness travel in Bali — yoga and emotional-reset retreats at Udara Bali, fasting and creative-clarity retreats at Mokka Bali, what each actually involves, typical duration and price, and real matched programs.",
+    "A practical guide to wellness travel in Bali — yoga and emotional-reset retreats at Udara Bali, fasting and creative-clarity retreats at Mokka Bali, what each actually involves, typical duration and price, and real matched programmes.",
   alternates: { canonical: "/guides/bali-wellness-guide" },
   openGraph: {
     title: "Wellness Travel Guide: Bali | Dream Islands",
     description:
-      "Yoga, emotional reset and fasting retreats in Bali — what to expect, programme types, duration, price and real matched programs.",
+      "Yoga, emotional reset and fasting retreats in Bali — what to expect, programme types, duration, price and real matched programmes.",
     url: "https://dreamislands.org/guides/bali-wellness-guide",
   },
 }
@@ -105,7 +105,7 @@ const FAQS = [
     a: "The 7-day version is a focused reset — daily yoga, sound healing, water healing. The 14-day version goes deeper, adding aerial yoga, full spa access and communal reflection, and is aimed at longer-term burnout recovery rather than a short reset.",
   },
   {
-    q: "Are these programs a substitute for ongoing medical or psychiatric care?",
+    q: "Are these programmes a substitute for ongoing medical or psychiatric care?",
     a: "No. The yoga, fasting and meditation programmes in Bali are a structured wellness reset, not medical treatment or diagnosis. Dream Islands is a Destination Marketing Organization, not a medical institution, and this is not medical advice.",
   },
 ]
@@ -149,14 +149,14 @@ export default async function BaliDestinationGuidePage() {
         </h1>
         <p className="body-lg" style={{ marginBottom: 20, maxWidth: 700 }}>
           Yoga and emotional reset at Udara Bali, fasting and creative clarity at Mokka Bali. Here's what each
-          actually involves and which real programs match.
+          actually involves and which real programmes match.
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 8 }}>
           <Link href="/start" className="btn btn-primary btn-lg">
             Get your WS →
           </Link>
           <Link href="/tracks/mind-balance" className="btn btn-ghost btn-lg">
-            Browse Mind Balance programs
+            Browse Mind Balance programmes
           </Link>
         </div>
       </section>
@@ -179,7 +179,7 @@ export default async function BaliDestinationGuidePage() {
       {/* WHAT IT INVOLVES */}
       <section className="shell" style={{ paddingTop: 24 }}>
         <div className="card" style={{ padding: 28 }}>
-          <h2 style={{ fontSize: 20, marginBottom: 14 }}>What a Bali program actually involves</h2>
+          <h2 style={{ fontSize: 20, marginBottom: 14 }}>What a Bali programme actually involves</h2>
           <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: 10 }}>
             {WHAT_IT_INVOLVES.map((c) => (
               <li key={c} className="body-sm" style={{ display: "flex", gap: 10 }}>
@@ -199,7 +199,7 @@ export default async function BaliDestinationGuidePage() {
       <section className="shell" style={{ paddingTop: 56 }}>
         <div className="section-head">
           <div>
-            <div className="eyebrow" style={{ marginBottom: 8 }}>All Bali programs</div>
+            <div className="eyebrow" style={{ marginBottom: 8 }}>All Bali programmes</div>
             <h2>Comparing your <span className="display-italic">options</span>.</h2>
           </div>
         </div>
@@ -231,8 +231,8 @@ export default async function BaliDestinationGuidePage() {
         <section className="shell" style={{ paddingTop: 56 }}>
           <div className="section-head">
             <div>
-              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programs</div>
-              <h2>Actual Udara Bali <span className="display-italic">programs</span>.</h2>
+              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programmes</div>
+              <h2>Actual Udara Bali <span className="display-italic">programmes</span>.</h2>
             </div>
           </div>
           <div className="rail">
@@ -248,8 +248,8 @@ export default async function BaliDestinationGuidePage() {
         <section className="shell" style={{ paddingTop: 56 }}>
           <div className="section-head">
             <div>
-              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programs</div>
-              <h2>Actual Mokka Bali <span className="display-italic">programs</span>.</h2>
+              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programmes</div>
+              <h2>Actual Mokka Bali <span className="display-italic">programmes</span>.</h2>
             </div>
           </div>
           <div className="rail">
@@ -273,7 +273,7 @@ export default async function BaliDestinationGuidePage() {
         >
           <div className="eyebrow" style={{ color: "rgba(255,255,255,.7)" }}>Not sure which one fits?</div>
           <p className="display" style={{ fontSize: "clamp(24px, 5vw, 36px)", margin: "12px 0 20px", maxWidth: 560 }}>
-            <span className="display-italic">Free WS</span>, matched program, real humans on WhatsApp.
+            <span className="display-italic">Free WS</span>, matched programme, real humans on WhatsApp.
           </p>
           <Link href="/start" className="btn" style={{ background: "var(--accent-ink)", color: "var(--accent-deep)" }}>
             Get your WS →

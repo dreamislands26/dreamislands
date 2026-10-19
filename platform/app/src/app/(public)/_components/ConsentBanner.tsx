@@ -50,52 +50,15 @@ export default function ConsentBanner() {
   if (!visible) return null
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 9999,
-        background: "#111",
-        color: "#fff",
-        padding: "16px 20px",
-        display: "flex",
-        flexWrap: "wrap",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: "12px",
-      }}
-    >
-      <p style={{ margin: 0, fontSize: "14px", maxWidth: "640px" }}>
+    <div className="ds-consent" role="dialog" aria-label="Cookies">
+      <p className="ds-body-m" style={{ margin: 0 }}>
         We use cookies to understand how you use Dream Islands and to show relevant offers. You can accept all cookies or reject non-essential ones.
       </p>
-      <div style={{ display: "flex", gap: "8px" }}>
-        <button
-          onClick={() => choose(false)}
-          style={{
-            background: "transparent",
-            border: "1px solid #fff",
-            color: "#fff",
-            padding: "8px 16px",
-            borderRadius: "6px",
-            cursor: "pointer",
-          }}
-        >
+      <div className="ds-consent-actions">
+        <button type="button" className="ds-consent-btn" onClick={() => choose(false)}>
           Reject non-essential
         </button>
-        <button
-          onClick={() => choose(true)}
-          style={{
-            background: "#fff",
-            border: "1px solid #fff",
-            color: "#111",
-            padding: "8px 16px",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontWeight: 600,
-          }}
-        >
+        <button type="button" className="ds-consent-btn ds-consent-primary" onClick={() => choose(true)}>
           Accept all
         </button>
       </div>

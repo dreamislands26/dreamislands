@@ -10,12 +10,12 @@ export const dynamic = "force-dynamic"
 export const metadata: Metadata = {
   title: "Burnout Recovery Retreats in Southeast Asia",
   description:
-    "A practical guide to burnout recovery retreats across Southeast and East Asia — symptoms to watch for, what a retreat can and can't fix, programme types, typical duration, and real matched programs from Thailand, Singapore, Malaysia and China.",
+    "A practical guide to burnout recovery retreats across Southeast and East Asia — symptoms to watch for, what a retreat can and can't fix, programme types, typical duration, and real matched programmes from Thailand, Singapore, Malaysia and China.",
   alternates: { canonical: "/guides/burnout-recovery-retreats-southeast-asia" },
   openGraph: {
     title: "Burnout Recovery Retreats in Southeast Asia | Dream Islands",
     description:
-      "Symptoms, what a retreat can and can't fix, programme types, duration, destinations and real matched programs for burnout recovery across Asia.",
+      "Symptoms, what a retreat can and can't fix, programme types, duration, destinations and real matched programmes for burnout recovery across Asia.",
     url: "https://dreamislands.org/guides/burnout-recovery-retreats-southeast-asia",
   },
 }
@@ -103,15 +103,15 @@ const FAQS = [
   },
   {
     q: "Is a wellness retreat a substitute for therapy?",
-    a: "No. A retreat can reset physical baseline — sleep, energy, inflammation markers, stress load — and give you space to think clearly. It is not a substitute for therapy or psychiatric treatment if what you're experiencing is clinical depression, an anxiety disorder, or another condition that needs diagnosis and ongoing care. Dream Islands is a Destination Marketing Organization, not a medical institution, and our programs are wellness travel, not medical treatment.",
+    a: "No. A retreat can reset physical baseline — sleep, energy, inflammation markers, stress load — and give you space to think clearly. It is not a substitute for therapy or psychiatric treatment if what you're experiencing is clinical depression, an anxiety disorder, or another condition that needs diagnosis and ongoing care. Dream Islands is a Destination Marketing Organization, not a medical institution, and our programmes are wellness travel, not medical treatment.",
   },
   {
-    q: "What's the difference between a detox retreat and a burnout recovery program?",
-    a: "A detox retreat is usually built around a specific physical protocol — diet, cleanse, TCM or spa treatments — aimed at markers like inflammation, energy or weight. A burnout recovery program is built around the stress/recovery cycle specifically: sleep architecture, nervous system regulation, digital detox and often a coaching or biometric component. Several programs combine both.",
+    q: "What's the difference between a detox retreat and a burnout recovery programme?",
+    a: "A detox retreat is usually built around a specific physical protocol — diet, cleanse, TCM or spa treatments — aimed at markers like inflammation, energy or weight. A burnout recovery programme is built around the stress/recovery cycle specifically: sleep architecture, nervous system regulation, digital detox and often a coaching or biometric component. Several programmes combine both.",
   },
   {
     q: "Do I need to travel far for burnout recovery if I'm based in Singapore, Hong Kong or another Asian city?",
-    a: "No. Several programs are designed specifically for zero-travel-friction resets — a 3–5 day executive protocol in Singapore, for example, needs no long-haul flight and no jet lag to recover from before you've even started.",
+    a: "No. Several programmes are designed specifically for zero-travel-friction resets — a 3–5 day executive protocol in Singapore, for example, needs no long-haul flight and no jet lag to recover from before you've even started.",
   },
 ]
 
@@ -161,14 +161,14 @@ export default async function BurnoutRecoveryGuidePage() {
         </h1>
         <p className="body-lg" style={{ marginBottom: 20, maxWidth: 700 }}>
           A structured reset, not a vacation. Here's how to tell if you need one, what it can and can't fix,
-          the different programme types available across Asia, and which real programs match.
+          the different programme types available across Asia, and which real programmes match.
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 8 }}>
           <Link href="/start" className="btn btn-primary btn-lg">
             Get your WS →
           </Link>
           <Link href="/programs?track=Reset" className="btn btn-ghost btn-lg">
-            Browse Reset &amp; Recovery programs
+            Browse Reset &amp; Recovery programmes
           </Link>
         </div>
       </section>
@@ -179,7 +179,7 @@ export default async function BurnoutRecoveryGuidePage() {
           <h2 style={{ fontSize: 22, marginBottom: 6 }}>Signs you might need a structured reset</h2>
           <p className="body-sm" style={{ marginBottom: 16, color: "var(--ink-2)" }}>
             None of these are a diagnosis — they're common signals people describe before booking a Reset &amp;
-            Recovery program.
+            Recovery programme.
           </p>
           <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: 10 }}>
             {SYMPTOMS.map((s) => (
@@ -262,8 +262,8 @@ export default async function BurnoutRecoveryGuidePage() {
         <section id="matched-programs" className="shell" style={{ paddingTop: 56, scrollMarginTop: 90 }}>
           <div className="section-head">
             <div>
-              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programs</div>
-              <h2>Actual burnout-recovery <span className="display-italic">programs</span>.</h2>
+              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programmes</div>
+              <h2>Actual burnout-recovery <span className="display-italic">programmes</span>.</h2>
             </div>
           </div>
           <div className="rail">
@@ -287,7 +287,7 @@ export default async function BurnoutRecoveryGuidePage() {
         >
           <div className="eyebrow" style={{ color: "rgba(255,255,255,.7)" }}>Not sure which one fits?</div>
           <p className="display" style={{ fontSize: "clamp(24px, 5vw, 36px)", margin: "12px 0 20px", maxWidth: 560 }}>
-            <span className="display-italic">Free WS</span>, matched program, real humans on WhatsApp.
+            <span className="display-italic">Free WS</span>, matched programme, real humans on WhatsApp.
           </p>
           <Link href="/start" className="btn" style={{ background: "var(--accent-ink)", color: "var(--accent-deep)" }}>
             Get your WS →

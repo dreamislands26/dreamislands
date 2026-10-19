@@ -10,12 +10,12 @@ export const dynamic = "force-dynamic"
 export const metadata: Metadata = {
   title: "Sleep and Nervous System Reset Retreats in Asia",
   description:
-    "A practical guide to sleep and nervous-system reset retreats across Asia — signs you need one, what a retreat can and can't fix, programme types, typical duration, and real matched programs from Thailand, Malaysia, Singapore and China.",
+    "A practical guide to sleep and nervous-system reset retreats across Asia — signs you need one, what a retreat can and can't fix, programme types, typical duration, and real matched programmes from Thailand, Malaysia, Singapore and China.",
   alternates: { canonical: "/guides/sleep-reset-retreats-asia" },
   openGraph: {
     title: "Sleep and Nervous System Reset Retreats in Asia | Dream Islands",
     description:
-      "Signs you need a sleep reset, what a retreat can and can't fix, programme types, duration, destinations and real matched programs across Asia.",
+      "Signs you need a sleep reset, what a retreat can and can't fix, programme types, duration, destinations and real matched programmes across Asia.",
     url: "https://dreamislands.org/guides/sleep-reset-retreats-asia",
   },
 }
@@ -99,7 +99,7 @@ const PROGRAMME_TYPES: ProgrammeType[] = [
 const FAQS = [
   {
     q: "How is a sleep-reset retreat different from a regular wellness retreat?",
-    a: "A sleep-reset program is built specifically around sleep architecture and nervous-system regulation — structured light exposure, movement timing, a screen-free wind-down, and often TCM diagnosis or sound therapy — rather than general relaxation. It's a targeted protocol, not a vacation with better bedding.",
+    a: "A sleep-reset programme is built specifically around sleep architecture and nervous-system regulation — structured light exposure, movement timing, a screen-free wind-down, and often TCM diagnosis or sound therapy — rather than general relaxation. It's a targeted protocol, not a vacation with better bedding.",
   },
   {
     q: "Can a retreat actually fix insomnia?",
@@ -107,7 +107,7 @@ const FAQS = [
   },
   {
     q: "How many days does it actually take to reset a sleep cycle?",
-    a: "A 3-day program introduces the practice and can shift acute stress. Most people see a measurable change by day 5–8, once light exposure, movement timing and a screen-free wind-down have run for long enough to matter. Longer, more clinical protocols go deeper into diagnostics and follow-through.",
+    a: "A 3-day programme introduces the practice and can shift acute stress. Most people see a measurable change by day 5–8, once light exposure, movement timing and a screen-free wind-down have run for long enough to matter. Longer, more clinical protocols go deeper into diagnostics and follow-through.",
   },
   {
     q: "Will jet lag undo the reset before it even starts?",
@@ -162,14 +162,14 @@ export default async function SleepResetGuidePage() {
         <p className="body-lg" style={{ marginBottom: 20, maxWidth: 700 }}>
           A structured protocol for sleep architecture and an overactive nervous system, not just a quiet room.
           Here's how to tell if you need one, what it can and can't fix, the programme types available across Asia,
-          and which real programs match.
+          and which real programmes match.
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 8 }}>
           <Link href="/start" className="btn btn-primary btn-lg">
             Get your WS →
           </Link>
           <Link href="/programs?track=Mind" className="btn btn-ghost btn-lg">
-            Browse Mind Balance programs
+            Browse Mind Balance programmes
           </Link>
         </div>
       </section>
@@ -180,7 +180,7 @@ export default async function SleepResetGuidePage() {
           <h2 style={{ fontSize: 22, marginBottom: 6 }}>Signs you might need a sleep reset</h2>
           <p className="body-sm" style={{ marginBottom: 16, color: "var(--ink-2)" }}>
             None of these are a diagnosis — they're common signals people describe before booking a Mind Balance
-            program.
+            programme.
           </p>
           <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: 10 }}>
             {SIGNS.map((s) => (
@@ -263,8 +263,8 @@ export default async function SleepResetGuidePage() {
         <section id="matched-programs" className="shell" style={{ paddingTop: 56, scrollMarginTop: 90 }}>
           <div className="section-head">
             <div>
-              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programs</div>
-              <h2>Actual sleep &amp; nervous-system <span className="display-italic">programs</span>.</h2>
+              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programmes</div>
+              <h2>Actual sleep &amp; nervous-system <span className="display-italic">programmes</span>.</h2>
             </div>
           </div>
           <div className="rail">
@@ -288,7 +288,7 @@ export default async function SleepResetGuidePage() {
         >
           <div className="eyebrow" style={{ color: "rgba(255,255,255,.7)" }}>Not sure which one fits?</div>
           <p className="display" style={{ fontSize: "clamp(24px, 5vw, 36px)", margin: "12px 0 20px", maxWidth: 560 }}>
-            <span className="display-italic">Free WS</span>, matched program, real humans on WhatsApp.
+            <span className="display-italic">Free WS</span>, matched programme, real humans on WhatsApp.
           </p>
           <Link href="/start" className="btn" style={{ background: "var(--accent-ink)", color: "var(--accent-deep)" }}>
             Get your WS →

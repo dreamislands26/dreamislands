@@ -1,0 +1,273 @@
+/* DS v2 · M3 tokens, exported from Figma «DIT · Design System v2 · M3»
+   (Palette A · Mint, Color · Scheme Light / Dark, Shape, Spacing, State,
+   text and effect styles). Light is the site default; dark is ready under
+   [data-theme="dark"] but has no switch yet. */
+
+:root {
+  /* accent */
+  --ds-primary: #60bb89; /* accent (Oleg 18.10.2026): brighter, same hue as the former #2b5c41 */
+  --ds-on-primary: #ffffff;
+  --ds-primary-container: #cdf3db;
+  --ds-on-primary-container: #0b4027;
+  --ds-secondary: #54665a;
+  --ds-on-secondary: #ffffff;
+  --ds-secondary-container: #bdedcf;
+  --ds-on-secondary-container: #1d3b2a;
+  --ds-tertiary: #2b5c41; /* the former accent: deep brand green (logo) */
+  --ds-on-tertiary: #ffffff;
+  --ds-tertiary-container: #e3f5e9;
+  --ds-on-tertiary-container: #1d3b2a;
+  --ds-error: #ba1a1a;
+  --ds-on-error: #ffffff;
+  --ds-error-container: #ffdad6;
+  --ds-on-error-container: #410002;
+
+  /* surface */
+  --ds-surface: #eff3ed;
+  --ds-surface-dim: #dee5dd;
+  --ds-surface-bright: #f5f8f3;
+  --ds-surface-container-lowest: #ffffff;
+  --ds-surface-container-low: #ffffff;
+  --ds-surface-container: #f8faf5;
+  --ds-surface-container-high: #ffffff;
+  --ds-surface-container-highest: #e1e9e1;
+  --ds-on-surface: #17281e;
+  --ds-on-surface-variant: #54665a;
+  --ds-outline: #7e8e82;
+  --ds-outline-variant: #d5ded5;
+  --ds-inverse-surface: #17281e;
+  --ds-inverse-on-surface: #eff3ed;
+  --ds-inverse-primary: #8bd8ab;
+  --ds-scrim: #000000;
+
+  /* tracks */
+  --ds-track-reset: #2f7d62;
+  --ds-track-reset-container: #d3eee3;
+  --ds-track-performance: #2b5c41;
+  --ds-track-performance-container: #d7f0e0;
+  --ds-track-mind: #3c6189;
+  --ds-track-mind-container: #dde7f2;
+  --ds-track-immersion: #7a6328;
+  --ds-track-immersion-container: #f1e8d2;
+  --ds-track-sport: #9a5726;
+  --ds-track-sport-container: #f6e3d6;
+
+  /* on photos */
+  --ds-image-plate: #f4f6f5;
+  --ds-on-image-plate: #1c262a;
+  --ds-on-image: #ffffff;
+
+  /* shape */
+  --ds-r-xs: 0.25rem;
+  --ds-r-sm: 0.5rem;
+  --ds-r-md: 0.75rem;
+  --ds-r-lg: 1rem;
+  --ds-r-lg-plus: 1.25rem;
+  --ds-r-xl: 1.75rem;
+  --ds-r-xl-plus: 2.25rem; /* blocks, modals, sheets */
+  --ds-r-full: 62.4375rem;
+
+  /* spacing */
+  --ds-s-1: 0.25rem;
+  --ds-s-2: 0.5rem;
+  --ds-s-3: 0.75rem;
+  --ds-s-4: 1rem;
+  --ds-s-5: 1.25rem;
+  --ds-s-6: 1.5rem;
+  --ds-s-8: 2rem;
+  --ds-s-10: 2.5rem;
+  --ds-s-12: 3rem;
+  --ds-s-16: 4rem;
+  --ds-s-20: 5rem;
+  --ds-s-24: 6rem;
+
+  /* state layers (opacity) */
+  --ds-state-hover: 0.08;
+  --ds-state-focus: 0.1;
+  --ds-state-pressed: 0.1;
+  --ds-state-disabled: 0.38;
+
+  /* elevation: popups and floating handles only. One soft shadow tinted with on-surface (Figma
+     Elevation/Level 1-4, after Oleg's slider thumb, 18.10.2026). */
+  --ds-elev-1: 0 0.125rem 0.5rem rgba(23, 40, 30, 0.1);
+  --ds-elev-2: 0 0.25rem 1rem rgba(23, 40, 30, 0.1);
+  --ds-elev-3: 0 0.5rem 2rem rgba(23, 40, 30, 0.12);
+  --ds-elev-4: 0 1rem 3rem rgba(23, 40, 30, 0.14);
+
+  /* motion: gentle spring (damping 0.78, response 0.42s, ~2% overshoot) for iOS-like UI movement */
+  --ds-spring: linear(0, 0.029, 0.101, 0.198, 0.306, 0.416, 0.521, 0.618, 0.703, 0.776, 0.838, 0.887, 0.927, 0.957, 0.98, 0.996, 1.007, 1.014, 1.018, 1.02, 1.02, 1.019, 1.017, 1.015, 1.013, 1.011, 1.009, 1.007, 1.005, 1.004, 1.003, 1.002, 1);
+  --ds-spring-dur: 0.55s;
+
+  /* type */
+  --ds-font-display: var(--font-bricolage, "Bricolage Grotesque"), -apple-system, "Segoe UI", sans-serif;
+  --ds-font-logo: var(--font-optima-fallback, "Belleza"), "Optima", sans-serif; /* wordmark only */
+  --ds-font-body: var(--font-dmsans, "DM Sans"), -apple-system, "Segoe UI", sans-serif;
+  --ds-font-icon: "Material Symbols Rounded";
+
+  /* layout */
+  --ds-container: 80rem; /* list screens: x 80 to 1360 at 1440 */
+  --ds-container-narrow: 70rem; /* detail screens: x 160 to 1280 at 1440 */
+  --ds-container-wide: 80rem;
+  --ds-gutter: 1.5rem;
+  --ds-page-pad: clamp(var(--ds-gutter), calc((100vw - 80rem) / 2), 5rem);
+}
+
+:root[data-theme="dark"] {
+  --ds-primary: #80dba7;
+  --ds-on-primary: #14201b;
+  --ds-primary-container: #1c4d34;
+  --ds-on-primary-container: #c4f1d5;
+  --ds-secondary: #bccabe;
+  --ds-on-secondary: #27332b;
+  --ds-secondary-container: #284434;
+  --ds-on-secondary-container: #eaf2f6;
+  --ds-tertiary: #aee1c0;
+  --ds-on-tertiary: #14201b;
+  --ds-tertiary-container: #32464c;
+  --ds-on-tertiary-container: #b0ecfc;
+  --ds-error: #ffb4ab;
+  --ds-on-error: #690005;
+  --ds-error-container: #93000a;
+  --ds-on-error-container: #ffdad6;
+  --ds-surface: #131b1e;
+  --ds-surface-dim: #0c1518;
+  --ds-surface-bright: #3d4649;
+  --ds-surface-container-lowest: #0c1518;
+  --ds-surface-container-low: #1c262a;
+  --ds-surface-container: #242c30;
+  --ds-surface-container-high: #2c3437;
+  --ds-surface-container-highest: #343d40;
+  --ds-on-surface: #eaf2f6;
+  --ds-on-surface-variant: #a1adb2;
+  --ds-outline: #879398;
+  --ds-outline-variant: #364246;
+  --ds-inverse-surface: #dbe4e8;
+  --ds-inverse-on-surface: #242c30;
+  --ds-inverse-primary: #60bb89;
+  --ds-track-reset: #7dd3ae;
+  --ds-track-reset-container: #2c4741;
+  --ds-track-performance: #aee1c0;
+  --ds-track-performance-container: #384b45;
+  --ds-track-mind: #9cc0ee;
+  --ds-track-mind-container: #344350;
+  --ds-track-immersion: #dcc690;
+  --ds-track-immersion-container: #434439;
+  --ds-track-sport: #f2a672;
+  --ds-track-sport-container: #493c32;
+}
+
+/* ── Type scale (two text levels per block: on-surface + on-surface-variant) ── */
+.ds-display-l { font: 700 3.5rem/3.75rem var(--ds-font-display); letter-spacing: -0.8px; }
+.ds-display-m { font: 600 2.75rem/3rem var(--ds-font-display); letter-spacing: -0.5px; }
+.ds-display-s { font: 500 2.25rem/2.5rem var(--ds-font-display); letter-spacing: -0.3px; }
+.ds-headline-l { font: 700 2rem/2.25rem var(--ds-font-display); letter-spacing: -0.3px; }
+.ds-headline-m { font: 600 1.5rem/1.2 var(--ds-font-display); letter-spacing: -0.2px; }
+.ds-headline-s { font: 700 1.125rem/1.2 var(--ds-font-display); letter-spacing: 0; }
+.ds-title-l { font: 600 1.125rem/1.5rem var(--ds-font-body); letter-spacing: -0.1px; }
+.ds-title-m { font: 500 1rem/1.25rem var(--ds-font-body); letter-spacing: 0; }
+.ds-title-s { font: 500 0.875rem/1.125rem var(--ds-font-body); letter-spacing: 0; }
+.ds-body-l { font: 400 1rem/1.5rem var(--ds-font-body); letter-spacing: 0; }
+.ds-body-m { font: 400 0.875rem/1.25rem var(--ds-font-body); letter-spacing: 0; }
+.ds-body-s { font: 400 0.75rem/1rem var(--ds-font-body); letter-spacing: 0.1px; }
+.ds-label-xl { font: 500 1rem/1.25rem var(--ds-font-body); letter-spacing: 0; }
+.ds-label-l { font: 500 0.875rem/1.125rem var(--ds-font-body); letter-spacing: 0; }
+.ds-label-m { font: 500 0.75rem/1rem var(--ds-font-body); letter-spacing: 0.1px; }
+.ds-label-s { font: 600 0.625rem/0.75rem var(--ds-font-body); letter-spacing: 0.4px; }
+.ds-overline { font: 500 0.8125rem/1.125rem var(--ds-font-body); letter-spacing: 0; }
+
+@media (max-width: 767px) {
+  .ds-display-l { font-size: 2.5rem; line-height: 2.75rem; letter-spacing: -0.5px; }
+  .ds-display-m { font-size: 2.125rem; line-height: 2.5rem; }
+  .ds-display-s { font-size: 1.875rem; line-height: 2.25rem; }
+  .ds-headline-l { font-size: 1.75rem; line-height: 2rem; }
+}
+
+.ds-muted { color: var(--ds-on-surface-variant); }
+.ds-ink { color: var(--ds-on-surface); }
+
+/* Material Symbols Rounded, Light (300). The glyph box is square so round
+   containers never stretch into ovals. */
+.ds-icon {
+  font-family: var(--ds-font-icon);
+  font-weight: 300;
+  font-style: normal;
+  font-size: 1.5rem;
+  line-height: 1;
+  width: 1em;
+  height: 1em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  direction: ltr;
+  overflow: hidden;
+  user-select: none;
+  font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 0, "opsz" 24;
+  -webkit-font-smoothing: antialiased;
+}
+.ds-icon[data-fill="1"] { font-variation-settings: "FILL" 1, "wght" 300, "GRAD" 0, "opsz" 24; }
+
+/* Divider between inline facts: a thin vertical bar in outline colour. */
+.ds-sep {
+  display: inline-block;
+  width: 1px;
+  height: 0.9em;
+  margin: 0 0.625rem;
+  background: var(--ds-outline-variant);
+  vertical-align: -0.1em;
+}
+
+/* Page frame */
+.ds-root {
+  background: var(--ds-surface);
+  color: var(--ds-on-surface);
+  font-family: var(--ds-font-body);
+  min-height: 100vh;
+}
+.ds-container { width: 100%; max-width: calc(var(--ds-container) + 2 * var(--ds-page-pad)); margin: 0 auto; padding: 0 var(--ds-page-pad); }
+.ds-container-narrow { width: 100%; max-width: calc(var(--ds-container-narrow) + 2 * var(--ds-page-pad)); margin: 0 auto; padding: 0 var(--ds-page-pad); }
+.ds-container-wide { width: 100%; max-width: calc(var(--ds-container-wide) + 2 * var(--ds-gutter)); margin: 0 auto; padding: 0 var(--ds-gutter); }
+
+.ds-visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+:where(.ds-root) :focus-visible {
+  outline: 0.125rem solid var(--ds-primary);
+  outline-offset: 0.125rem;
+}
+
+/* Old site pieces living inside the new frame */
+.ds-root .fab-wa { box-shadow: var(--ds-elev-2); }
+@media (max-width: 767px) {
+  /* The tab bar owns the bottom edge on phones; WhatsApp lives in page CTAs. */
+  .ds-root .fab-wa { display: none; }
+}
+/* Sizes are in rem. On phones the root scales with the screen: 16px at the 390pt design width
+   (375 gives 15.4px, 430 gives 17.6px), so every iPhone shows the same layout. Desktop stays 16px. */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+@media (max-width: 767px) {
+  html { font-size: min(calc(100vw / 24.375), 18px); }
+}
+
+html:has(.ds-root), body:has(.ds-root) { background: var(--ds-surface); color: var(--ds-on-surface); }
+
+/* Cookie banner: a popup, so it gets elevation */
+.ds-consent {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: 1.5rem; z-index: 9999;
+  width: min(45rem, calc(100% - 2rem));
+  display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; justify-content: space-between;
+  padding: 1.25rem 1.5rem; border-radius: var(--ds-r-xl-plus);
+  background: var(--ds-surface-container-high); color: var(--ds-on-surface); box-shadow: var(--ds-elev-3);
+  font-family: var(--ds-font-body);
+}
+.ds-consent p { flex: 1 1 20rem; color: var(--ds-on-surface-variant); }
+.ds-consent-actions { display: flex; gap: 0.5rem; }
+.ds-consent-btn { height: 2.5rem; padding: 0 1.25rem; border-radius: var(--ds-r-full); font: 500 0.875rem/1.125rem var(--ds-font-body); color: var(--ds-primary); background: transparent; cursor: pointer; white-space: nowrap; }
+.ds-consent-primary { background: var(--ds-primary); color: var(--ds-on-primary); }
+@media (max-width: 767px) { .ds-consent { bottom: calc(96px + env(safe-area-inset-bottom)); padding: 16px 20px; } .ds-consent-actions { width: 100%; } .ds-consent-btn { flex: 1; } }
+.ds-root:has([data-focus]) .fab-wa { display: none; }

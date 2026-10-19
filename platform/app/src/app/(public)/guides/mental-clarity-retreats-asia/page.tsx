@@ -8,12 +8,12 @@ export const dynamic = "force-dynamic"
 export const metadata: Metadata = {
   title: "Mental Clarity Retreats in Asia",
   description:
-    "A practical guide to mental clarity retreats across Asia — signs of mental clutter and decision fatigue, what a retreat can and can't fix, programme types, typical duration, and real matched programs from Thailand, Malaysia, Indonesia, the Philippines and Vietnam.",
+    "A practical guide to mental clarity retreats across Asia — signs of mental clutter and decision fatigue, what a retreat can and can't fix, programme types, typical duration, and real matched programmes from Thailand, Malaysia, Indonesia, the Philippines and Vietnam.",
   alternates: { canonical: "/guides/mental-clarity-retreats-asia" },
   openGraph: {
     title: "Mental Clarity Retreats in Asia | Dream Islands",
     description:
-      "Signs of mental clutter and decision fatigue, what a retreat can and can't fix, programme types, duration, destinations and real matched programs across Asia.",
+      "Signs of mental clutter and decision fatigue, what a retreat can and can't fix, programme types, duration, destinations and real matched programmes across Asia.",
     url: "https://dreamislands.org/guides/mental-clarity-retreats-asia",
   },
 }
@@ -84,11 +84,11 @@ const PROGRAMME_TYPES: ProgrammeType[] = [
 const FAQS = [
   {
     q: "How is Mental Clarity different from Reduce Stress & Anxiety?",
-    a: "Stress and anxiety programs target the nervous system and emotional load directly. Mental clarity programs target focus, decision fatigue and creative capacity — the cognitive side rather than the emotional side. Many guests benefit from both, and some programs touch on both outcomes.",
+    a: "Stress and anxiety programmes target the nervous system and emotional load directly. Mental clarity programmes target focus, decision fatigue and creative capacity — the cognitive side rather than the emotional side. Many guests benefit from both, and some programmes touch on both outcomes.",
   },
   {
     q: "Do I need meditation experience to join?",
-    a: "No. Most programs on this page are built for beginners, with guided daily sessions rather than assuming a prior practice.",
+    a: "No. Most programmes on this page are built for beginners, with guided daily sessions rather than assuming a prior practice.",
   },
   {
     q: "How long until I notice a difference in focus?",
@@ -96,7 +96,7 @@ const FAQS = [
   },
   {
     q: "Can a digital detox work if I still need to check email for work?",
-    a: "Some programs allow limited, scheduled connectivity; others are fully screen-free. Ask the team about a specific program's policy before booking if staying reachable is a requirement for you.",
+    a: "Some programmes allow limited, scheduled connectivity; others are fully screen-free. Ask the team about a specific programme's policy before booking if staying reachable is a requirement for you.",
   },
 ]
 export default async function MentalClarityGuidePage() {
@@ -142,14 +142,14 @@ export default async function MentalClarityGuidePage() {
         </h1>
         <p className="body-lg" style={{ marginBottom: 20, maxWidth: 700 }}>
           Structured space to quiet the noise, not just a quiet room. Here's how to tell if you need one,
-          what it can and can't fix, the programme types available across Asia, and which real programs match.
+          what it can and can't fix, the programme types available across Asia, and which real programmes match.
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 8 }}>
           <Link href="/start" className="btn btn-primary btn-lg">
             Get your WS →
           </Link>
           <Link href="/programs?track=Mind" className="btn btn-ghost btn-lg">
-            Browse Mind Balance programs
+            Browse Mind Balance programmes
           </Link>
         </div>
       </section>
@@ -159,7 +159,7 @@ export default async function MentalClarityGuidePage() {
           <h2 style={{ fontSize: 22, marginBottom: 6 }}>Signs you might need a mental-clarity reset</h2>
           <p className="body-sm" style={{ marginBottom: 16, color: "var(--ink-2)" }}>
             None of these are a diagnosis — they're common signals people describe before booking a Mind
-            Balance program built for clarity and focus.
+            Balance programme built for clarity and focus.
           </p>
           <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: 10 }}>
             {SIGNS.map((s) => (
@@ -238,8 +238,8 @@ export default async function MentalClarityGuidePage() {
         <section id="matched-programs" className="shell" style={{ paddingTop: 56, scrollMarginTop: 90 }}>
           <div className="section-head">
             <div>
-              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programs</div>
-              <h2>Actual mental-clarity <span className="display-italic">programs</span>.</h2>
+              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programmes</div>
+              <h2>Actual mental-clarity <span className="display-italic">programmes</span>.</h2>
             </div>
           </div>
           <div className="rail">
@@ -262,7 +262,7 @@ export default async function MentalClarityGuidePage() {
         >
           <div className="eyebrow" style={{ color: "rgba(255,255,255,.7)" }}>Not sure which one fits?</div>
           <p className="display" style={{ fontSize: "clamp(24px, 5vw, 36px)", margin: "12px 0 20px", maxWidth: 560 }}>
-            <span className="display-italic">Free WS</span>, matched program, real humans on WhatsApp.
+            <span className="display-italic">Free WS</span>, matched programme, real humans on WhatsApp.
           </p>
           <Link href="/start" className="btn" style={{ background: "var(--accent-ink)", color: "var(--accent-deep)" }}>
             Get your WS →

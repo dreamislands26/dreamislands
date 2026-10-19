@@ -22,6 +22,8 @@ function detectBrowser(): string {
 
 export default function AttributionInit() {
   useEffect(() => {
+    // Local redesign runs share the production database: skip the session write.
+    if (process.env.NEXT_PUBLIC_DISABLE_ANALYTICS === "1") return
     captureAttribution()
     const attribution = getAttribution()
     const sessionId = getSessionId()

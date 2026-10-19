@@ -10,12 +10,12 @@ export const dynamic = "force-dynamic"
 export const metadata: Metadata = {
   title: "Wellness Travel Guide: Mile, Yunnan, China",
   description:
-    "A practical guide to medical wellness travel in Mile, Yunnan — silica hot springs, functional medicine, biomarker panels and executive health protocols at Mile Wellness Resort, what each programme actually involves, typical duration and price, and real matched programs.",
+    "A practical guide to medical wellness travel in Mile, Yunnan — silica hot springs, functional medicine, biomarker panels and executive health protocols at Mile Wellness Resort, what each programme actually involves, typical duration and price, and real matched programmes.",
   alternates: { canonical: "/guides/mile-yunnan-wellness-guide" },
   openGraph: {
     title: "Wellness Travel Guide: Mile, Yunnan, China | Dream Islands",
     description:
-      "Medical-grade wellness in Mile, Yunnan — silica hot springs, biomarker panels and executive health protocols. What to expect, programme types, duration, price and real matched programs.",
+      "Medical-grade wellness in Mile, Yunnan — silica hot springs, biomarker panels and executive health protocols. What to expect, programme types, duration, price and real matched programmes.",
     url: "https://dreamislands.org/guides/mile-yunnan-wellness-guide",
   },
 }
@@ -25,7 +25,7 @@ const VIDEO_JSON_LD = {
   "@type": "VideoObject",
   name: "Mile Wellness Resort, Yunnan | TCM, Medical Wellness & Hot Springs in China",
   description:
-    "Mile Wellness Resort is a premium medical wellness retreat in Mile, Yunnan, China, combining Traditional Chinese Medicine (TCM), functional medicine, modern diagnostics, silica hot springs and restorative wellness. Programs range from short 3-day wellness escapes to 7-14 day deep recovery, executive health and preventive wellness programs.",
+    "Mile Wellness Resort is a premium medical wellness retreat in Mile, Yunnan, China, combining Traditional Chinese Medicine (TCM), functional medicine, modern diagnostics, silica hot springs and restorative wellness. Programmes range from short 3-day wellness escapes to 7-14 day deep recovery, executive health and preventive wellness programmes.",
   thumbnailUrl: ["https://i.ytimg.com/vi/fpyzycLUIck/hqdefault.jpg"],
   uploadDate: "2026-09-01T08:00:25-07:00",
   duration: "PT1M4S",
@@ -41,7 +41,7 @@ const VIDEO_JSON_LD = {
 const WHY_MILE = [
   "Mile Wellness Resort is the most clinically intensive destination in the network — real biomarker panels, functional medicine and IV protocols, not a spa-only reset",
   "Built around Mile's natural silica hot springs — a genuine mineral-spring resource the resort's protocols are layered on top of",
-  "A genuinely wide range: a $900 three-day rest weekend and a $10,000 fully bespoke preventive-health program with a personal coordinator sit side by side",
+  "A genuinely wide range: a $900 three-day rest weekend and a $10,000 fully bespoke preventive-health programme with a personal coordinator sit side by side",
   "The composite Xi'an + Mile itinerary pairs TCM conditioning with the medical-wellness stay, run in partnership with Xi'an Overseas Tourism Co., Ltd.",
 ]
 
@@ -136,7 +136,7 @@ const FAQS = [
     a: "The Xi'an & Mile Medical Wellness Journey pairs TCM conditioning in Xi'an with the medical-wellness stay at Mile — a good fit if you want a gentler build-up. Going straight to Mile suits guests who want to skip the Xi'an leg and start diagnostics immediately.",
   },
   {
-    q: "Are these programs a substitute for ongoing medical care?",
+    q: "Are these programmes a substitute for ongoing medical care?",
     a: "No. Even the more clinical Mile programmes are a structured wellness and preventive-health protocol, not a replacement for your own doctor or ongoing medical treatment. Dream Islands is a Destination Marketing Organization, not a medical institution, and this is not medical advice.",
   },
 ]
@@ -183,14 +183,14 @@ export default async function MileYunnanDestinationGuidePage() {
         <p className="body-lg" style={{ marginBottom: 20, maxWidth: 700 }}>
           The network's most clinically intensive destination — silica hot springs, functional medicine and
           biomarker panels at Mile Wellness Resort. Here's what each programme actually involves and which
-          real programs match.
+          real programmes match.
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 8 }}>
           <Link href="/start" className="btn btn-primary btn-lg">
             Get your WS →
           </Link>
           <Link href="/tracks/performance" className="btn btn-ghost btn-lg">
-            Browse Performance programs
+            Browse Performance programmes
           </Link>
         </div>
       </section>
@@ -226,7 +226,7 @@ export default async function MileYunnanDestinationGuidePage() {
       {/* WHAT IT INVOLVES */}
       <section className="shell" style={{ paddingTop: 24 }}>
         <div className="card" style={{ padding: 28 }}>
-          <h2 style={{ fontSize: 20, marginBottom: 14 }}>What a Mile program actually involves</h2>
+          <h2 style={{ fontSize: 20, marginBottom: 14 }}>What a Mile programme actually involves</h2>
           <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: 10 }}>
             {WHAT_IT_INVOLVES.map((c) => (
               <li key={c} className="body-sm" style={{ display: "flex", gap: 10 }}>
@@ -246,7 +246,7 @@ export default async function MileYunnanDestinationGuidePage() {
       <section className="shell" style={{ paddingTop: 56 }}>
         <div className="section-head">
           <div>
-            <div className="eyebrow" style={{ marginBottom: 8 }}>All Mile, Yunnan programs</div>
+            <div className="eyebrow" style={{ marginBottom: 8 }}>All Mile, Yunnan programmes</div>
             <h2>Comparing your <span className="display-italic">options</span>.</h2>
           </div>
         </div>
@@ -278,7 +278,7 @@ export default async function MileYunnanDestinationGuidePage() {
         <section className="shell" style={{ paddingTop: 56 }}>
           <div className="section-head">
             <div>
-              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programs</div>
+              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programmes</div>
               <h2>Quick <span className="display-italic">resets</span>.</h2>
             </div>
           </div>
@@ -295,7 +295,7 @@ export default async function MileYunnanDestinationGuidePage() {
         <section className="shell" style={{ paddingTop: 56 }}>
           <div className="section-head">
             <div>
-              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programs</div>
+              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programmes</div>
               <h2>Executive &amp; preventive <span className="display-italic">health</span>.</h2>
             </div>
           </div>
@@ -312,7 +312,7 @@ export default async function MileYunnanDestinationGuidePage() {
         <section className="shell" style={{ paddingTop: 56 }}>
           <div className="section-head">
             <div>
-              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programs</div>
+              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programmes</div>
               <h2>Deep medical <span className="display-italic">recovery</span>.</h2>
             </div>
           </div>
@@ -337,7 +337,7 @@ export default async function MileYunnanDestinationGuidePage() {
         >
           <div className="eyebrow" style={{ color: "rgba(255,255,255,.7)" }}>Not sure which one fits?</div>
           <p className="display" style={{ fontSize: "clamp(24px, 5vw, 36px)", margin: "12px 0 20px", maxWidth: 560 }}>
-            <span className="display-italic">Free WS</span>, matched program, real humans on WhatsApp.
+            <span className="display-italic">Free WS</span>, matched programme, real humans on WhatsApp.
           </p>
           <Link href="/start" className="btn" style={{ background: "var(--accent-ink)", color: "var(--accent-deep)" }}>
             Get your WS →

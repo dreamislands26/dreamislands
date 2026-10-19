@@ -13,7 +13,7 @@ import { COUNTRIES, COUNTRY_FLAGS, countrySlug } from "../_lib/countries"
 // their own booking CTA independent of this nav).
 const LINKS_BEFORE_DEST = [
   { href: "/#outcomes", label: "Outcomes" },
-  { href: "/programs", label: "Programs" },
+  { href: "/programs", label: "Programmes" },
 ]
 const LINKS_AFTER_DEST = [
   { href: "/#how-it-works", label: "How it works" },

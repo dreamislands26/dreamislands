@@ -1,0 +1,5 @@
+.tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
+.device { display: flex; align-items: center; gap: 1rem; margin-top: 1.5rem; padding: 1.25rem 1.5rem; border-radius: var(--ds-r-xl-plus); background: var(--ds-surface-container-low); }
+.device > :global(.ds-icon) { font-size: 1.75rem; color: var(--ds-primary); }
+.device > div { flex: 1; min-width: 0; }
+@media (max-width: 767px) { .device { flex-direction: column; align-items: flex-start; } }

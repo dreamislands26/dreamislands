@@ -36,7 +36,7 @@ export const HOW_IT_WORKS = [
   },
   {
     n: "02",
-    title: "See your matched programs",
+    title: "See your matched programmes",
     body: "Three retreats across Asia, ranked by your score. Composite stays for deep work, focused tracks for one priority.",
   },
   {
@@ -93,6 +93,10 @@ export type LandingProgram = {
   price: string
   tags: string[]
   location: string
+  /** Card place line: the resort name (DS Program card). */
+  place?: string[]
+  /** Average published guest rating, when there are reviews. */
+  rating?: number | null
   flag: string
   country: string | null
   hero_image_url: string | null
@@ -120,6 +124,8 @@ export function mapProgram(row: DbProgramRow): LandingProgram {
   if (firstProp?.island) locationParts.push(firstProp.island)
   if (firstProp?.country) locationParts.push(firstProp.country)
   const location = locationParts.join(", ") || (firstProp?.name ?? "")
+  // Card shows the resort only, next to the flag (Oleg, 17.10.2026)
+  const place = firstProp?.name?.trim() ? [firstProp.name.trim()] : []
   const flag = firstProp?.country ? (COUNTRY_FLAGS[firstProp.country] ?? "") : ""
   const contact_wa =
     row.program_properties?.map((pp) => pp.properties?.contact_wa).find((wa) => !!wa) ?? null
@@ -139,6 +145,7 @@ export function mapProgram(row: DbProgramRow): LandingProgram {
     price,
     tags: row.outcomes ?? [],
     location,
+    place: place.filter(Boolean),
     flag,
     country: firstProp?.country ?? null,
     hero_image_url: row.hero_image_url,

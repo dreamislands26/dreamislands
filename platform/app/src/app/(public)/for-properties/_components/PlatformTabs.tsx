@@ -4,8 +4,8 @@ import { useState } from "react"
 import { track } from "../../_lib/track"
 
 const TABS = [
-  { key: "admin", label: "Admin", blurb: "Manages the full network — properties, programs, bookings and guest journeys in one place." },
-  { key: "partner", label: "Partner", blurb: "What a property team sees — their guests, their programs, their delivery calendar." },
+  { key: "admin", label: "Admin", blurb: "Manages the full network — properties, programmes, bookings and guest journeys in one place." },
+  { key: "partner", label: "Partner", blurb: "What a property team sees — their guests, their programmes, their delivery calendar." },
   { key: "user", label: "User", blurb: "The guest's own view of their journey, goals and progress." },
   { key: "consumer", label: "Consumer frontend", blurb: "The public dreamislands.org experience guests book through." },
 ] as const

@@ -131,8 +131,8 @@ export default function ReserveModal({
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!programId && !caseMode) { setError("Pick a program"); return }
-    if (isPriced && !variantId) { setError("Pick a program length"); return }
+    if (!programId && !caseMode) { setError("Pick a programme"); return }
+    if (isPriced && !variantId) { setError("Pick a programme length"); return }
     if (!name.trim()) { setError("Enter your name"); return }
     if (!contact.trim()) { setError("Enter an email or WhatsApp number"); return }
     if (!arrival && !caseMode) { setError("Pick an arrival date"); return }
@@ -289,7 +289,7 @@ export default function ReserveModal({
               <form onSubmit={onSubmit} style={{ display: "grid", gap: 12 }}>
                 {programs.length > 1 && (
                   <label>
-                    <div className="eyebrow" style={{ marginBottom: 6 }}>Program</div>
+                    <div className="eyebrow" style={{ marginBottom: 6 }}>Programme</div>
                     <select
                       className="field"
                       value={programId}
@@ -312,7 +312,7 @@ export default function ReserveModal({
                       lineHeight: 1.5,
                     }}
                   >
-                    {caseMode ? "Tell us briefly about your case. Our team reviews it, confirms a suitable programme and cost, and only then proceeds to booking. No payment is taken now." : "We don't have live pricing for this program yet. Tell us your dates and we'll get back to you with availability and pricing — no payment needed now."}
+                    {caseMode ? "Tell us briefly about your case. Our team reviews it, confirms a suitable programme and cost, and only then proceeds to booking. No payment is taken now." : "We don't have live pricing for this programme yet. Tell us your dates and we'll get back to you with availability and pricing — no payment needed now."}
                   </div>
                 )}
                 {!isUnpriced && (
@@ -404,7 +404,7 @@ export default function ReserveModal({
                       </div>
                     )}
                     <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span>Program total</span>
+                      <span>Programme total</span>
                       <strong>THB {formatTHB(fullPrice)}</strong>
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between" }}>

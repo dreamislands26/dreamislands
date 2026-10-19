@@ -1,0 +1,20 @@
+/* Price range (Figma "Price range") */
+.root { display: flex; flex-direction: column; gap: 0.75rem; }
+.sub { margin: 0; font: 400 0.875rem/1.25rem var(--ds-font-body); color: var(--ds-on-surface-variant); }
+.hist { height: 4rem; display: flex; align-items: flex-end; gap: 0.125rem; padding: 0 0.875rem; }
+.bar { flex: 1; border-radius: 0.125rem 0.125rem 0 0; background: var(--ds-outline-variant); }
+.bar[data-on] { background: var(--ds-primary); }
+.slider { position: relative; height: 1.75rem; margin: 0 0.875rem; }
+.track { position: absolute; left: 0; right: 0; top: 50%; height: 0.125rem; margin-top: -0.0625rem; background: var(--ds-outline-variant); }
+.range { position: absolute; top: 50%; height: 0.25rem; margin-top: -0.125rem; border-radius: 0.125rem; background: var(--ds-primary); }
+.slider input { position: absolute; inset: 0 -0.875rem; width: calc(100% + 1.75rem); margin: 0; background: none; pointer-events: none; -webkit-appearance: none; appearance: none; }
+.slider input::-webkit-slider-runnable-track { height: 1.75rem; background: none; }
+.slider input::-webkit-slider-thumb { -webkit-appearance: none; pointer-events: auto; width: 1.75rem; height: 1.75rem; border-radius: 50%; background: var(--ds-surface-container-lowest); box-shadow: var(--ds-elev-1); cursor: grab; }
+.slider input::-moz-range-thumb { pointer-events: auto; width: 1.75rem; height: 1.75rem; border: 0; border-radius: 50%; background: var(--ds-surface-container-lowest); box-shadow: var(--ds-elev-1); cursor: grab; }
+.slider input::-moz-range-track { background: none; }
+.slider input:focus-visible::-webkit-slider-thumb { outline: 0.125rem solid var(--ds-primary); outline-offset: 0.125rem; }
+.fields { display: flex; justify-content: space-between; gap: 0.75rem; }
+.field { display: flex; flex-direction: column; gap: 0.375rem; }
+.fieldEnd { align-items: flex-end; }
+.label { font: 400 0.75rem/1rem var(--ds-font-body); letter-spacing: 0.1px; color: var(--ds-on-surface-variant); }
+.value { height: 2.75rem; padding: 0 1.25rem; display: inline-flex; align-items: center; border-radius: var(--ds-r-full); background: var(--ds-surface-container-high); font: 400 1rem/1.5rem var(--ds-font-body); color: var(--ds-on-surface); }

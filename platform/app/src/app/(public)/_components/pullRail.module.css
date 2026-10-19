@@ -1,0 +1,43 @@
+/* Wolt-style "see all" tab at the end of a rail (Figma 150:24472): 67x116, radius 36 on the left,
+   secondary-container, centred on the photo. Hidden at rest; --pull (set from PullRail.tsx while
+   the finger overscrolls the rail's end) slides it in, then stretches it, then morphs it into a circle. */
+.wrap { position: relative; --pull: 0; }
+
+.scroller { display: flex; gap: var(--gap); overflow-x: auto; overscroll-behavior-x: none; scrollbar-width: none; margin-right: -0.75rem; padding-right: 0.75rem; transform: translateX(calc(var(--pull) * -1px)); transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.1); }
+.scroller::-webkit-scrollbar { display: none; }
+.wrap[data-drag] .scroller { transition: none; }
+
+.tab {
+  /* k: 0 at rest, 1 at the threshold (ARM = 110 in PullRail.tsx) */
+  --k: min(1, var(--pull) / 110);
+  position: absolute;
+  z-index: 1;
+  overflow: hidden;
+  /* Right edge eases from the screen edge to where the circle will sit (36px in; the wrap is 12px in) */
+  right: calc(-0.75rem + 2.25rem * var(--k));
+  top: calc((var(--photo) - 7.25rem) / 2);
+  /* Left edge rides with the end of the rail, under the finger */
+  width: max(0px, calc(var(--pull) * 1px - 2.25rem * var(--k)));
+  height: 7.25rem;
+  border-radius: 2.25rem 0 0 2.25rem;
+  background: var(--ds-secondary-container);
+  color: #173a27;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font: 500 0.9375rem/1.5rem var(--ds-font-body);
+  transition: width 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.1), right 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.1), height 0.25s ease, top 0.25s ease, border-radius 0.25s ease;
+}
+/* While dragging the tab follows the finger; only the morph into a circle is animated */
+.wrap[data-drag] .tab { transition: height 0.22s cubic-bezier(0.3, 1.4, 0.5, 1), top 0.22s cubic-bezier(0.3, 1.4, 0.5, 1), border-radius 0.22s ease; }
+.wrap[data-drag][data-armed] .tab { transition: width 0.22s cubic-bezier(0.3, 1.4, 0.5, 1), height 0.22s cubic-bezier(0.3, 1.4, 0.5, 1), top 0.22s cubic-bezier(0.3, 1.4, 0.5, 1), border-radius 0.22s ease; }
+
+.label { white-space: nowrap; transition: opacity 0.12s ease; }
+.arrow { position: absolute; opacity: 0; transform: scale(0.5); transition: opacity 0.12s ease, transform 0.26s cubic-bezier(0.3, 1.6, 0.5, 1); }
+
+/* Armed: the tab shrinks into a 56px circle around the same right edge (36px from the screen edge);
+   pulling further only drifts it a little. */
+.wrap[data-armed] .tab { width: 3.5rem; height: 3.5rem; top: calc((var(--photo) - 3.5rem) / 2); right: calc(1.5rem + max(0px, (var(--pull) - 110) * 0.06px)); border-radius: 50%; }
+.wrap[data-armed] .label { opacity: 0; }
+.wrap[data-armed] .arrow { opacity: 1; transform: scale(1); }

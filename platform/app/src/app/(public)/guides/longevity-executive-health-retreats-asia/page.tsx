@@ -10,12 +10,12 @@ export const dynamic = "force-dynamic"
 export const metadata: Metadata = {
   title: "Longevity and Executive Health Retreats in Asia",
   description:
-    "A practical guide to longevity and executive health retreats across Asia — who they're for, what a program can and can't do, programme types, typical duration and price, and real matched programs from China.",
+    "A practical guide to longevity and executive health retreats across Asia — who they're for, what a programme can and can't do, programme types, typical duration and price, and real matched programmes from China.",
   alternates: { canonical: "/guides/longevity-executive-health-retreats-asia" },
   openGraph: {
     title: "Longevity and Executive Health Retreats in Asia | Dream Islands",
     description:
-      "Who it's for, what a program can and can't do, programme types, duration, destinations and real matched programs for longevity and executive health across Asia.",
+      "Who it's for, what a programme can and can't do, programme types, duration, destinations and real matched programmes for longevity and executive health across Asia.",
     url: "https://dreamislands.org/guides/longevity-executive-health-retreats-asia",
   },
 }
@@ -40,7 +40,7 @@ const CAN_DO = [
 const CANNOT_DO = [
   "Diagnose or treat an existing medical condition — that requires your own physician and ongoing clinical care",
   "Replace regular check-ups with your primary doctor; this is a proactive, preventive layer, not a substitute for continuity of care",
-  "Guarantee longevity outcomes — biomarker optimization is grounded in real science, but individual results vary and no program can promise a specific outcome",
+  "Guarantee longevity outcomes — biomarker optimization is grounded in real science, but individual results vary and no programme can promise a specific outcome",
 ]
 
 type ProgrammeType = {
@@ -99,14 +99,14 @@ const PROGRAMME_TYPES: ProgrammeType[] = [
 const FAQS = [
   {
     q: "What's the difference between a \"longevity retreat\" and an executive health check-up?",
-    a: "There's real overlap. Longevity-focused programs often combine Western diagnostics with traditional approaches — TCM, herbal protocols, Taiji — aimed at long-term biomarker trends. An executive health check-up leans more heavily on comprehensive diagnostics and a functional-medicine read of your current state. Several programs blend both.",
+    a: "There's real overlap. Longevity-focused programmes often combine Western diagnostics with traditional approaches — TCM, herbal protocols, Taiji — aimed at long-term biomarker trends. An executive health check-up leans more heavily on comprehensive diagnostics and a functional-medicine read of your current state. Several programmes blend both.",
   },
   {
     q: "Is this a substitute for seeing my own doctor?",
     a: "No. This is a proactive, preventive layer — comprehensive diagnostics and a structured protocol you wouldn't easily get through routine care. It doesn't replace ongoing care with your own physician. Dream Islands is a Destination Marketing Organization, not a medical institution, and this is not medical advice.",
   },
   {
-    q: "Why are these so much more expensive than other wellness programs?",
+    q: "Why are these so much more expensive than other wellness programmes?",
     a: "The price reflects the depth of clinical work: full biomarker panels, functional medicine assessments and specialist time cost significantly more than a typical spa or detox protocol. This is diagnostic and preventive medicine delivered in a retreat setting, not a luxury markup on a standard wellness stay.",
   },
   {
@@ -161,15 +161,15 @@ export default async function LongevityExecutiveHealthGuidePage() {
         </h1>
         <p className="body-lg" style={{ marginBottom: 20, maxWidth: 700 }}>
           Comprehensive diagnostics and a proactive protocol, not a guess about what your body needs.
-          Here's who this is for, what a program can and can't do, the programme types available across Asia,
-          and which real programs match.
+          Here's who this is for, what a programme can and can't do, the programme types available across Asia,
+          and which real programmes match.
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 8 }}>
           <Link href="/start" className="btn btn-primary btn-lg">
             Get your WS →
           </Link>
           <Link href="/programs?track=Performance" className="btn btn-ghost btn-lg">
-            Browse Performance programs
+            Browse Performance programmes
           </Link>
         </div>
       </section>
@@ -180,7 +180,7 @@ export default async function LongevityExecutiveHealthGuidePage() {
           <h2 style={{ fontSize: 22, marginBottom: 6 }}>Who this is for</h2>
           <p className="body-sm" style={{ marginBottom: 16, color: "var(--ink-2)" }}>
             This isn't symptom-driven the way a burnout or sleep reset is — it's proactive. These are the signals
-            people describe before booking a Performance program built around diagnostics.
+            people describe before booking a Performance programme built around diagnostics.
           </p>
           <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: 10 }}>
             {SIGNS.map((s) => (
@@ -197,7 +197,7 @@ export default async function LongevityExecutiveHealthGuidePage() {
       <section className="shell" style={{ paddingTop: 24 }}>
         <div style={{ display: "grid", gap: 16 }} className="two-col">
           <div className="card" style={{ padding: 28 }}>
-            <h2 style={{ fontSize: 20, marginBottom: 14 }}>What a program can do</h2>
+            <h2 style={{ fontSize: 20, marginBottom: 14 }}>What a programme can do</h2>
             <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: 10 }}>
               {CAN_DO.map((c) => (
                 <li key={c} className="body-sm" style={{ display: "flex", gap: 10 }}>
@@ -263,8 +263,8 @@ export default async function LongevityExecutiveHealthGuidePage() {
         <section id="matched-programs" className="shell" style={{ paddingTop: 56, scrollMarginTop: 90 }}>
           <div className="section-head">
             <div>
-              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programs</div>
-              <h2>Actual longevity &amp; executive health <span className="display-italic">programs</span>.</h2>
+              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programmes</div>
+              <h2>Actual longevity &amp; executive health <span className="display-italic">programmes</span>.</h2>
             </div>
           </div>
           <div className="rail">
@@ -288,7 +288,7 @@ export default async function LongevityExecutiveHealthGuidePage() {
         >
           <div className="eyebrow" style={{ color: "rgba(255,255,255,.7)" }}>Not sure which one fits?</div>
           <p className="display" style={{ fontSize: "clamp(24px, 5vw, 36px)", margin: "12px 0 20px", maxWidth: 560 }}>
-            <span className="display-italic">Free WS</span>, matched program, real humans on WhatsApp.
+            <span className="display-italic">Free WS</span>, matched programme, real humans on WhatsApp.
           </p>
           <Link href="/start" className="btn" style={{ background: "var(--accent-ink)", color: "var(--accent-deep)" }}>
             Get your WS →

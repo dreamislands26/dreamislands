@@ -2,7 +2,8 @@ import Image from "next/image"
 import Link from "next/link"
 import { supabaseAdmin } from "@/lib/supabase-server"
 import type { Metadata } from "next"
-import { COUNTRY_FLAGS, countrySlug } from "../_lib/countries"
+import { countrySlug } from "../_lib/countries"
+import Flag from "../ds/Flag"
 
 export const metadata: Metadata = {
   title: "All Properties & Destinations",
@@ -95,7 +96,7 @@ export default async function PropertiesPage() {
           Where the <span className="display-italic">work happens</span>.
         </h1>
         <p className="body-lg" style={{ marginBottom: 24, maxWidth: 760 }}>
-          Every program on Dream Islands is delivered through a real, curated property, clinic or
+          Every programme on Dream Islands is delivered through a real, curated property, clinic or
           center on the ground - not a generic listing. This is the full destination directory:
           where each one is, what it does, and what it's part of.
         </p>
@@ -108,7 +109,7 @@ export default async function PropertiesPage() {
               className="tag-outline tag"
               style={{ fontSize: 13 }}
             >
-              {COUNTRY_FLAGS[g.name] ?? ""} {g.name} ({g.items.length})
+              <Flag of={g.name} /> {g.name} ({g.items.length})
             </a>
           ))}
         </div>
@@ -128,7 +129,7 @@ export default async function PropertiesPage() {
               }}
             >
               <h2 style={{ margin: 0, fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 30, color: "var(--ink)" }}>
-                {COUNTRY_FLAGS[group.name] ?? ""} {group.name}
+                <Flag of={group.name} /> {group.name}
               </h2>
               <Link href={"/destinations/" + countrySlug(group.name)} className="btn btn-soft" style={{ fontSize: 13 }}>
                 {group.name} destination page {"→"}
@@ -159,7 +160,7 @@ export default async function PropertiesPage() {
                     )}
                   </div>
                   <div className="body-sm" style={{ marginBottom: 14 }}>
-                    {prop.country ? COUNTRY_FLAGS[prop.country] ?? "" : ""}{" "}
+                    {prop.country ? <Flag of={prop.country} /> : null}{" "}
                     {[prop.island, prop.country].filter(Boolean).join(" · ")}
                   </div>
                   {prop.description && (
@@ -219,7 +220,7 @@ export default async function PropertiesPage() {
 
         <div style={{ marginTop: 8 }}>
           <Link href="/programs" className="btn btn-primary">
-            Browse programs at these properties
+            Browse programmes at these properties
           </Link>
         </div>
       </section>

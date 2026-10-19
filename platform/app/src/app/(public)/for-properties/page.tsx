@@ -7,12 +7,12 @@ import { PageViewTracker, ViewTracker, TrackedAnchor, TrackedLink } from "./_com
 export const metadata: Metadata = {
   title: "Wellness Platform for Hotels, Resorts & Retreats",
   description:
-    "Qualify wellness guests, configure tailored programs, coordinate practitioners and build repeat journeys with the Dream Islands platform.",
+    "Qualify wellness guests, configure tailored programmes, coordinate practitioners and build repeat journeys with the Dream Islands platform.",
   alternates: { canonical: "/for-properties" },
   openGraph: {
     title: "Wellness Platform for Hotels, Resorts & Retreats | Dream Islands",
     description:
-      "Qualify wellness guests, configure tailored programs, coordinate practitioners and build repeat journeys with the Dream Islands platform.",
+      "Qualify wellness guests, configure tailored programmes, coordinate practitioners and build repeat journeys with the Dream Islands platform.",
     url: "https://dreamislands.org/for-properties",
   },
 }
@@ -27,7 +27,7 @@ const PROBLEM_POINTS = [
 
 const WORKFLOW: Array<[string, string, string]> = [
   ["01", "Qualify", "Capture goal, travel dates, preferences, intensity and relevant constraints."],
-  ["02", "Plan", "Configure an approved program with suitable services and experiences."],
+  ["02", "Plan", "Configure an approved programme with suitable services and experiences."],
   ["03", "Resource", "Assign practitioners and confirm delivery capacity."],
   ["04", "Deliver", "Coordinate the stay, check-ins and operational actions."],
   ["05", "Continue", "Record the next recommendation and create a reason to return."],
@@ -43,14 +43,14 @@ const PROPERTY_JOBS: Array<[string, string, string]> = [
 
 const CONTROL: { coordinates: string[]; controls: string[] } = {
   coordinates: [
-    "Program and content structure",
+    "Programme and content structure",
     "Guest qualification and journey handoff",
     "Platform workflow",
     "Permissioned insights as the product develops",
   ],
   controls: [
     "Guest suitability and practitioner judgment",
-    "Program design",
+    "Programme design",
     "Availability and capacity",
     "Pricing and commercial terms",
     "On-site delivery",
@@ -58,10 +58,10 @@ const CONTROL: { coordinates: string[]; controls: string[] } = {
 }
 
 const PARTNER_FIT = [
-  "Properties with a real wellness program, not only rooms and amenities.",
+  "Properties with a real wellness programme, not only rooms and amenities.",
   "Teams with named practitioners, modalities, diagnostics or structured protocols.",
   "Properties seeking qualified demand and repeat journeys.",
-  "Teams willing to maintain accurate program and availability information.",
+  "Teams willing to maintain accurate programme and availability information.",
 ]
 
 const FAQ: Array<[string, string]> = [
@@ -71,19 +71,19 @@ const FAQ: Array<[string, string]> = [
   ],
   [
     "What part of the platform is live today?",
-    "The core operating system — admin, partner and user views managing supply, programs, bookings and guest journeys — is live production software today. Wellness Intelligence, the guest and partner insight dashboards, is a product prototype built on real, anonymized production data.",
+    "The core operating system — admin, partner and user views managing supply, programmes, bookings and guest journeys — is live production software today. Wellness Intelligence, the guest and partner insight dashboards, is a product prototype built on real, anonymized production data.",
   ],
   [
     "What does implementation require from our property?",
-    "Accurate, current program and availability information, and named practitioners or modalities on file.",
+    "Accurate, current programme and availability information, and named practitioners or modalities on file.",
   ],
   [
     "Does the platform require PMS or medical-record integration?",
-    "No. Programs, availability and practitioner information are managed directly in the platform.",
+    "No. Programmes, availability and practitioner information are managed directly in the platform.",
   ],
   [
-    "Who controls guest suitability and program delivery?",
-    "The property. Dream Islands coordinates qualification, journey handoff and platform workflow — the property retains guest suitability and practitioner judgment, program design, availability, pricing and on-site delivery.",
+    "Who controls guest suitability and programme delivery?",
+    "The property. Dream Islands coordinates qualification, journey handoff and platform workflow — the property retains guest suitability and practitioner judgment, programme design, availability, pricing and on-site delivery.",
   ],
   [
     "What guest information can a partner see?",
@@ -95,7 +95,7 @@ const FAQ: Array<[string, string]> = [
   ],
   [
     "What is Wellness Intelligence and when will it be available?",
-    "The next product layer, turning guest, program and journey data into longitudinal insight for both guests and partners — currently a product prototype built on real, anonymized data.",
+    "The next product layer, turning guest, programme and journey data into longitudinal insight for both guests and partners — currently a product prototype built on real, anonymized data.",
   ],
 ]
 
@@ -107,7 +107,7 @@ export default function ForPropertiesPage() {
         <div className="eyebrow" style={{ marginBottom: 12 }}>For Wellness Properties</div>
         <h1 className="display" style={{ fontSize: "clamp(34px, 8vw, 58px)", margin: "0 0 20px", color: "var(--ink)" }}>
           Run every wellness stay as a{" "}
-          <span className="display-italic">program</span>, not a package code.
+          <span className="display-italic">programme</span>, not a package code.
         </h1>
         <p className="body-lg" style={{ marginBottom: 28, maxWidth: 680 }}>
           Dream Islands gives wellness properties one operating layer to qualify guests, tailor the
@@ -167,7 +167,7 @@ export default function ForPropertiesPage() {
             <div className="eyebrow" style={{ marginBottom: 8 }}>Live platform</div>
             <h2>The Dream Islands platform <span className="display-italic">is live</span>.</h2>
             <p className="body-sm" style={{ marginTop: 8, maxWidth: 600 }}>
-              One operating system connects supply, programs, bookings and guest journeys across the network.
+              One operating system connects supply, programmes, bookings and guest journeys across the network.
             </p>
           </div>
         </div>
@@ -213,8 +213,8 @@ export default function ForPropertiesPage() {
               <p className="body-sm" style={{ margin: 0 }}>The guest sees how wellbeing changes before, during and after a journey.</p>
             </div>
             <div>
-              <h3 style={{ margin: "0 0 6px", fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 18, color: "var(--ink)" }}>Program & Guest Insights</h3>
-              <p className="body-sm" style={{ margin: 0 }}>The partner sees aggregated program performance, plus only the individual information permitted by guest consent.</p>
+              <h3 style={{ margin: "0 0 6px", fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 18, color: "var(--ink)" }}>Programme & Guest Insights</h3>
+              <p className="body-sm" style={{ margin: 0 }}>The partner sees aggregated programme performance, plus only the individual information permitted by guest consent.</p>
             </div>
           </div>
         </div>
@@ -294,7 +294,7 @@ export default function ForPropertiesPage() {
         <div id="demo" className="section-head" style={{ scrollMarginTop: 24 }}>
           <div>
             <div className="eyebrow" style={{ marginBottom: 8 }}>Get started</div>
-            <h2>Show us one program you want to <span className="display-italic">improve</span>.</h2>
+            <h2>Show us one programme you want to <span className="display-italic">improve</span>.</h2>
           </div>
         </div>
         <DemoForm />

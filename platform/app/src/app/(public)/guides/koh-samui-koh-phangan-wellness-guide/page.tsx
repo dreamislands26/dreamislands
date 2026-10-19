@@ -10,12 +10,12 @@ export const dynamic = "force-dynamic"
 export const metadata: Metadata = {
   title: "Wellness Travel Guide: Koh Samui & Koh Phangan",
   description:
-    "A practical guide to wellness travel in Koh Samui and Koh Phangan — medical-grade detox, longevity and sleep resets on Samui, meditation and nature immersion on Phangan, what each actually involves, typical duration and price, and real matched programs.",
+    "A practical guide to wellness travel in Koh Samui and Koh Phangan — medical-grade detox, longevity and sleep resets on Samui, meditation and nature immersion on Phangan, what each actually involves, typical duration and price, and real matched programmes.",
   alternates: { canonical: "/guides/koh-samui-koh-phangan-wellness-guide" },
   openGraph: {
     title: "Wellness Travel Guide: Koh Samui & Koh Phangan | Dream Islands",
     description:
-      "Medical-grade resets on Koh Samui, meditation and nature immersion on Koh Phangan — what to expect, programme types, duration, price and real matched programs.",
+      "Medical-grade resets on Koh Samui, meditation and nature immersion on Koh Phangan — what to expect, programme types, duration, price and real matched programmes.",
     url: "https://dreamislands.org/guides/koh-samui-koh-phangan-wellness-guide",
   },
 }
@@ -120,11 +120,11 @@ const FAQS = [
     a: "Yes — Koh Samui and Koh Phangan are connected by a roughly 30–45 minute ferry, and it's common to pair a few days of clinical reset on Samui with a few days of meditation on Phangan. Tell us on WhatsApp and we'll help sequence dates across both.",
   },
   {
-    q: "What's the difference between Detox Reset and Signature Program?",
-    a: "Signature Program is the flexible full-retreat baseline — the core Tanya Samui protocol without narrowing to one outcome. Detox Reset is a more specifically structured 6–11 day deep-detox aimed at lowering inflammation, resetting circadian rhythm and shifting stored fluid and toxin load.",
+    q: "What's the difference between Detox Reset and Signature Programme?",
+    a: "Signature Programme is the flexible full-retreat baseline — the core Tanya Samui protocol without narrowing to one outcome. Detox Reset is a more specifically structured 6–11 day deep-detox aimed at lowering inflammation, resetting circadian rhythm and shifting stored fluid and toxin load.",
   },
   {
-    q: "Are these programs a substitute for ongoing medical or psychiatric care?",
+    q: "Are these programmes a substitute for ongoing medical or psychiatric care?",
     a: "No. The clinical protocols on Koh Samui are a structured wellness reset, not medical treatment or diagnosis, and the meditation programmes on Koh Phangan are not a substitute for mental health care. Dream Islands is a Destination Marketing Organization, not a medical institution, and this is not medical advice.",
   },
 ]
@@ -168,14 +168,14 @@ export default async function SamuiPhanganDestinationGuidePage() {
         </h1>
         <p className="body-lg" style={{ marginBottom: 20, maxWidth: 700 }}>
           Two islands, one short ferry apart — clinical, medically-supervised resets on Samui, meditation and
-          nature immersion on Phangan. Here's what each actually involves and which real programs match.
+          nature immersion on Phangan. Here's what each actually involves and which real programmes match.
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 8 }}>
           <Link href="/start" className="btn btn-primary btn-lg">
             Get your WS →
           </Link>
           <Link href="/tracks/reset-recovery" className="btn btn-ghost btn-lg">
-            Browse Reset & Recovery programs
+            Browse Reset & Recovery programmes
           </Link>
         </div>
       </section>
@@ -198,7 +198,7 @@ export default async function SamuiPhanganDestinationGuidePage() {
       {/* WHAT IT INVOLVES */}
       <section className="shell" style={{ paddingTop: 24 }}>
         <div className="card" style={{ padding: 28 }}>
-          <h2 style={{ fontSize: 20, marginBottom: 14 }}>What a Samui or Phangan program actually involves</h2>
+          <h2 style={{ fontSize: 20, marginBottom: 14 }}>What a Samui or Phangan programme actually involves</h2>
           <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: 10 }}>
             {WHAT_IT_INVOLVES.map((c) => (
               <li key={c} className="body-sm" style={{ display: "flex", gap: 10 }}>
@@ -218,7 +218,7 @@ export default async function SamuiPhanganDestinationGuidePage() {
       <section className="shell" style={{ paddingTop: 56 }}>
         <div className="section-head">
           <div>
-            <div className="eyebrow" style={{ marginBottom: 8 }}>All Samui &amp; Phangan programs</div>
+            <div className="eyebrow" style={{ marginBottom: 8 }}>All Samui &amp; Phangan programmes</div>
             <h2>Comparing your <span className="display-italic">options</span>.</h2>
           </div>
         </div>
@@ -250,8 +250,8 @@ export default async function SamuiPhanganDestinationGuidePage() {
         <section className="shell" style={{ paddingTop: 56 }}>
           <div className="section-head">
             <div>
-              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programs</div>
-              <h2>Actual Koh Samui <span className="display-italic">programs</span>.</h2>
+              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programmes</div>
+              <h2>Actual Koh Samui <span className="display-italic">programmes</span>.</h2>
             </div>
           </div>
           <div className="rail">
@@ -267,8 +267,8 @@ export default async function SamuiPhanganDestinationGuidePage() {
         <section className="shell" style={{ paddingTop: 56 }}>
           <div className="section-head">
             <div>
-              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programs</div>
-              <h2>Actual Koh Phangan <span className="display-italic">programs</span>.</h2>
+              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programmes</div>
+              <h2>Actual Koh Phangan <span className="display-italic">programmes</span>.</h2>
             </div>
           </div>
           <div className="rail">
@@ -292,7 +292,7 @@ export default async function SamuiPhanganDestinationGuidePage() {
         >
           <div className="eyebrow" style={{ color: "rgba(255,255,255,.7)" }}>Not sure which one fits?</div>
           <p className="display" style={{ fontSize: "clamp(24px, 5vw, 36px)", margin: "12px 0 20px", maxWidth: 560 }}>
-            <span className="display-italic">Free WS</span>, matched program, real humans on WhatsApp.
+            <span className="display-italic">Free WS</span>, matched programme, real humans on WhatsApp.
           </p>
           <Link href="/start" className="btn" style={{ background: "var(--accent-ink)", color: "var(--accent-deep)" }}>
             Get your WS →

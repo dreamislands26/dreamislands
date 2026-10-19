@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic"
 export const metadata: Metadata = {
   title: "Boost Energy Retreats in Asia",
   description:
-    "A practical guide to boosting energy through wellness travel in Asia — signs of low energy worth addressing, what a retreat can and can't fix, and how to find the right starting point across Dream Islands' Asia-wide program catalogue.",
+    "A practical guide to boosting energy through wellness travel in Asia — signs of low energy worth addressing, what a retreat can and can't fix, and how to find the right starting point across Dream Islands' Asia-wide programme catalogue.",
   alternates: { canonical: "/guides/boost-energy-retreats-asia" },
   openGraph: {
     title: "Boost Energy Retreats in Asia | Dream Islands",
@@ -21,27 +21,27 @@ const SIGNS = [
   "Wanting to feel more \"switched on\" day to day, without a specific problem to point to",
 ]
 const CAN_DO = [
-  "Several existing programs — sleep-focused resets, detox protocols, stress-recovery retreats — touch on energy indirectly, since fatigue is often downstream of poor sleep, chronic stress or metabolic load",
-  "A free WS assessment can flag whether your energy issue is more of a sleep, stress or metabolic pattern, and point you to the program built for that root cause",
+  "Several existing programmes — sleep-focused resets, detox protocols, stress-recovery retreats — touch on energy indirectly, since fatigue is often downstream of poor sleep, chronic stress or metabolic load",
+  "A free WS assessment can flag whether your energy issue is more of a sleep, stress or metabolic pattern, and point you to the programme built for that root cause",
   "Structured environments — regular meals, daylight, movement, fewer screens — reliably shift energy for most people within days",
 ]
 const CANNOT_DO = [
-  "We don't yet have a program built specifically with energy as the primary, headline goal — we'd rather say that plainly than map you to something that's a loose fit",
+  "We don't yet have a programme built specifically with energy as the primary, headline goal — we'd rather say that plainly than map you to something that's a loose fit",
   "Diagnose or treat a medical cause of fatigue, such as anemia, a thyroid condition or sleep apnea — that needs a physician",
-  "Guarantee a specific energy outcome from any program",
+  "Guarantee a specific energy outcome from any programme",
 ]
 const FAQS = [
   {
-    q: "Do you have a program specifically for boosting energy?",
-    a: "Not yet as a dedicated, purpose-built program. Dream Islands' catalogue is built around outcomes people book for directly, and today none of our programs are designed with energy as the primary, headline goal — most of the fatigue relief guests report comes as a side effect of a sleep, stress or metabolic reset. We'd rather tell you that clearly than stretch a loose match to look like a fit.",
+    q: "Do you have a programme specifically for boosting energy?",
+    a: "Not yet as a dedicated, purpose-built programme. Dream Islands' catalogue is built around outcomes people book for directly, and today none of our programmes are designed with energy as the primary, headline goal — most of the fatigue relief guests report comes as a side effect of a sleep, stress or metabolic reset. We'd rather tell you that clearly than stretch a loose match to look like a fit.",
   },
   {
-    q: "Which existing programs would help with low energy?",
+    q: "Which existing programmes would help with low energy?",
     a: "It depends on the root cause. If your fatigue tracks with poor sleep, the Sleep Reset guide is the more precise starting point. If it tracks with chronic stress or burnout, the Burnout Recovery guide is closer. If it's tied to weight or digestion, the Metabolic Health guide may fit better. The WS is the fastest way to work out which of these is actually driving your energy, rather than guessing.",
   },
   {
-    q: "Will a dedicated energy program be added later?",
-    a: "This is a new and still-growing part of our program taxonomy. As we add programs designed specifically around energy, they'll appear here with real matched options — we won't backfill this page with anything that isn't a genuine primary match.",
+    q: "Will a dedicated energy programme be added later?",
+    a: "This is a new and still-growing part of our programme taxonomy. As we add programmes designed specifically around energy, they'll appear here with real matched options — we won't backfill this page with anything that isn't a genuine primary match.",
   },
 ]
 export default function BoostEnergyGuidePage() {
@@ -180,7 +180,7 @@ export default function BoostEnergyGuidePage() {
         >
           <div className="eyebrow" style={{ color: "rgba(255,255,255,.7)" }}>Not sure which one fits?</div>
           <p className="display" style={{ fontSize: "clamp(24px, 5vw, 36px)", margin: "12px 0 20px", maxWidth: 560 }}>
-            <span className="display-italic">Free WS</span>, matched program, real humans on WhatsApp.
+            <span className="display-italic">Free WS</span>, matched programme, real humans on WhatsApp.
           </p>
           <Link href="/start" className="btn" style={{ background: "var(--accent-ink)", color: "var(--accent-deep)" }}>
             Get your WS →

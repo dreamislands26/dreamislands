@@ -8,7 +8,7 @@ export default function MyMessages() {
         <div className="eyebrow" style={{ marginBottom: 12 }}>Messages</div>
         <h2 className="display" style={{ fontSize: 32, margin: "0 0 10px", color: "var(--ink)" }}>Talk to the team</h2>
         <p className="body" style={{ margin: "0 0 24px", maxWidth: 520 }}>
-          We answer on WhatsApp and by email — questions about your program, your dates, or anything that came up
+          We answer on WhatsApp and by email — questions about your programme, your dates, or anything that came up
           during your stay.
         </p>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>

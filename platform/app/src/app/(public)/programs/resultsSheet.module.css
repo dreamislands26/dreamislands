@@ -1,0 +1,9 @@
+/* Results sheet over the catalogue map (mobile): fixed, moved by transform between three resting points */
+.sheet { position: fixed; left: 0; right: 0; top: 0; z-index: 45; height: calc(100dvh - var(--full, 7.5rem)); display: flex; flex-direction: column; border-radius: var(--ds-r-xl-plus) var(--ds-r-xl-plus) 0 0; background: var(--ds-surface); box-shadow: var(--ds-elev-2); transform: translateY(46dvh); transition: transform 0.32s cubic-bezier(0.2, 0, 0, 1), border-radius 0.32s cubic-bezier(0.2, 0, 0, 1); will-change: transform; }
+/* Full: the sheet meets the search bar edge to edge, no corners and no shadow */
+.sheet[data-snap="full"] { border-radius: 0; box-shadow: none; }
+.head { position: relative; flex: none; padding: 1.5rem 1.5rem 1rem; touch-action: none; cursor: grab; }
+.handle { position: absolute; top: 0.5rem; left: 50%; width: 2rem; height: 0.25rem; margin-left: -1rem; border-radius: 0.125rem; background: var(--ds-outline-variant); }
+.list { position: relative; flex: 1; min-height: 0; overflow: hidden; overscroll-behavior: contain; padding: 0 1.5rem calc(2rem + env(safe-area-inset-bottom)); }
+.sheet[data-snap="full"] .list { overflow-y: auto; }
+.sheet[data-away] { transform: translateY(100dvh) !important; }

@@ -1,76 +1,132 @@
 "use client"
-
-import { useEffect, useMemo, useRef, useState } from "react"
-import {
-  WBS_QUESTIONS,
-  WBS_SECTION_LABELS,
-  computeWbs,
-  type WbsAnswers,
-  type WbsQuestion,
-  type WbsResult,
-} from "@/lib/wbs"
-import { Icon } from "../_components/Icon"
+// Wellness Journey (S2): one question per screen, section check-ins,
+// resume from where you left off. Scoring and the /api/intake payload are
+// unchanged from production.
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { WBS_QUESTIONS, WBS_SECTION_LABELS, computeWbs, type WbsAnswers, type WbsQuestion, type WbsResult, type WbsSection } from "@/lib/wbs"
 import { track } from "../_lib/track"
-import SaveResultBlock from "./SaveResultBlock"
 import MatchedPrograms, { type MatchedProgram } from "../_components/MatchedPrograms"
+import SaveResultBlock from "./SaveResultBlock"
 import { NoCloseMatch, MedicalSupport, PreventiveLane, type MedicalItem, type LaneItem } from "../matched/[id]/MatchedView"
+import { Logo } from "../ds/chrome"
+import { Badge, Button, Facts, Icon, IconButton, TextField, cx } from "../ds/ui"
+import s from "./journey.module.css"
 
 const ALL_QUESTIONS = WBS_QUESTIONS.filter(
-  (q): q is Extract<WbsQuestion, { type: "choice" }> | Extract<WbsQuestion, { type: "height_weight" }> =>
-    q.type === "choice" || q.type === "height_weight",
+  (q): q is Extract<WbsQuestion, { type: "choice" }> | Extract<WbsQuestion, { type: "height_weight" }> => q.type === "choice" || q.type === "height_weight",
 )
+const SECTIONS = Array.from(new Set(ALL_QUESTIONS.map((q) => q.section))) as WbsSection[]
+const STORE = "di_wj_progress_v1"
 
-type Phase = "questions" | "contact" | "submitting" | "done"
+type Phase = "questions" | "section" | "contact" | "submitting" | "done"
 type ContactForm = { name: string; whatsapp: string; email: string; country: string }
+type Saved = { step: number; answers: Record<string, string | number | null>; at: string }
+
+const OPTION_ICONS: Record<string, string> = { A: "battery_alert", B: "self_improvement", C: "monitor_weight", D: "face_retouching_natural", E: "biotech", F: "directions_run" }
+
+const subscribeNoop = () => () => {}
+function readStore(): string | null {
+  try {
+    return localStorage.getItem(STORE)
+  } catch {
+    return null
+  }
+}
+
+function splitLabel(label: string) {
+  const [title, ...rest] = label.split(" — ")
+  return { title, sub: rest.join(" — ") || null }
+}
 
 export default function AssessmentView() {
+  const router = useRouter()
   const total = ALL_QUESTIONS.length
-
   const [step, setStep] = useState(0)
   const [answers, setAnswers] = useState<Record<string, string | number | null>>({})
   const [phase, setPhase] = useState<Phase>("questions")
+  const [choice, setChoice] = useState<{ step: number; value: string } | null>(null)
+  const [resumeDecided, setResumeDecided] = useState(false)
+  const rawSaved = useSyncExternalStore(subscribeNoop, readStore, () => null)
+  const saved = useMemo<Saved | null>(() => {
+    if (!rawSaved) return null
+    try {
+      const v = JSON.parse(rawSaved) as Saved
+      return v && v.step > 0 && v.step < ALL_QUESTIONS.length ? v : null
+    } catch {
+      return null
+    }
+  }, [rawSaved])
   const [contact, setContact] = useState<ContactForm>({ name: "", whatsapp: "", email: "", country: "" })
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [score, setScore] = useState<WbsResult | null>(null)
   const [matchedId, setMatchedId] = useState<string | null>(null)
   const [matchedPrograms, setMatchedPrograms] = useState<MatchedProgram[]>([])
+  const [savedToProfile, setSavedToProfile] = useState(false)
+  // Ranking v1 extras from /api/intake: no close match, preventive lane, medical pathway
   const [noMatch, setNoMatch] = useState(false)
   const [medicalPathway, setMedicalPathway] = useState<MedicalItem[]>([])
   const [preventiveLane, setPreventiveLane] = useState<LaneItem[]>([])
-  const [savedToProfile, setSavedToProfile] = useState(false)
-
-  const scrollerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (scrollerRef.current) {
-      scrollerRef.current.scrollTo({ top: scrollerRef.current.scrollHeight, behavior: "smooth" })
-    }
-  }, [step, phase])
-
-  const current = ALL_QUESTIONS[step]
-  const progress = Math.min(step / total, 1)
-
-  function advance(newAnswers: Record<string, string | number | null>) {
-    setAnswers(newAnswers)
-    if (step + 1 >= total) {
-      setStep(total)
-      setTimeout(() => setPhase("contact"), 350)
-    } else {
-      setStep(step + 1)
-    }
-  }
-
-  function pickAnswer(value: string) {
-    advance({ ...answers, [current.id]: value })
-  }
-
-  function pickHeightWeight(heightCm: number | null, weightKg: number | null) {
-    advance({ ...answers, height_cm: heightCm, weight_kg: weightKg })
-  }
 
   useEffect(() => {
     track("wbs_start")
   }, [])
+
+  function persist(nextStep: number, nextAnswers: Record<string, string | number | null>) {
+    try {
+      localStorage.setItem(STORE, JSON.stringify({ step: nextStep, answers: nextAnswers, at: new Date().toISOString() }))
+    } catch {
+      // ignore
+    }
+  }
+  function clearStore() {
+    try {
+      localStorage.removeItem(STORE)
+    } catch {
+      // ignore
+    }
+  }
+
+  const current = ALL_QUESTIONS[step]
+  const pending = choice && choice.step === step ? choice.value : current && current.type === "choice" ? ((answers[current.id] as string | undefined) ?? null) : null
+  useEffect(() => {
+    window.scrollTo({ top: 0 })
+  }, [step, phase])
+  const showResume = phase === "questions" && step === 0 && !resumeDecided && !!saved
+
+  function advance(nextAnswers: Record<string, string | number | null>) {
+    setResumeDecided(true)
+    setAnswers(nextAnswers)
+    const next = step + 1
+    persist(next, nextAnswers)
+    if (next >= total) {
+      setStep(total)
+      setPhase("contact")
+      return
+    }
+    // Section check-in when the section changes (not after the goal question)
+    if (ALL_QUESTIONS[next].section !== current.section && current.section !== "intent") {
+      setStep(next)
+      setPhase("section")
+      return
+    }
+    setStep(next)
+  }
+
+  function back() {
+    if (phase === "contact") {
+      setStep(total - 1)
+      setPhase("questions")
+      return
+    }
+    if (phase === "section") {
+      setStep(step - 1)
+      setPhase("questions")
+      return
+    }
+    if (step > 0) setStep(step - 1)
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -87,9 +143,7 @@ export default function AssessmentView() {
       }
       wbsAnswers.height_cm = typeof answers.height_cm === "number" ? answers.height_cm : null
       wbsAnswers.weight_kg = typeof answers.weight_kg === "number" ? answers.weight_kg : null
-
       const result = computeWbs(wbsAnswers)
-
       const res = await fetch("/api/intake", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -121,17 +175,18 @@ export default function AssessmentView() {
       })
       const json = await res.json()
       if (!res.ok || !json.success) {
-        setSubmitError(json.error ?? "Submission failed — please try again.")
+        setSubmitError(json.error ?? "Submission failed. Please try again.")
         setPhase("contact")
         return
       }
+      clearStore()
       setScore(result)
-      setMatchedId(json.user.id)
+      setMatchedId(json.user?.id ?? null)
       setMatchedPrograms((json.matched_programs ?? []) as MatchedProgram[])
+      setSavedToProfile(!!json.saved_to_profile)
       setNoMatch(json.no_close_match === true)
       setMedicalPathway((json.medical_pathway ?? []) as MedicalItem[])
       setPreventiveLane((json.preventive_lane ?? []) as LaneItem[])
-      setSavedToProfile(!!json.saved_to_profile)
       setPhase("done")
       track("wbs_complete", { wbs_score: result.total, cohort: result.cohort })
     } catch (err) {
@@ -140,435 +195,203 @@ export default function AssessmentView() {
     }
   }
 
-  const renderedSections = new Set<string>()
+  const answered = Math.min(step, total)
+  const progress = phase === "done" ? 1 : answered / total
+  const sectionIndex = current ? SECTIONS.indexOf(current.section) : SECTIONS.length - 1
+  const prevSection = step > 0 ? ALL_QUESTIONS[step - 1]?.section : null
+  const left = total - answered
 
-  return (
-    <div className="page" style={{ minHeight: "100svh", display: "flex", flexDirection: "column" }}>
-      <div className="shell" style={{ paddingTop: 16, paddingBottom: 14 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ flex: 1 }}>
-            <div className="eyebrow" style={{ marginBottom: 6 }}>Wellbeing &amp; Wellness Score (WS)</div>
-            <div
-              style={{
-                height: 6,
-                borderRadius: 6,
-                background: "var(--surface-2)",
-                overflow: "hidden",
-                border: "1px solid var(--line-2)",
-              }}
-            >
-              <div
-                style={{
-                  height: "100%",
-                  width: `${progress * 100}%`,
-                  background: "var(--accent)",
-                  transition: "width .35s ease",
-                  borderRadius: 6,
-                }}
+  const head = (
+    <header className={s.head}>
+      <Logo size="s" />
+      {phase !== "done" && (
+        <div className={s.progressWrap} aria-label={`Question ${Math.min(answered + 1, total)} of ${total}`}>
+          <span className={s.progressLabel}><Facts items={["Wellness Journey", phase === "contact" || phase === "submitting" ? "Last step" : `${Math.min(answered + 1, total)} of ${total}`]} /></span>
+          <span className={s.progress}><span style={{ width: `${progress * 100}%` }} /></span>
+        </div>
+      )}
+      <IconButton icon="close" label="Leave the Wellness Journey" onClick={() => router.push("/")} />
+    </header>
+  )
+
+  // Completion keeps the production mechanics: celebration + score, "sent" confirmation with the
+  // save-to-profile push (inline sign-in opens the profile), then the matched programs with reserve.
+  if (phase === "done" && score) {
+    return (
+      <div className={s.doneWrap} data-focus>
+        {head}
+        <main className={s.done}>
+          <section className={s.doneCard}>
+            <p className={s.doneKicker}>Baseline complete</p>
+            <h1 className={s.doneTitle}>Beautiful.</h1>
+            <p className="ds-body-l" style={{ margin: 0 }}>Here&apos;s your baseline — and the programmes built for it are just below.</p>
+            <ScoreReveal score={score} />
+          </section>
+
+          <SaveResultBlock initialEmail={contact.email.trim() || undefined} alreadySaved={savedToProfile} />
+
+          {matchedId && noMatch && <NoCloseMatch focus={score.focus} />}
+          {matchedId && !noMatch && (
+            <div className={s.doneMatched}>
+              <MatchedPrograms
+                userId={matchedId}
+                name={contact.name.trim() || null}
+                programs={matchedPrograms}
+                heading={
+                  <div style={{ marginBottom: "1.5rem" }}>
+                    <p className={s.doneKicker} style={{ textAlign: "left" }}>Matched to your score · {score.focus}</p>
+                    <h2 className="ds-display-s" style={{ margin: "0.5rem 0 0.75rem" }}>
+                      Made for a baseline <span style={{ color: "var(--ds-primary)" }}>like yours</span>.
+                    </h2>
+                    <p className="ds-body-l ds-muted" style={{ margin: 0 }}>Reserve dates right here, or chat with us on WhatsApp — we&apos;ll tune the programme to you.</p>
+                  </div>
+                }
               />
             </div>
-            <div className="body-sm" style={{ marginTop: 6, fontVariantNumeric: "tabular-nums" }}>
-              {Math.min(step, total)} / {total}
-              {current && phase === "questions" ? ` · ${WBS_SECTION_LABELS[current.section]}` : ""}
-              {phase === "contact" ? " · Contact details" : ""}
-              {phase === "done" ? " · Complete" : ""}
-            </div>
-          </div>
-        </div>
+          )}
+          {matchedId && preventiveLane.length > 0 && <PreventiveLane items={preventiveLane} />}
+          {matchedId && medicalPathway.length > 0 && <MedicalSupport items={medicalPathway} />}
+        </main>
       </div>
-
-      <div
-        ref={scrollerRef}
-        style={{
-          flex: 1,
-          overflowY: "auto",
-          padding: "0 var(--pad) 120px",
-          maxWidth: 560,
-          width: "100%",
-          margin: "0 auto",
-        }}
-      >
-        <div style={{ padding: "16px 0 24px" }}>
-          <h1 className="display" style={{ margin: 0, fontSize: 38, color: "var(--ink)" }}>
-            Hello, <span className="display-italic" style={{ color: "var(--accent)" }}>friend</span>.
-          </h1>
-          <p className="body" style={{ margin: "8px 0 0" }}>
-            Let&apos;s find your WS. {total} questions · 2 minutes.
-          </p>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          {/* Answered history */}
-          {ALL_QUESTIONS.slice(0, step).map((q) => {
-            const sectionLabel = WBS_SECTION_LABELS[q.section]
-            const showSection = !renderedSections.has(q.section)
-            if (showSection) renderedSections.add(q.section)
-
-            let answerDisplay: string
-            if (q.type === "height_weight") {
-              const hcm = answers.height_cm
-              const wkg = answers.weight_kg
-              if (hcm || wkg) {
-                answerDisplay = [hcm && `${hcm} cm`, wkg && `${wkg} kg`].filter(Boolean).join(" / ")
-              } else {
-                answerDisplay = "Skipped"
-              }
-            } else {
-              const opt = q.options.find((o) => o.value === answers[q.id])
-              answerDisplay = opt?.label ?? String(answers[q.id] ?? "")
-            }
-
-            return (
-              <div key={q.id}>
-                {showSection && <SectionLabel label={sectionLabel} />}
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  <div className="bubble bubble-prompt">
-                    {q.title}
-                    {q.hint && (
-                      <div className="body-sm" style={{ marginTop: 4, color: "var(--ink-3)" }}>
-                        {q.hint}
-                      </div>
-                    )}
-                  </div>
-                  <div className="bubble bubble-answer">{answerDisplay}</div>
-                </div>
-              </div>
-            )
-          })}
-
-          {/* Current question */}
-          {phase === "questions" && current && (() => {
-            const sectionLabel = WBS_SECTION_LABELS[current.section]
-            const showSection = !renderedSections.has(current.section)
-            if (showSection) renderedSections.add(current.section)
-            return (
-              <div>
-                {showSection && <SectionLabel label={sectionLabel} />}
-                <div className="rise" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                  <div className="bubble bubble-prompt">
-                    {current.title}
-                    {current.hint && (
-                      <div className="body-sm" style={{ marginTop: 4, color: "var(--ink-3)" }}>
-                        {current.hint}
-                      </div>
-                    )}
-                  </div>
-                  {current.type === "choice" && (
-                    <div style={{ display: "grid", gap: 8, marginTop: 4 }}>
-                      {current.options.map((opt) => (
-                        <button
-                          key={opt.value}
-                          type="button"
-                          onClick={() => pickAnswer(opt.value)}
-                          style={{
-                            padding: "14px 18px",
-                            background: "var(--accent)",
-                            color: "var(--accent-ink)",
-                            borderRadius: "var(--r-pill)",
-                            fontSize: 15,
-                            fontWeight: 500,
-                            textAlign: "center",
-                            transition: "transform .15s, background .2s",
-                            border: 0,
-                            cursor: "pointer",
-                          }}
-                          onMouseDown={(e) => (e.currentTarget.style.transform = "scale(.97)")}
-                          onMouseUp={(e) => (e.currentTarget.style.transform = "")}
-                          onMouseLeave={(e) => (e.currentTarget.style.transform = "")}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                  {current.type === "height_weight" && (
-                    <HeightWeightCard onContinue={pickHeightWeight} />
-                  )}
-                </div>
-              </div>
-            )
-          })()}
-
-          {/* Contact form */}
-          {phase === "contact" && (
-            <div className="rise" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              <div className="bubble bubble-prompt">
-                Last step — how do we reach you?
-                <div className="body-sm" style={{ marginTop: 4, color: "var(--ink-3)" }}>
-                  We&apos;ll send your baseline score and matched programmes to WhatsApp.
-                </div>
-              </div>
-              <form
-                onSubmit={onSubmit}
-                className="card"
-                style={{ padding: 22, display: "grid", gap: 12 }}
-              >
-                <label style={{ display: "block" }}>
-                  <div className="eyebrow" style={{ marginBottom: 6 }}>Your name</div>
-                  <input
-                    className="field"
-                    placeholder="Alex Carter"
-                    autoComplete="name"
-                    value={contact.name}
-                    onChange={(e) => setContact({ ...contact, name: e.target.value })}
-                    onFocus={(e) => e.currentTarget.scrollIntoView({ block: "center", behavior: "smooth" })}
-                  />
-                </label>
-                <label style={{ display: "block" }}>
-                  <div className="eyebrow" style={{ marginBottom: 6 }}>
-                    WhatsApp number <span style={{ color: "var(--accent)" }}>*</span>
-                  </div>
-                  <input
-                    className="field"
-                    type="tel"
-                    inputMode="tel"
-                    autoComplete="tel"
-                    placeholder="+65 9123 4567"
-                    value={contact.whatsapp}
-                    required
-                    onChange={(e) => setContact({ ...contact, whatsapp: e.target.value })}
-                    onFocus={(e) => e.currentTarget.scrollIntoView({ block: "center", behavior: "smooth" })}
-                  />
-                </label>
-                <label style={{ display: "block" }}>
-                  <div className="eyebrow" style={{ marginBottom: 6 }}>Email (optional) · we&apos;ll email your report</div>
-                  <input
-                    className="field"
-                    type="email"
-                    inputMode="email"
-                    autoComplete="email"
-                    placeholder="alex@example.com"
-                    value={contact.email}
-                    onChange={(e) => setContact({ ...contact, email: e.target.value })}
-                    onFocus={(e) => e.currentTarget.scrollIntoView({ block: "center", behavior: "smooth" })}
-                  />
-                </label>
-                <label style={{ display: "block" }}>
-                  <div className="eyebrow" style={{ marginBottom: 6 }}>Country (optional)</div>
-                  <input
-                    className="field"
-                    placeholder="Singapore"
-                    autoComplete="country-name"
-                    value={contact.country}
-                    onChange={(e) => setContact({ ...contact, country: e.target.value })}
-                    onFocus={(e) => e.currentTarget.scrollIntoView({ block: "center", behavior: "smooth" })}
-                  />
-                </label>
-                {submitError && (
-                  <div
-                    role="alert"
-                    style={{
-                      padding: "10px 14px",
-                      borderRadius: 12,
-                      background: "rgba(168,54,43,.1)",
-                      color: "#a8362b",
-                      fontSize: 13,
-                    }}
-                  >
-                    {submitError}
-                  </div>
-                )}
-                <button type="submit" className="btn btn-primary btn-block btn-lg">
-                  See my baseline <Icon.arrow width={16} height={16} />
-                </button>
-              </form>
-            </div>
-          )}
-
-          {phase === "submitting" && (
-            <div className="bubble bubble-prompt">Computing your score…</div>
-          )}
-
-          {phase === "done" && score && (
-            <div className="rise" style={{ marginTop: 8 }}>
-              <div className="card" style={{ padding: 28, textAlign: "center" }}>
-                <div className="eyebrow" style={{ marginBottom: 6 }}>Baseline complete</div>
-                <h2 className="display" style={{ margin: "0 0 8px", fontSize: 32, color: "var(--accent)" }}>
-                  <span className="display-italic">Beautiful.</span>
-                </h2>
-                <p className="body" style={{ margin: "0 0 16px" }}>
-                  Here&apos;s your baseline — and the programmes built for it are just below.
-                </p>
-                <ScoreReveal score={score} />
-              </div>
-
-              <SaveResultBlock
-                initialEmail={contact.email.trim() || undefined}
-                alreadySaved={savedToProfile}
-              />
-
-              {matchedId && noMatch && <NoCloseMatch focus={score.focus} />}
-              {matchedId && !noMatch && (
-                <div style={{ marginTop: 40 }}>
-                  <MatchedPrograms
-                    userId={matchedId}
-                    name={contact.name.trim() || null}
-                    programs={matchedPrograms}
-                    heading={
-                      <div style={{ marginBottom: 22 }}>
-                        <div className="eyebrow" style={{ marginBottom: 10 }}>Matched to your score · {score.focus}</div>
-                        <h2 className="display" style={{ margin: "0 0 10px", fontSize: "clamp(30px, 7vw, 44px)", color: "var(--ink)" }}>
-                          Made for a baseline <span className="display-italic" style={{ color: "var(--accent)" }}>like yours</span>.
-                        </h2>
-                        <p className="body" style={{ margin: 0 }}>
-                          Reserve dates right here, or chat with us on WhatsApp — we&apos;ll tune the programme to you.
-                        </p>
-                      </div>
-                    }
-                  />
-                </div>
-              )}
-              {matchedId && preventiveLane.length > 0 && <PreventiveLane items={preventiveLane} />}
-              {matchedId && medicalPathway.length > 0 && <MedicalSupport items={medicalPathway} />}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function SectionLabel({ label }: { label: string }) {
-  return (
-    <div style={{ textAlign: "center", margin: "10px 0 4px" }}>
-      <span
-        style={{
-          fontSize: 11,
-          letterSpacing: ".14em",
-          textTransform: "uppercase",
-          color: "var(--ink-3)",
-          fontWeight: 600,
-        }}
-      >
-        — {label} —
-      </span>
-    </div>
-  )
-}
-
-function HeightWeightCard({ onContinue }: { onContinue: (hcm: number | null, wkg: number | null) => void }) {
-  const [hStr, setHStr] = useState("")
-  const [wStr, setWStr] = useState("")
-
-  function handleContinue() {
-    const hcm = hStr ? Math.round(parseFloat(hStr)) : null
-    const wkg = wStr ? Math.round(parseFloat(wStr) * 10) / 10 : null
-    onContinue(
-      hcm && hcm >= 100 && hcm <= 250 ? hcm : null,
-      wkg && wkg >= 20 && wkg <= 350 ? wkg : null,
     )
   }
 
   return (
-    <div className="card" style={{ padding: 20, display: "grid", gap: 12 }}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-        <label style={{ display: "block" }}>
-          <div className="eyebrow" style={{ marginBottom: 6 }}>Height (cm)</div>
-          <input
-            className="field"
-            type="number"
-            placeholder="172"
-            min={100}
-            max={250}
-            value={hStr}
-            onChange={(e) => setHStr(e.target.value)}
-            autoFocus
-          />
-        </label>
-        <label style={{ display: "block" }}>
-          <div className="eyebrow" style={{ marginBottom: 6 }}>Weight (kg)</div>
-          <input
-            className="field"
-            type="number"
-            placeholder="68"
-            min={20}
-            max={350}
-            step={0.5}
-            value={wStr}
-            onChange={(e) => setWStr(e.target.value)}
-          />
-        </label>
-      </div>
-      <button
-        type="button"
-        className="btn btn-primary btn-block"
-        onClick={handleContinue}
-      >
-        Continue →
-      </button>
-      <button
-        type="button"
-        className="btn btn-ghost btn-block"
-        style={{ fontSize: 13 }}
-        onClick={() => onContinue(null, null)}
-      >
-        Skip
-      </button>
+    <div className={s.wrap} data-focus>
+      {head}
+      <main className={s.main}>
+        {showResume && saved && (
+          <section className={s.center}>
+            <Badge icon="spa" />
+            <h1 className="ds-headline-l" style={{ margin: 0 }}>Continue your Wellness Journey</h1>
+            <p className="ds-body-l ds-muted" style={{ margin: 0 }}>
+              You answered {saved.step} of {total} questions{saved.at ? ` on ${new Date(saved.at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}` : ""}. Pick up where you left off, it takes about a minute.
+            </p>
+            <div className={s.actions}>
+              <Button variant="filled" size="l" onClick={() => { setResumeDecided(true); setAnswers(saved.answers); setStep(saved.step) }}>Continue</Button>
+              <Button variant="tonal" size="l" onClick={() => { clearStore(); setResumeDecided(true); setAnswers({}); setStep(0) }}>Start over</Button>
+            </div>
+          </section>
+        )}
+
+        {phase === "section" && prevSection && (
+          <section className={s.card}>
+            <p className={s.kicker}><Facts items={[`Section ${SECTIONS.indexOf(prevSection) + 1} of ${SECTIONS.length}`, "done"]} /></p>
+            <h1 className="ds-headline-m" style={{ margin: 0 }}>{WBS_SECTION_LABELS[prevSection]}: done</h1>
+            <p className="ds-body-l ds-muted" style={{ margin: 0 }}>
+              Next: {WBS_SECTION_LABELS[current.section]}. Your answers so far are saved and will shape your matches.
+            </p>
+            <Button variant="filled" size="l" block onClick={() => setPhase("questions")}>
+              Continue<span className="ds-sep" style={{ background: "currentColor", opacity: 0.4 }} />{left} questions left
+            </Button>
+          </section>
+        )}
+
+        {phase === "questions" && !showResume && current && (
+          <section className={s.card}>
+            <div className={s.topRow}>
+              {step > 0 ? <IconButton icon="arrow_back" label="Previous question" onClick={back} /> : <span />}
+              <p className={s.kicker}>{WBS_SECTION_LABELS[current.section]}{current.section !== "intent" ? ` · section ${sectionIndex + 1} of ${SECTIONS.length}` : ""}</p>
+            </div>
+            <h1 className="ds-headline-m" style={{ margin: 0 }}>{current.title}</h1>
+            {current.hint && <p className="ds-body-m ds-muted" style={{ margin: 0 }}>{current.hint}</p>}
+
+            {current.type === "choice" && (
+              <>
+                <div className={s.options} role="radiogroup" aria-label={current.title}>
+                  {current.options.map((opt) => {
+                    const { title, sub } = splitLabel(opt.label)
+                    const on = pending === opt.value
+                    const icon = current.id === "intent" ? OPTION_ICONS[opt.value] : null
+                    return (
+                      <button key={opt.value} type="button" role="radio" aria-checked={on} className={cx(s.option, on && s.optionOn, !sub && s.optionCompact)} onClick={() => setChoice({ step, value: opt.value })} onDoubleClick={() => advance({ ...answers, [current.id]: opt.value })}>
+                        {icon && <span className={s.optionIcon}><Icon name={icon} /></span>}
+                        <span className={s.optionText}>
+                          <span className={s.optionTitle}>{title}</span>
+                          {sub && <span className={s.optionSub}>{sub}</span>}
+                        </span>
+                        <span className={s.check}>{on ? <Icon name="check_circle" fill /> : null}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+                <Button variant="filled" size="l" block disabled={!pending} onClick={() => pending && advance({ ...answers, [current.id]: pending })}>Continue</Button>
+              </>
+            )}
+            {current.type === "height_weight" && <HeightWeight onContinue={(h, w) => advance({ ...answers, height_cm: h, weight_kg: w })} />}
+            <p className={s.savedNote}><Icon name="cloud_done" size={16} />Your answers are saved as you go</p>
+          </section>
+        )}
+
+        {(phase === "contact" || phase === "submitting") && (
+          <section className={s.card}>
+            <div className={s.topRow}>
+              <IconButton icon="arrow_back" label="Previous question" onClick={back} />
+              <p className={s.kicker}>Last step</p>
+            </div>
+            <h1 className="ds-headline-m" style={{ margin: 0 }}>How do we reach you?</h1>
+            <p className="ds-body-m ds-muted" style={{ margin: 0 }}>We send your Wellness Score and matched programmes to WhatsApp. A person replies, not a bot.</p>
+            <form onSubmit={onSubmit} className={s.form}>
+              <TextField label="Your name" autoComplete="name" placeholder="Alex Carter" value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} />
+              <TextField label="WhatsApp number *" type="tel" inputMode="tel" autoComplete="tel" placeholder="+65 9123 4567" required value={contact.whatsapp} onChange={(e) => setContact({ ...contact, whatsapp: e.target.value })} error={!!submitError && !contact.whatsapp.trim()} />
+              <TextField label="Email (optional), for your report" type="email" inputMode="email" autoComplete="email" placeholder="alex@example.com" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} />
+              <TextField label="Country (optional)" autoComplete="country-name" placeholder="Singapore" value={contact.country} onChange={(e) => setContact({ ...contact, country: e.target.value })} />
+              {submitError && <p className="ds-body-m" style={{ color: "var(--ds-error)", margin: 0 }} role="alert">{submitError}</p>}
+              <Button type="submit" variant="filled" size="l" block disabled={phase === "submitting"} trailingIcon={phase === "submitting" ? undefined : "arrow_forward"}>
+                {phase === "submitting" ? "Computing your score…" : "See my Wellness Score"}
+              </Button>
+              <p className="ds-body-s ds-muted" style={{ margin: 0, textAlign: "center" }}>
+                By continuing you agree to be contacted about your result. <Link href="/how-wbs-works" style={{ color: "var(--ds-primary)" }}>How the score works</Link>
+              </p>
+            </form>
+          </section>
+        )}
+      </main>
     </div>
   )
 }
 
-function barColor(v: number) {
-  return v >= 50 ? "var(--accent)" : "#d4882a"
+function HeightWeight({ onContinue }: { onContinue: (h: number | null, w: number | null) => void }) {
+  const [h, setH] = useState("")
+  const [w, setW] = useState("")
+  const parsed = useMemo(() => {
+    const hcm = h ? Math.round(parseFloat(h)) : null
+    const wkg = w ? Math.round(parseFloat(w) * 10) / 10 : null
+    return { hcm: hcm && hcm >= 100 && hcm <= 250 ? hcm : null, wkg: wkg && wkg >= 20 && wkg <= 350 ? wkg : null }
+  }, [h, w])
+  return (
+    <div className={s.form}>
+      <div className={s.pair}>
+        <TextField label="Height, cm" type="number" placeholder="172" min={100} max={250} value={h} onChange={(e) => setH(e.target.value)} autoFocus />
+        <TextField label="Weight, kg" type="number" placeholder="68" min={20} max={350} step={0.5} value={w} onChange={(e) => setW(e.target.value)} />
+      </div>
+      <Button variant="filled" size="l" block onClick={() => onContinue(parsed.hcm, parsed.wkg)}>Continue</Button>
+      <Button variant="text" size="m" onClick={() => onContinue(null, null)}>Skip this question</Button>
+    </div>
+  )
 }
 
+/** Score and the five sub-scores, as on production (Safety = 100 - risk; amber under 50). */
 function ScoreReveal({ score }: { score: WbsResult }) {
-  const cats = useMemo(
-    () => [
-      { label: "Body", val: score.body },
-      { label: "Recovery", val: score.recovery },
-      { label: "Metabolic", val: score.metabolic },
-      { label: "Mind", val: score.mind },
-      { label: "Safety", val: Math.round(100 - score.risk) },
-    ],
-    [score],
-  )
-
+  const cats = [
+    { label: "Body", val: score.body },
+    { label: "Recovery", val: score.recovery },
+    { label: "Metabolic", val: score.metabolic },
+    { label: "Mind", val: score.mind },
+    { label: "Safety", val: Math.round(100 - score.risk) },
+  ]
   return (
-    <div style={{ marginTop: 12, textAlign: "left" }}>
-      <div
-        style={{
-          fontFamily: "var(--font-display)",
-          fontSize: 78,
-          lineHeight: 1,
-          color: "var(--accent)",
-          fontVariantNumeric: "tabular-nums",
-          textAlign: "center",
-        }}
-      >
+    <div className={s.reveal}>
+      <p className={s.revealScore}>
         {score.total}
-        <span style={{ fontSize: 28, color: "var(--ink-3)" }}>/100</span>
-      </div>
-      <div className="body-sm" style={{ marginBottom: 18, textAlign: "center", color: "var(--ink-2)" }}>
-        {score.focus}
-      </div>
-      <div style={{ display: "grid", gap: 10 }}>
+        <span>/100</span>
+      </p>
+      <p className={s.revealFocus}>{score.focus}</p>
+      <div className={s.bars}>
         {cats.map((c) => (
           <div key={c.label}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                fontSize: 12,
-                marginBottom: 4,
-                color: "var(--ink-2)",
-              }}
-            >
-              <span>{c.label}</span>
-              <span style={{ fontVariantNumeric: "tabular-nums" }}>{c.val}</span>
-            </div>
-            <div
-              style={{ height: 8, borderRadius: 4, background: "var(--surface)", overflow: "hidden" }}
-            >
-              <div
-                style={{
-                  height: "100%",
-                  width: `${c.val}%`,
-                  background: barColor(c.val),
-                  transition: "width 1s ease",
-                }}
-              />
-            </div>
+            <div className={s.barHead}><span>{c.label}</span><span>{c.val}</span></div>
+            <div className={s.barTrack}><div className={s.barFill} style={{ width: `${c.val}%`, background: c.val >= 50 ? "var(--ds-primary)" : "#d4882a" }} /></div>
           </div>
         ))}
       </div>

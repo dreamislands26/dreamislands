@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><clipPath id="c"><circle cx="256" cy="256" r="256"/></clipPath></defs><g clip-path="url(#c)">
+<g id="Group">
+<path id="Vector" d="M0 0H512V89L432.8 252.7L512 423V512H0V423L82.7 253.4L0 89V0Z" fill="#D80027"/>
+<path id="Vector_2" d="M0 89H512V167L469.4 258.2L512 345V423H0V345L40 252.5L0 167V89Z" fill="#EEEEEE"/>
+<path id="Vector_3" d="M0 167H512V345H0V167Z" fill="#0052B4"/>
+</g>
+</g></svg>

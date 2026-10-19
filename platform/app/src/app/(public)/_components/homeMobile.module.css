@@ -1,0 +1,164 @@
+/* S1 · Главная · Mobile (Figma 97:2767, revision 17.10.2026): 0.75rem side padding, sections 2rem apart */
+.root { display: none; }
+@media (max-width: 767px) { .root { display: block; padding-bottom: 12px; overflow-x: clip; } }
+
+.root p, .root h1, .root h2, .root h3 { margin: 0; }
+
+/* Fixed header: transparent over the hero, background colour once the hero is scrolled past */
+.bar { position: fixed; z-index: 60; top: 0; left: 0; right: 0; height: calc(3.375rem + env(safe-area-inset-top)); padding: calc(0.375rem + env(safe-area-inset-top)) 0.3125rem 0.375rem; display: flex; align-items: center; justify-content: space-between; background: transparent; transition: background-color 0.2s ease; }
+.barSolid { background: var(--ds-surface); }
+.barMark { width: 2.375rem; height: 2.375rem; flex: none; background: #fff; -webkit-mask: url(/brand/mark.svg) center / contain no-repeat; mask: url(/brand/mark.svg) center / contain no-repeat; transition: background-color 0.2s ease; }
+.barSolid .barMark { background: var(--ds-tertiary); }
+.barActions { display: flex; gap: 0.25rem; }
+.barBtn { height: 2.625rem; padding: 0 1rem; border-radius: var(--ds-r-full); background: rgba(255, 255, 255, 0.8); color: rgba(0, 0, 0, 0.74); font: 500 0.875rem/1.125rem var(--ds-font-body); display: inline-flex; align-items: center; text-decoration: none; cursor: pointer; transition: background-color 0.2s ease, color 0.2s ease; }
+.barBtnGreen { background: var(--ds-primary); color: #fff; }
+@media (hover: hover) { .barBtn:hover { background: var(--ds-primary); color: #fff; } }
+
+/* Hero: 440, the fixed header lies over its top */
+/* Wolt-style unfold. --hero-p (0..1, set on scroll): the corner radius grows from 48 to 160px while the
+   hero widens past both screen edges by radius x p, so the arc gets flatter and slides out of view;
+   at p = 1 the visible bottom edge is straight. */
+.hero { --hero-r: calc(3rem + 7rem * var(--hero-p, 0)); --hero-out: calc(var(--hero-r) * var(--hero-p, 0)); position: relative; height: 22.5rem; margin: 0 calc(-1 * var(--hero-out)); border-radius: 0 0 var(--hero-r) var(--hero-r); overflow: hidden; background: #000; }
+.heroVideo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.heroImg { position: absolute !important; inset: 0; height: 100% !important; border-radius: 0 !important; }
+.heroShade { position: absolute; left: 0; right: 0; top: 4.9375rem; bottom: 0; background: linear-gradient(180deg, rgba(4, 23, 13, 0) 0%, rgba(4, 23, 13, 0.82) 42%, rgba(4, 23, 13, 1) 100%); }
+.heroBody { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 calc(1.5rem + var(--hero-out)) 1.5rem; display: flex; flex-direction: column; align-items: stretch; gap: 1rem; }
+.heroCtaTag { padding: 0.125rem 0.5rem; border-radius: 1.0625rem; background: #a3e8a0; color: rgba(5, 25, 16, 0.72); font: 500 0.8125rem/1.125rem var(--ds-font-body); letter-spacing: 0; }
+.heroText { display: flex; flex-direction: column; gap: 0.25rem; text-align: center; color: #fff; }
+.heroCta { height: 3.25rem; padding: 0.875rem 2.75rem; border-radius: var(--ds-r-full); background: #b5ffb0; box-shadow: 0 0 2.175rem rgba(181, 255, 176, 0.3); color: #173a27; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font: 600 1.125rem/1.5rem var(--ds-font-body); letter-spacing: -0.1px; text-decoration: none; }
+
+/* Search + goal chips: sticky under the header */
+.search { position: sticky; z-index: 50; top: calc(3.375rem + env(safe-area-inset-top)); display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: var(--ds-surface); }
+.searchBtn { width: 2.625rem; height: 2.625rem; flex: none; border-radius: 50%; background: var(--ds-surface-container-low); box-shadow: 0 0 1rem rgba(6, 26, 18, 0.07); display: inline-flex; align-items: center; justify-content: center; color: var(--ds-on-surface); }
+.chips { display: flex; gap: 0.5rem; overflow-x: auto; scrollbar-width: none; margin-right: -0.75rem; padding-right: 0.75rem; min-width: 0; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { height: 2.5625rem; flex: none; display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.625rem; border-radius: 62.5rem; background: var(--ds-surface-container-low); color: var(--ds-on-surface); text-decoration: none; }
+.chipDot { width: 1.3125rem; height: 1.3125rem; border-radius: 50%; background: var(--ds-secondary-container); color: var(--ds-on-secondary-container); flex: none; display: inline-flex; align-items: center; justify-content: center; }
+.chipDot :global(.ds-icon) { font-size: 0.875rem; }
+
+/* Sections */
+.section { padding: 2rem 0.75rem 0; display: flex; flex-direction: column; gap: 1rem; }
+.search + .section { padding-top: 1.25rem; }
+.head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.headText { display: flex; flex-direction: column; min-width: 0; }
+.go { width: 1.75rem; height: 1.75rem; flex: none; border-radius: 50%; background: rgba(5, 24, 15, 0.05); display: inline-flex; align-items: center; justify-content: center; color: var(--ds-on-surface); text-decoration: none; }
+.seeAll { flex: none; display: inline-flex; align-items: center; gap: 0.375rem; font: 400 1rem/1.5rem var(--ds-font-body); color: var(--ds-primary); text-decoration: none; }
+.rail { display: flex; gap: 0.75rem; overflow-x: auto; scrollbar-width: none; margin-right: -0.75rem; padding-right: 0.75rem; }
+.rail::-webkit-scrollbar { display: none; }
+.card { width: 10.25rem; flex: none; }
+
+/* How it works card */
+.how { border-radius: var(--ds-r-xl-plus); background: var(--ds-surface-container-low); overflow: hidden; }
+.howArt { position: relative; height: 14.625rem; background: var(--ds-secondary-container); overflow: hidden; }
+.howArt::after { content: ""; position: absolute; left: 0; right: 0; top: 5.6875rem; bottom: 0; background: linear-gradient(180deg, rgba(255, 255, 255, 0), var(--ds-surface-container-low)); }
+.howLeaf { position: absolute; left: 9.9375rem; top: -0.875rem; }
+.howHead { position: absolute; z-index: 1; left: 1.5rem; right: 1.5rem; top: 9.75rem; display: flex; flex-direction: column; gap: 0.25rem; }
+.howBody { display: flex; flex-direction: column; gap: 1.5rem; padding: 0 1.5rem 1.5rem; }
+.steps { display: flex; flex-direction: column; gap: 1rem; }
+.step { display: flex; gap: 1rem; align-items: flex-start; }
+.step > :global(.ds-headline-s) { color: var(--ds-primary); flex: none; }
+.survey { height: 3.25rem; border-radius: var(--ds-r-full); background: var(--ds-primary); color: #fff; display: flex; align-items: center; justify-content: center; font: 600 1.125rem/1.5rem var(--ds-font-body); letter-spacing: -0.1px; text-decoration: none; }
+
+/* Track tiles: two rows that scroll together */
+.tiles { display: grid; grid-template-rows: repeat(2, 10.25rem); grid-auto-flow: column; grid-auto-columns: 15rem; gap: 0.5rem; overflow-x: auto; scrollbar-width: none; margin-right: -0.75rem; padding-right: 0.75rem; }
+.tiles::-webkit-scrollbar { display: none; }
+.tile { position: relative; width: 15rem; height: 10.25rem; flex: none; border-radius: 1.25rem; background: #c9e7d6; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; text-decoration: none; color: var(--ds-on-surface); overflow: hidden; }
+.tileTitle { width: 9.5625rem; font: 700 1.125rem/1.2 var(--ds-font-display); }
+.tileHook { width: 8.125rem; font: 400 0.875rem/1.25rem var(--ds-font-body); color: var(--ds-on-surface-variant); }
+.tileIcon { position: absolute; top: 0.6875rem; right: 0.625rem; font-size: 4.3125rem !important; font-weight: 300; color: var(--ds-primary); }
+.tileGo { position: absolute; right: 1.1875rem; bottom: 1rem; height: 2.125rem; padding: 0.5rem 1rem; border-radius: var(--ds-r-full); background: var(--ds-surface); color: var(--ds-on-surface); display: inline-flex; align-items: center; }
+.tileGo svg { width: 0.875rem; height: 0.9375rem; }
+
+/* Best recovery: place cards */
+.placeRail { display: flex; gap: 1rem; overflow-x: auto; scrollbar-width: none; margin-right: -0.75rem; padding-right: 0.75rem; }
+.placeRail::-webkit-scrollbar { display: none; }
+.place { width: 21.1875rem; flex: none; display: flex; flex-direction: column; gap: 0.125rem; text-decoration: none; color: var(--ds-on-surface); }
+.placePhoto.placePhoto { width: 21.1875rem; height: 12.75rem; border-radius: 1.25rem !important; margin-bottom: 0.625rem; }
+.placePrice { display: flex; align-items: center; }
+
+/* Destinations for you: 7rem photo tiles */
+.countryRail { display: flex; gap: 0.5rem; overflow-x: auto; scrollbar-width: none; margin-right: -0.75rem; padding-right: 0.75rem; }
+.countryRail::-webkit-scrollbar { display: none; }
+.country { width: 7rem; flex: none; display: flex; flex-direction: column; gap: 0.375rem; text-decoration: none; color: var(--ds-on-surface); }
+.countryPhoto.countryPhoto { width: 7rem; height: 7rem; border-radius: 1rem !important; }
+.countryText { display: flex; flex-direction: column; min-width: 0; }
+.countryText > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Promise */
+.promise { border-radius: var(--ds-r-xl-plus); background: var(--ds-surface-container-lowest); padding: 2rem 1.5rem 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+.promiseTight { gap: 1rem; }
+.promiseIcon { font-size: 2rem; color: var(--ds-primary); font-variation-settings: "wght" 300; }
+.promiseText { display: flex; flex-direction: column; gap: 0.5rem; }
+.promiseAccent { color: #26c568; }
+.promiseBody { font: 400 1rem/1.5rem var(--ds-font-body); color: rgba(28, 38, 42, 0.9); }
+.promiseActions { display: flex; flex-direction: column; gap: 0.75rem; }
+.promiseActions > a { height: 3rem; font: 500 1rem/1.25rem var(--ds-font-body); }
+.promiseGreen { border-radius: var(--ds-r-full); background: var(--ds-primary); color: #fff; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+.promise > a, .decide > a { height: 3rem; font: 500 1rem/1.25rem var(--ds-font-body); }
+.glow { box-shadow: 0 0 2.175rem rgba(181, 255, 176, 0.3); } /* Take Survey glow (Figma) */
+.promiseTonal.onTonal { background: var(--ds-surface-container-low); } /* the decide banner is tonal itself */
+/* Primary / secondary pair (Figma Promise 197:26097, 214:30685): 48px, Title/Medium; secondary is DS Tonal L */
+.promiseTonal { border-radius: var(--ds-r-full); background: var(--ds-secondary-container); color: var(--ds-on-secondary-container); display: flex; align-items: center; justify-content: center; text-decoration: none; }
+
+/* See all programs: 2-column grid, fade over the last row, Load more */
+.gridWrap { position: relative; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 0.75rem; }
+.gridFade { position: absolute; left: 0; right: 0; bottom: 0; height: 6.5625rem; background: linear-gradient(180deg, rgba(239, 243, 237, 0), var(--ds-surface)); pointer-events: none; }
+.loadMore { display: flex; flex-direction: column; align-items: center; gap: 0.625rem; text-align: center; }
+.loadBtn { width: 12.5rem; height: 3rem; border-radius: var(--ds-r-full); background: var(--ds-primary); color: #fff; font: 500 1rem/1.25rem var(--ds-font-body); cursor: pointer; }
+.gridBanner { grid-column: 1 / -1; }
+/* "Can't decide?": short version of the promise card, shown after the second Load more */
+.decide { border-radius: var(--ds-r-xl-plus); background: var(--ds-secondary-container); padding: 2rem 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+.decide p { color: var(--ds-on-surface); }
+/* Short nudge after every 3rd Load more: one tonal pill across the grid */
+.nudge { height: 3.5rem; padding: 0 1.5rem; border-radius: var(--ds-r-full); background: var(--ds-secondary-container); color: var(--ds-on-secondary-container); display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; font: 500 1rem/1.25rem var(--ds-font-body); text-decoration: none; }
+
+/* Feel different: heading, then Before / During / After rows (Figma 150:25681, 150:25609) */
+.intro { padding: 1.5rem 0.75rem 0; }
+.phase { display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 1.5rem 0.75rem 0; text-align: center; }
+.phaseArt { width: 14rem; height: 10.5rem; flex: none; border-radius: 1.5rem; background: var(--ds-surface-container-highest); display: flex; align-items: center; justify-content: center; color: var(--ds-primary); }
+.phaseArt :global(.ds-icon) { font-size: 2.5rem; }
+.phaseText { display: flex; flex-direction: column; gap: 0.25rem; min-width: 0; }
+.phaseSub { font: 500 1rem/1.25rem var(--ds-font-body); color: #2f7d62; }
+.surveyRow { padding: 1.5rem 0.75rem 0; }
+.surveyBig { height: 3.25rem; border-radius: var(--ds-r-full); background: var(--ds-primary); box-shadow: 0 0 2.175rem rgba(96, 187, 137, 0.3); color: #fff; display: flex; align-items: center; justify-content: center; gap: 0.5rem; font: 600 1.125rem/1.5rem var(--ds-font-body); letter-spacing: -0.1px; text-decoration: none; }
+.surveyTag { padding: 0.125rem 0.5rem; border-radius: 1.0625rem; background: #7cda91; color: #fff; font: 500 0.8125rem/1.125rem var(--ds-font-body); }
+
+/* China: video across the whole card, translucent mint over the lower part (Figma 197:26223). No blur: it renders poorly on the web. */
+.cn { padding-top: 2.25rem; }
+.cnCard { position: relative; isolation: isolate; margin: 0 0.625rem; border-radius: 2.25rem; overflow: hidden; -webkit-mask-image: linear-gradient(#fff, #fff); background: var(--ds-primary); padding: 15.875rem 0 0.5rem; display: flex; flex-direction: column; color: #fff; }
+.cnVideo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.cnShade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0, 0, 0, 0) 11.1625rem, rgba(0, 0, 0, 0.7) 17.88rem); }
+.cnGreen { position: absolute; left: 0; right: 0; top: 9.625rem; bottom: 0; background: linear-gradient(180deg, rgba(96, 187, 137, 0) 0, rgba(96, 187, 137, 0.72) 9.6875rem); }
+.cnText, .cnRow, .cnActions { position: relative; z-index: 1; }
+.cnText { display: flex; flex-direction: column; gap: 0.75rem; padding: 0 1rem; }
+.cnText h2, .cnText p { color: #fff; }
+.cnKicker { font: 400 0.875rem/1.25rem var(--ds-font-body); color: rgba(255, 255, 255, 0.7) !important; }
+.cnStats { display: flex; gap: 0.25rem; flex-wrap: wrap; opacity: 0.8; }
+.cnStats > span { padding: 0.125rem 0.5rem; border-radius: 1.25rem; background: rgba(0, 0, 0, 0.4); font: 500 0.8125rem/1.125rem var(--ds-font-body); white-space: nowrap; }
+.cnRow { display: flex; gap: 0.5rem; overflow-x: auto; scrollbar-width: none; padding: 0 1rem; margin-top: 1rem; }
+.cnRow::-webkit-scrollbar { display: none; }
+.mini { width: 15.875rem; height: 5rem; flex: none; display: flex; align-items: center; gap: 0.625rem; padding: 0.5rem; border-radius: 1.5rem; background: #fff; color: var(--ds-on-surface); text-decoration: none; }
+/* Doubled class: these size the shared DS Photo (width: 100%), whose CSS may load after this file on
+   client navigation (back to home), so they must win on specificity, not order. */
+.miniPhoto.miniPhoto { width: 4rem; height: 4rem; flex: none; border-radius: 1rem !important; }
+.miniText { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.miniTitle { font: 500 1rem/1.25rem var(--ds-font-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.miniLine { display: flex; align-items: center; min-width: 0; font: 400 0.75rem/1rem var(--ds-font-body); letter-spacing: 0.1px; color: var(--ds-on-surface-variant); white-space: nowrap; }
+.miniEllipsis { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.miniDot { width: 3px; height: 3px; flex: none; margin: 0 0.5rem; border-radius: 50%; background: var(--ds-on-surface-variant); opacity: 0.4; }
+.miniStar { color: #ffb546; margin-right: 0.125rem; }
+.cnActions { display: flex; justify-content: space-between; align-items: center; padding: 0 1rem; margin-top: 0.5rem; }
+.cnContact, .cnExplore { height: 3.25rem; padding: 0 0.75rem; border-radius: var(--ds-r-full); display: inline-flex; align-items: center; gap: 0.5rem; font: 600 1.125rem/1.5rem var(--ds-font-body); letter-spacing: -0.1px; text-decoration: none; }
+.cnContact { font: 500 0.875rem/1.125rem var(--ds-font-body); letter-spacing: 0; color: rgba(255, 255, 255, 0.8); }
+.cnExplore { color: #fff; }
+
+/* Feel the difference: guest stories, 173x208 cards (Figma 150:25078) */
+.story { width: 10.8125rem; height: 13rem; flex: none; border-radius: 1.25rem; background: var(--ds-surface-container-low); padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.story :global(.ds-stars), .story > span:first-child { color: #8fd9ad; font-size: 0.75rem; }
+.storyText { flex: 1; min-height: 0; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; font: 400 0.8125rem/1.125rem var(--ds-font-body); color: var(--ds-on-surface); }
+.storyWho { display: flex; flex-direction: column; padding-top: 0.5rem; border-top: 1px solid var(--ds-outline-variant); min-width: 0; }
+.storyWho > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.storyMeta { font: 400 0.75rem/1rem var(--ds-font-body); color: var(--ds-on-surface-variant); }
+.textBtn { align-self: flex-start; height: 2.5rem; padding: 0 0.75rem; margin-left: -0.75rem; display: inline-flex; align-items: center; border-radius: var(--ds-r-full); font: 500 1rem/1.25rem var(--ds-font-body); color: var(--ds-primary); text-decoration: none; }
+.story > span:first-child :global(.ds-icon) { font-size: 0.875rem; }

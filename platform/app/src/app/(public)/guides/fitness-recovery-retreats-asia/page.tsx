@@ -8,12 +8,12 @@ export const dynamic = "force-dynamic"
 export const metadata: Metadata = {
   title: "Fitness and Sports Recovery Retreats in Asia",
   description:
-    "A practical guide to fitness, training and sports-recovery retreats across Asia — signs you need a structured training block, what a program can and can't do, programme types, typical duration, and real matched programs from the Philippines and Indonesia.",
+    "A practical guide to fitness, training and sports-recovery retreats across Asia — signs you need a structured training block, what a programme can and can't do, programme types, typical duration, and real matched programmes from the Philippines and Indonesia.",
   alternates: { canonical: "/guides/fitness-recovery-retreats-asia" },
   openGraph: {
     title: "Fitness and Sports Recovery Retreats in Asia | Dream Islands",
     description:
-      "Signs you need a structured training block, what a program can and can't do, programme types, duration, destinations and real matched programs across Asia.",
+      "Signs you need a structured training block, what a programme can and can't do, programme types, duration, destinations and real matched programmes across Asia.",
     url: "https://dreamislands.org/guides/fitness-recovery-retreats-asia",
   },
 }
@@ -83,15 +83,15 @@ const PROGRAMME_TYPES: ProgrammeType[] = [
 const FAQS = [
   {
     q: "Do I need to already be an athlete to join?",
-    a: "No. Programs span a range of intensities — Active Recovery is built for lower-intensity, depleted or overtrained guests, while Ironman and Triathlon Prep camps assume an existing training base for an upcoming event.",
+    a: "No. Programmes span a range of intensities — Active Recovery is built for lower-intensity, depleted or overtrained guests, while Ironman and Triathlon Prep camps assume an existing training base for an upcoming event.",
   },
   {
     q: "How is this different from a normal gym holiday?",
-    a: "These programs combine real coaching and structured training load with dedicated recovery protocols — spa, hot springs, mobility work — built into the schedule, rather than just giving you facility access and leaving recovery up to you.",
+    a: "These programmes combine real coaching and structured training load with dedicated recovery protocols — spa, hot springs, mobility work — built into the schedule, rather than just giving you facility access and leaving recovery up to you.",
   },
   {
     q: "Can I use these for injury recovery?",
-    a: "Active-recovery-focused programs can support a return to training, but this isn't a substitute for physiotherapy or sports-medicine care. If you're recovering from a specific injury, check with your physician before booking a training-focused program.",
+    a: "Active-recovery-focused programmes can support a return to training, but this isn't a substitute for physiotherapy or sports-medicine care. If you're recovering from a specific injury, check with your physician before booking a training-focused programme.",
   },
   {
     q: "What's the difference between the 7-day and 14-day Ironman or Triathlon prep camps?",
@@ -142,14 +142,14 @@ export default async function RebuildYourBodyGuidePage() {
         <p className="body-lg" style={{ marginBottom: 20, maxWidth: 700 }}>
           Structured training with real recovery built in — not a gym holiday. Here's how to tell if you
           need one, what it can and can't do, the programme types available across Asia, and which real
-          programs match.
+          programmes match.
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 8 }}>
           <Link href="/start" className="btn btn-primary btn-lg">
             Get your WS →
           </Link>
           <Link href="/programs?track=Performance" className="btn btn-ghost btn-lg">
-            Browse Performance programs
+            Browse Performance programmes
           </Link>
         </div>
       </section>
@@ -159,7 +159,7 @@ export default async function RebuildYourBodyGuidePage() {
           <h2 style={{ fontSize: 22, marginBottom: 6 }}>Signs you might need a structured training block</h2>
           <p className="body-sm" style={{ marginBottom: 16, color: "var(--ink-2)" }}>
             None of these are a diagnosis — they're common signals people describe before booking a
-            Performance program built around rebuilding capacity.
+            Performance programme built around rebuilding capacity.
           </p>
           <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: 10 }}>
             {SIGNS.map((s) => (
@@ -175,7 +175,7 @@ export default async function RebuildYourBodyGuidePage() {
       <section className="shell" style={{ paddingTop: 24 }}>
         <div style={{ display: "grid", gap: 16 }} className="two-col">
           <div className="card" style={{ padding: 28 }}>
-            <h2 style={{ fontSize: 20, marginBottom: 14 }}>What a program can do</h2>
+            <h2 style={{ fontSize: 20, marginBottom: 14 }}>What a programme can do</h2>
             <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: 10 }}>
               {CAN_DO.map((c) => (
                 <li key={c} className="body-sm" style={{ display: "flex", gap: 10 }}>
@@ -238,8 +238,8 @@ export default async function RebuildYourBodyGuidePage() {
         <section id="matched-programs" className="shell" style={{ paddingTop: 56, scrollMarginTop: 90 }}>
           <div className="section-head">
             <div>
-              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programs</div>
-              <h2>Actual fitness &amp; recovery <span className="display-italic">programs</span>.</h2>
+              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programmes</div>
+              <h2>Actual fitness &amp; recovery <span className="display-italic">programmes</span>.</h2>
             </div>
           </div>
           <div className="rail">
@@ -262,7 +262,7 @@ export default async function RebuildYourBodyGuidePage() {
         >
           <div className="eyebrow" style={{ color: "rgba(255,255,255,.7)" }}>Not sure which one fits?</div>
           <p className="display" style={{ fontSize: "clamp(24px, 5vw, 36px)", margin: "12px 0 20px", maxWidth: 560 }}>
-            <span className="display-italic">Free WS</span>, matched program, real humans on WhatsApp.
+            <span className="display-italic">Free WS</span>, matched programme, real humans on WhatsApp.
           </p>
           <Link href="/start" className="btn" style={{ background: "var(--accent-ink)", color: "var(--accent-deep)" }}>
             Get your WS →

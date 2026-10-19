@@ -1,0 +1,14 @@
+/* Mobile detail photo (CF2/CF3): 390x360, buttons over it, 1 / N counter */
+.mPhoto { display: none; }
+@media (max-width: 767px) {
+  /* Photo 390x360 with buttons over it */
+  .mPhoto { display: block; position: relative; height: 22.5rem; margin: 0; }
+  .mPhotoTrack { display: flex; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+  .mPhotoTrack::-webkit-scrollbar { display: none; }
+  .mPhotoSlide { flex: 0 0 100%; height: 100%; scroll-snap-align: start; padding: 0; border: 0; display: block; }
+  .mPhotoSlide > div { height: 100%; border-radius: 0 !important; }
+  .mPhotoBar { position: absolute; left: 0; right: 0; top: calc(3.25rem + env(safe-area-inset-top) * 0); display: flex; justify-content: space-between; padding: 0 1rem; }
+  .mPhotoActions { display: flex; gap: 0.5rem; }
+  .mCounter { position: absolute; right: 1.25rem; bottom: 3rem; height: 1.5rem; padding: 0.25rem 0.625rem; border-radius: var(--ds-r-full); background: rgba(0, 0, 0, 0.6); color: #fff; font: 500 0.75rem/1rem var(--ds-font-body); }
+
+}

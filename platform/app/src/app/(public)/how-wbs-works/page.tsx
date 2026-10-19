@@ -3,11 +3,11 @@ import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "How the Wellbeing & Wellness Score (WS) Works",
-  description: "23 questions across 6 sections produce your Wellbeing & Wellness Score (WS) and match you to one of six wellness program focus areas.",
+  description: "23 questions across 6 sections produce your Wellbeing & Wellness Score (WS) and match you to one of six wellness programme focus areas.",
   alternates: { canonical: "/how-wbs-works" },
   openGraph: {
     title: "How the Wellbeing & Wellness Score (WS) Works | Dream Islands",
-    description: "23 questions across 6 sections produce your Wellbeing & Wellness Score (WS) and match you to one of six wellness program focus areas.",
+    description: "23 questions across 6 sections produce your Wellbeing & Wellness Score (WS) and match you to one of six wellness programme focus areas.",
     url: "https://dreamislands.org/how-wbs-works",
   },
 }
@@ -24,19 +24,19 @@ const SECTIONS = [
 const FAQS = [
   {
     q: "Is the Wellbeing & Wellness Score a medical diagnosis?",
-    a: "No. Dream Islands operates as a Destination Marketing Organization promoting wellness travel. We do not provide medical or psychiatric services and are not a medical institution. WS is a self-reported wellness assessment used to personalize program recommendations.",
+    a: "No. Dream Islands operates as a Destination Marketing Organization promoting wellness travel. We do not provide medical or psychiatric services and are not a medical institution. WS is a self-reported wellness assessment used to personalize programme recommendations.",
   },
   {
     q: "How many questions are in the assessment?",
     a: "23 questions across 6 sections, plus a height and weight entry used to calculate BMI as part of the Metabolic subscale.",
   },
   {
-    q: "Does an AI decide my program?",
+    q: "Does an AI decide my programme?",
     a: "No. Matching uses a fixed, rules-based scoring formula - your stated goal plus your four subscale scores are checked against a lookup table of six focus areas, not a machine-learning model.",
   },
   {
     q: "What happens if my score triggers a medical review?",
-    a: "Certain answers - such as a cancer history, heavy alcohol use, or a very low subscale score - automatically flag your assessment so our team reviews it before any program is confirmed.",
+    a: "Certain answers - such as a cancer history, heavy alcohol use, or a very low subscale score - automatically flag your assessment so our team reviews it before any programme is confirmed.",
   },
 ]
 
@@ -56,7 +56,7 @@ export default function HowWbsWorksPage() {
     "@type": "HowTo",
     name: "How to take the Dream Islands Wellbeing & Wellness Score (WS) assessment",
     description:
-      "23 questions across 6 sections produce your Wellness Baseline Score (WBS) and match you to a wellness program.",
+      "23 questions across 6 sections produce your Wellness Baseline Score (WBS) and match you to a wellness programme.",
     totalTime: "PT5M",
     step: [
       ...SECTIONS.map((s) => ({
@@ -68,7 +68,7 @@ export default function HowWbsWorksPage() {
         "@type": "HowToStep",
         name: "Get your matched program",
         text:
-          "Your initial focus area plus your subscale scores are checked against a fixed, rules-based scoring formula to recommend a program and stay length.",
+          "Your initial focus area plus your subscale scores are checked against a fixed, rules-based scoring formula to recommend a programme and stay length.",
       },
     ],
   }
@@ -99,11 +99,11 @@ export default function HowWbsWorksPage() {
         </div>
 
         <div className="card" style={{ padding: 28, marginBottom: 24 }}>
-          <h2 style={{ fontSize: 20, marginBottom: 14 }}>From answers to a program</h2>
+          <h2 style={{ fontSize: 20, marginBottom: 14 }}>From answers to a programme</h2>
           <p className="body-sm">
             Your first answer sets an initial focus area - Body & Detox, Sleep & Recovery, Weight & Metabolic
             Health, Beauty & Aesthetics, Longevity, or Performance & Energy. That focus area, combined with your
-            subscale scores, determines a recommended program and stay length through a fixed, rules-based
+            subscale scores, determines a recommended programme and stay length through a fixed, rules-based
             scoring formula - not a machine-learning model. If you skip the goal question, we route you by
             whichever subscale scored lowest.
           </p>

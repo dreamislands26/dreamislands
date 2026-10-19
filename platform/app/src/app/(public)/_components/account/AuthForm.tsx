@@ -10,7 +10,7 @@ const COPY = {
   login: {
     eyebrow: "Your profile",
     title: "Log in to Dream Islands",
-    text: "Your score, how it changes, and your programs — in one place. We'll email you a one-time code, no password.",
+    text: "Your score, how it changes, and your programmes — in one place. We'll email you a one-time code, no password.",
     cta: "Send code",
   },
   save: {

@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
       { source: "/properties/sichuan-university-west-china-hospital", destination: "/medical/china/hospitals/west-china-hospital", statusCode: 301 },
       { source: "/properties/sun-yat-sen-university-affiliated-hospital", destination: "/medical/china/hospitals/sun-yat-sen-university-hospital", statusCode: 301 },
       { source: "/properties/better-migrate-medical-network", destination: "/medical/china", statusCode: 301 },
+      // The DS v2 medical page moved into the Stage 1 medical section
+      { source: "/destinations/china/medical", destination: "/medical/china", statusCode: 301 },
     ]
   },
   images: {

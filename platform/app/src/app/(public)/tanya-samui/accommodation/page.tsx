@@ -39,7 +39,7 @@ export default async function TanyaAccommodationPage() {
         </h1>
         <p className="body-lg" style={{ marginBottom: 40, maxWidth: 700 }}>
           From shared New Wing rooms to private pool villas — every room type at Tanya Samui, with nightly
-          rates. Accommodation is included in every program; villas and upgrades are available on request.
+          rates. Accommodation is included in every programme; villas and upgrades are available on request.
         </p>
 
         <div style={{ display: "grid", gap: 20, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
@@ -85,7 +85,7 @@ export default async function TanyaAccommodationPage() {
 
         <div style={{ marginTop: 40 }}>
           <Link href="/tanya-samui#programs" className="btn btn-primary">
-            Browse programs at Tanya Samui
+            Browse programmes at Tanya Samui
           </Link>
         </div>
       </section>

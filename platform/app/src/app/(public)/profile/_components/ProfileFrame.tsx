@@ -7,7 +7,7 @@ import type { ProfileState } from "./load"
 
 const TABS = [
   { href: "/profile", label: "Wellness Intelligence" },
-  { href: "/profile/programs", label: "Programs" },
+  { href: "/profile/programs", label: "Programmes" },
   { href: "/profile/messages", label: "Messages" },
   { href: "/profile/details", label: "Profile" },
 ]
@@ -39,7 +39,7 @@ export default function ProfileFrame({ data, children }: { data: ProfileState; c
           </h1>
           <p className="body-lg rise rise-3" style={{ maxWidth: 520, margin: "0 auto 30px" }}>
             Your Wellbeing &amp; Wellness Score, how it changes before, during and after each journey, and your
-            programs — all in one place.
+            programmes — all in one place.
           </p>
           <div className="rise rise-4" style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
             <button type="button" className="btn btn-primary" onClick={() => openAuth({ reason: "login" })}>

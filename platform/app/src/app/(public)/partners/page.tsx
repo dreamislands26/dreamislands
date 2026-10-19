@@ -4,11 +4,11 @@ import { Icon } from "../_components/Icon"
 
 export const metadata: Metadata = {
   title: "Partnership / B2B / MICE",
-  description: "Partner with Dream Islands — wellness property onboarding, B2B distribution, and MICE wellness programs across Asia.",
+  description: "Partner with Dream Islands — wellness property onboarding, B2B distribution, and MICE wellness programmes across Asia.",
   alternates: { canonical: "/partners" },
   openGraph: {
     title: "Partnership / B2B / MICE | Dream Islands",
-    description: "Wellness property onboarding, B2B distribution, and MICE wellness programs across Asia.",
+    description: "Wellness property onboarding, B2B distribution, and MICE wellness programmes across Asia.",
     url: "https://dreamislands.org/partners",
   },
 }
@@ -18,23 +18,23 @@ export const dynamic = "force-dynamic"
 const OFFERINGS: Array<[string, string]> = [
   [
     "White label API",
-    "Plug your property or clinic into Dream Islands' guest-matching and booking infrastructure — under your own brand. We handle intake, program matching and follow-up; you handle delivery.",
+    "Plug your property or clinic into Dream Islands' guest-matching and booking infrastructure — under your own brand. We handle intake, programme matching and follow-up; you handle delivery.",
   ],
   [
     "Corporate retreats (MICE)",
-    "Structured wellness offsites and incentive travel for companies — group programs, on-site coordination, and outcome reporting for HR and leadership teams.",
+    "Structured wellness offsites and incentive travel for companies — group programmes, on-site coordination, and outcome reporting for HR and leadership teams.",
   ],
   [
-    "Program & inventory packaging",
-    "We help properties turn loose treatments and activities into standardized, bookable wellness programs — priced, scheduled, and ready to match against real guest demand.",
+    "Programme & inventory packaging",
+    "We help properties turn loose treatments and activities into standardized, bookable wellness programmes — priced, scheduled, and ready to match against real guest demand.",
   ],
 ]
 
 const WHY_PARTNER: Array<[string, string]> = [
   ["Less OTA dependency", "Guests come to you already matched by goal, not by who bid highest on an ad."],
-  ["Real differentiation", "A standardized program framework instead of \"spa + yoga\" that looks the same everywhere."],
+  ["Real differentiation", "A standardized programme framework instead of \"spa + yoga\" that looks the same everywhere."],
   ["Pre-qualified demand", "Every referral has already completed a Wellbeing & Wellness Score (WS) — no cold walk-ins."],
-  ["Outcome data", "We track what guests actually experience, so you learn which programs perform and which don't."],
+  ["Outcome data", "We track what guests actually experience, so you learn which programmes perform and which don't."],
 ]
 
 export default function PartnersPage() {
@@ -51,7 +51,7 @@ export default function PartnersPage() {
         </h1>
         <p className="body-lg" style={{ marginBottom: 44, maxWidth: 720 }}>
           Dream Islands works directly with wellness properties, activity providers, and corporate
-          travel buyers across Asia — standardizing programs, matching pre-qualified
+          travel buyers across Asia — standardizing programmes, matching pre-qualified
           guests to the right offering, and tracking outcomes over time.
         </p>
 

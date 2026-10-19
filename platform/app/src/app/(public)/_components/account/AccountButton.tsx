@@ -68,7 +68,7 @@ export default function AccountButton() {
           ) : (
             <>
               <Link href="/profile" onClick={() => setOpen(false)} role="menuitem">My Wellness Journey</Link>
-              <Link href="/profile/programs" onClick={() => setOpen(false)} role="menuitem">My programs</Link>
+              <Link href="/profile/programs" onClick={() => setOpen(false)} role="menuitem">My programmes</Link>
               <Link href="/profile/details" onClick={() => setOpen(false)} role="menuitem">Profile details</Link>
             </>
           )}

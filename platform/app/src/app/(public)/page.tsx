@@ -1,12 +1,8 @@
 ﻿import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { getSessionUser } from "@/lib/auth"
-import { supabaseAdmin } from "@/lib/supabase-server"
-import HomeView from "./_components/HomeView"
-import { getCatalogStats } from "@/lib/stats"
-import { type DbProgramRow } from "./_lib/programMapping"
-import { mapProgramsResolved } from "./_lib/programMappingResolved"
-import type { Review } from "./_components/ReviewsSection"
+import HomeV2 from "./_components/HomeV2"
+import { loadGallery, loadOutcomes, loadPrograms, loadProperties, loadReviews } from "./_lib/catalog"
 
 export const dynamic = "force-dynamic"
 
@@ -33,28 +29,9 @@ export default async function Root() {
     if (user?.role === "partner") redirect("/partner")
   }
 
-  const { data: rows } = await supabaseAdmin
-    .from("programs")
-    .select(
-      "id, name, slug, summary, cohort, tier, duration_days, price_usd, outcomes, is_composite, hero_image_url, " +
-        "program_properties(role, properties(id, name, island, country, contact_wa)), " +
-        "program_variants(duration_days, duration_nights, price_basic_usd, price_vip_usd, active)",
-    )
-    .eq("active", true)
-    .eq("status", "published")
-    .order("sort_order")
-    .order("cohort")
-    .order("duration_days")
-
-  const { data: reviewRows } = await supabaseAdmin
-    .from("reviews")
-    .select("*")
-    .eq("status", "published")
-    .in("visibility", ["both", "en"])
-    .order("featured", { ascending: false })
-    .order("created_at", { ascending: false })
-
-  const programs = await mapProgramsResolved((rows ?? []) as unknown as DbProgramRow[])
-  const stats = await getCatalogStats()
-  return <HomeView programs={programs} reviews={(reviewRows ?? []) as Review[]} stats={stats} />
+  const [programs, props, outcomes, reviews] = await Promise.all([loadPrograms(), loadProperties(), loadOutcomes(), loadReviews()])
+  const tanya = props.find((p) => p.slug === "tanya-core") ?? null
+  const chinaImage = props.find((p) => p.slug === "wudang-mountain-wellness-center")?.image_url ?? null
+  const tanyaPhotos = tanya ? (await loadGallery({ property_id: tanya.id }, "Tanya Samui")).slice(0, 3).map((g) => g.url) : []
+  return <HomeV2 programs={programs} tanya={tanya} tanyaPhotos={tanyaPhotos} chinaImage={chinaImage} outcomes={outcomes} properties={props} reviews={reviews} />
 }

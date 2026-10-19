@@ -1,11 +1,13 @@
-﻿import Link from "next/link"
 import type { Metadata } from "next"
 import { supabaseAdmin } from "@/lib/supabase-server"
-import { ReviewCard, type Review } from "../_components/ReviewsSection"
+import { loadReviews } from "../_lib/catalog"
+import { Stars } from "../ds/ui"
+import { JourneyPrompt, ReviewCard, cardStyles as cs } from "../ds/cards"
+import x from "../ds/sections.module.css"
 
 export const metadata: Metadata = {
   title: "Guest Reviews",
-  description: "Real guest stories from Dream Islands wellness journeys across Asia — outcomes, programs, and destinations.",
+  description: "Real guest stories from Dream Islands wellness journeys across Asia — outcomes, programmes, and destinations.",
   alternates: { canonical: "/reviews" },
   openGraph: {
     title: "Guest Reviews | Dream Islands",
@@ -24,8 +26,6 @@ export default async function ReviewsPage() {
     .in("visibility", ["both", "en"])
     .order("featured", { ascending: false })
     .order("created_at", { ascending: false })
-
-  const reviews = (data ?? []) as Review[]
 
   const ratedReviews = (data ?? []).filter((r: any) => typeof r.rating === "number")
   const avgRating =
@@ -66,47 +66,31 @@ export default async function ReviewsPage() {
         }
       : null
 
+  const list = await loadReviews()
+
   return (
-    <div style={{ background: "#1C262A", minHeight: "100vh", paddingBottom: 80 }}>
-      {jsonLd && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-      )}
-      <div className="shell" style={{ paddingTop: 64, paddingBottom: 48 }}>
-        <div className="eyebrow" style={{ color: "#AEE1C0", marginBottom: 12 }}>
-          Guest reviews
-        </div>
-        <h1 className="display" style={{ color: "#fff", margin: "0 0 20px" }}>
-          Guest Stories
-        </h1>
-        <p className="body-lg" style={{ color: "rgba(255,255,255,.75)", marginBottom: 40, maxWidth: 640 }}>
-          We measure outcomes, not just satisfaction — these are real guests, matched by goal,
-          describing what actually changed before, during and after their stay.
-        </p>
-        <div
-          style={{
-            display: "grid",
-            gap: 16,
-            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-          }}
-        >
-          {reviews.map((r) => (
-            <ReviewCard key={r.id} review={r} />
+    <div className="ds-container">
+      {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />}
+      <header className={x.pageHead}>
+        <p className={x.overline} style={{ margin: 0 }}>Guest stories</p>
+        <h1 className="ds-display-s">What guests say</h1>
+        <p className="ds-body-l ds-muted">We measure outcomes, not just satisfaction: these are real guests, matched by goal, describing what actually changed before, during and after their stay.</p>
+        {avgRating && (
+          <p className="ds-title-m" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <Stars value={avgRating} /> {avgRating.toFixed(1)} <span className="ds-body-m ds-muted">from {ratedReviews.length} guests</span>
+          </p>
+        )}
+      </header>
+      <section className={`${x.section} ${x.last}`}>
+        <div className={cs.grid3} style={{ rowGap: 48 }}>
+          {list.map((r) => (
+            <ReviewCard key={r.id} rating={r.rating} text={r.text} name={r.name} meta={r.meta ?? undefined} />
           ))}
-          {reviews.length === 0 && (
-            <p style={{ color: "rgba(255,255,255,.5)", gridColumn: "1 / -1" }}>
-              No reviews yet.
-            </p>
-          )}
         </div>
         <div style={{ marginTop: 48 }}>
-          <Link href="/" style={{ color: "#AEE1C0", fontSize: 14 }}>
-            {"←"} Back to home
-          </Link>
+          <JourneyPrompt title="Want a story like these?" sub="Start with your Wellness Journey: 2 minutes, a Wellness Score and matched programmes." cta="Start your Wellness Journey" />
         </div>
-      </div>
+      </section>
     </div>
   )
 }

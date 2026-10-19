@@ -10,12 +10,12 @@ export const dynamic = "force-dynamic"
 export const metadata: Metadata = {
   title: "Anxiety and Stress Recovery Retreats in Asia",
   description:
-    "A practical guide to anxiety and stress recovery retreats across Asia — signs to watch for, what a retreat can and can't fix, programme types, typical duration, and real matched programs from Vietnam, Indonesia, Thailand and the Philippines.",
+    "A practical guide to anxiety and stress recovery retreats across Asia — signs to watch for, what a retreat can and can't fix, programme types, typical duration, and real matched programmes from Vietnam, Indonesia, Thailand and the Philippines.",
   alternates: { canonical: "/guides/anxiety-stress-recovery-retreats-asia" },
   openGraph: {
     title: "Anxiety and Stress Recovery Retreats in Asia | Dream Islands",
     description:
-      "Signs, what a retreat can and can't fix, programme types, duration, destinations and real matched programs for anxiety and stress recovery across Asia.",
+      "Signs, what a retreat can and can't fix, programme types, duration, destinations and real matched programmes for anxiety and stress recovery across Asia.",
     url: "https://dreamislands.org/guides/anxiety-stress-recovery-retreats-asia",
   },
 }
@@ -39,7 +39,7 @@ const CAN_DO = [
 
 const CANNOT_DO = [
   "Replace therapy or psychiatric care for a diagnosed anxiety disorder, PTSD, or clinical depression",
-  "Process acute grief or trauma in a way that substitutes for grief counseling or trauma-informed therapy — some programs support this work, none replace it",
+  "Process acute grief or trauma in a way that substitutes for grief counseling or trauma-informed therapy — some programmes support this work, none replace it",
   "Guarantee the anxiety won't return once you're back in the environment that produced it, without follow-through",
 ]
 
@@ -116,19 +116,19 @@ const ANXIETY_SLUGS = [
 const FAQS = [
   {
     q: "Is this therapy, or a substitute for therapy?",
-    a: "No. These are wellness travel programs, not clinical mental health treatment. They can create distance from stress triggers and support structured practices like breathwork and meditation, but they do not diagnose or treat anxiety disorders, PTSD or clinical depression. Dream Islands is a Destination Marketing Organization, not a medical institution, and this is not medical advice.",
+    a: "No. These are wellness travel programmes, not clinical mental health treatment. They can create distance from stress triggers and support structured practices like breathwork and meditation, but they do not diagnose or treat anxiety disorders, PTSD or clinical depression. Dream Islands is a Destination Marketing Organization, not a medical institution, and this is not medical advice.",
   },
   {
     q: "What's the difference between an anxiety/stress retreat and a general wellness retreat?",
-    a: "A general wellness retreat is built around broad relaxation — spa, food, scenery. A stress-recovery program is built specifically around down-regulating the nervous system: structured breathwork, meditation, movement or TCM, often with a therapeutic or facilitated-processing component, in either a solo or group format depending on the program.",
+    a: "A general wellness retreat is built around broad relaxation — spa, food, scenery. A stress-recovery programme is built specifically around down-regulating the nervous system: structured breathwork, meditation, movement or TCM, often with a therapeutic or facilitated-processing component, in either a solo or group format depending on the programme.",
   },
   {
     q: "How long should I go for?",
-    a: "A 3-day program can provide acute relief and a reset for immediate overwhelm. Most people see a more durable shift at 7 days, with time to actually process rather than just decompress. For deep, unresolved stress or a major life transition, 14–21 day programs go further into structured emotional recalibration.",
+    a: "A 3-day programme can provide acute relief and a reset for immediate overwhelm. Most people see a more durable shift at 7 days, with time to actually process rather than just decompress. For deep, unresolved stress or a major life transition, 14–21 day programmes go further into structured emotional recalibration.",
   },
   {
     q: "Should I go alone or with a group?",
-    a: "Depends on what actually helps you. Some programs are explicitly community-based — shared workshops, group reflection — for people who recover better with peer support. Others are solitary and self-paced for people who need real distance from other people, not more social interaction.",
+    a: "Depends on what actually helps you. Some programmes are explicitly community-based — shared workshops, group reflection — for people who recover better with peer support. Others are solitary and self-paced for people who need real distance from other people, not more social interaction.",
   },
 ]
 
@@ -171,14 +171,14 @@ export default async function AnxietyStressGuidePage() {
         <p className="body-lg" style={{ marginBottom: 20, maxWidth: 700 }}>
           Real distance from what's driving the stress response, plus structured practice to come down from it.
           Here's how to tell if you need one, what it can and can't fix, the programme types available across Asia,
-          and which real programs match.
+          and which real programmes match.
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 8 }}>
           <Link href="/start" className="btn btn-primary btn-lg">
             Get your WS →
           </Link>
           <Link href="/programs?track=Mind" className="btn btn-ghost btn-lg">
-            Browse Mind Balance programs
+            Browse Mind Balance programmes
           </Link>
         </div>
       </section>
@@ -189,7 +189,7 @@ export default async function AnxietyStressGuidePage() {
           <h2 style={{ fontSize: 22, marginBottom: 6 }}>Signs you might need a stress recovery reset</h2>
           <p className="body-sm" style={{ marginBottom: 16, color: "var(--ink-2)" }}>
             None of these are a diagnosis — they're common signals people describe before booking a Mind Balance
-            program.
+            programme.
           </p>
           <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: 10 }}>
             {SIGNS.map((s) => (
@@ -272,8 +272,8 @@ export default async function AnxietyStressGuidePage() {
         <section className="shell" style={{ paddingTop: 56 }}>
           <div className="section-head">
             <div>
-              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programs</div>
-              <h2>Actual anxiety &amp; stress recovery <span className="display-italic">programs</span>.</h2>
+              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programmes</div>
+              <h2>Actual anxiety &amp; stress recovery <span className="display-italic">programmes</span>.</h2>
             </div>
           </div>
           <div className="rail">
@@ -297,7 +297,7 @@ export default async function AnxietyStressGuidePage() {
         >
           <div className="eyebrow" style={{ color: "rgba(255,255,255,.7)" }}>Not sure which one fits?</div>
           <p className="display" style={{ fontSize: "clamp(24px, 5vw, 36px)", margin: "12px 0 20px", maxWidth: 560 }}>
-            <span className="display-italic">Free WS</span>, matched program, real humans on WhatsApp.
+            <span className="display-italic">Free WS</span>, matched programme, real humans on WhatsApp.
           </p>
           <Link href="/start" className="btn" style={{ background: "var(--accent-ink)", color: "var(--accent-deep)" }}>
             Get your WS →

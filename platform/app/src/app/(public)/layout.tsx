@@ -1,29 +1,34 @@
-import TopNav from "./_components/TopNav"
-import Footer from "./_components/Footer"
-import WhatsAppFab from "./_components/WhatsAppFab"
 import AttributionInit from "./_components/AttributionInit"
 import ConsentBanner from "./_components/ConsentBanner"
+import WhatsAppFab from "./_components/WhatsAppFab"
 import AuthProvider from "./_components/account/AuthProvider"
-import { supabaseAdmin } from "@/lib/supabase-server"
+import { Footer, MobileTopBar, NavigationBar, NavTracker, TopAppBar } from "./ds/chrome"
+// Old styles stay loaded until every page has moved to DS v2.
 import "./landing.css"
-export default async function PublicLayout({
+import "./ds/tokens.css"
+import "./ds/legacy.css"
+
+export default function PublicLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const { data: programRows } = await supabaseAdmin
-    .from("programs")
-    .select("id, name")
-    .eq("active", true)
-    .eq("status", "published")
-    .order("sort_order")
   return (
-    <div style={{ fontFamily: "var(--font-body)" }}>
+    <div className="ds-root">
+      {/* Material Symbols Rounded, Light. Hoisted to <head> by React. */}
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300,0..1,0&display=block"
+        precedence="default"
+      />
       <AuthProvider>
         <AttributionInit />
+        <NavTracker />
         <ConsentBanner />
-        <TopNav programs={programRows ?? []} />
-        {children}
+        <TopAppBar />
+        <MobileTopBar />
+        <main className="ds-main">{children}</main>
         <Footer />
         <WhatsAppFab />
+        <NavigationBar />
       </AuthProvider>
     </div>
   )

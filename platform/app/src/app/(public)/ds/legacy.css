@@ -1,0 +1,82 @@
+/* Compatibility layer: pages not rebuilt yet (guides, Tanya Samui, reviews,
+   B2B, profile, account) keep their markup but pick up DS v2 inside .ds-root.
+   Old tokens are re-pointed at DS roles; old classes get DS shape and type. */
+
+.ds-root {
+  --bg: var(--ds-surface);
+  --surface: var(--ds-surface);
+  --surface-2: var(--ds-surface-container-low);
+  --line: var(--ds-outline-variant);
+  --line-2: var(--ds-outline-variant);
+  --ink: var(--ds-on-surface);
+  --ink-2: var(--ds-on-surface-variant);
+  --ink-3: var(--ds-on-surface-variant);
+  --accent: var(--ds-primary);
+  --accent-soft: var(--ds-primary-container);
+  --accent-deep: var(--ds-primary);
+  --accent-ink: var(--ds-on-primary);
+  --reset: var(--ds-track-reset);
+  --sleep: var(--ds-track-mind);
+  --sport: var(--ds-track-sport);
+  --font-display: var(--ds-font-display);
+  --font-body: var(--ds-font-body);
+  --r-sm: 0.5rem;
+  --r-md: 0.75rem;
+  --r-lg: 1rem;
+  --r-xl: 2.25rem;
+  --card-bg: var(--ds-surface-container-low);
+  --card-border: 0;
+  --card-shadow: none;
+  --shadow-1: none;
+  --shadow-2: none;
+}
+
+.ds-root .page { background: transparent; min-height: 0; padding-bottom: 6rem !important; }
+.ds-root .shell { max-width: calc(var(--ds-container) + 2 * var(--ds-page-pad)); padding: 0 var(--ds-page-pad); }
+
+/* Type: no caps with letter-spacing; Belleza has no italic */
+.ds-root .eyebrow { font: 500 0.8125rem/1.125rem var(--ds-font-body); letter-spacing: 0; text-transform: none; color: var(--ds-on-surface-variant); }
+.ds-root .display { font-family: var(--ds-font-display); font-weight: 600; letter-spacing: -0.3px; line-height: 1.1; color: var(--ds-on-surface); }
+.ds-root .display-italic { font-style: normal; color: inherit; }
+.ds-root .body-lg { font: 400 1rem/1.5rem var(--ds-font-body); color: var(--ds-on-surface-variant); }
+.ds-root .body { font: 400 0.875rem/1.25rem var(--ds-font-body); color: var(--ds-on-surface-variant); }
+.ds-root .body-sm { font: 400 0.875rem/1.25rem var(--ds-font-body); color: var(--ds-on-surface-variant); }
+.ds-root .section-head { margin: 0 0 1.5rem; align-items: flex-end; }
+.ds-root .section-head h2 { font: 600 1.5rem/1.2 var(--ds-font-display); letter-spacing: -0.2px; }
+.ds-root h1.display { font-size: clamp(2rem, 5vw, 2.75rem) !important; line-height: 1.1 !important; }
+.ds-root h2 { color: var(--ds-on-surface); }
+
+/* Blocks: tone, radius 36, no border, no shadow */
+.ds-root .card { background: var(--ds-surface-container-low); border: 0; border-radius: var(--ds-r-xl-plus); box-shadow: none; }
+.ds-root .tag { background: var(--ds-surface-container-high); color: var(--ds-on-surface); border: 0; border-radius: var(--ds-r-full); font: 500 0.75rem/1rem var(--ds-font-body); letter-spacing: 0.1px; text-transform: none; padding: 0.25rem 0.625rem; }
+.ds-root .tag-outline { background: var(--ds-surface-container-high); border: 0; }
+
+/* Buttons: DS pills, hug */
+.ds-root .btn { height: 2.5rem; padding: 0 1.5rem; border-radius: var(--ds-r-full); font: 500 0.875rem/1.125rem var(--ds-font-body); letter-spacing: 0; box-shadow: none; border: 0; }
+.ds-root .btn-lg { height: 3rem; padding: 0 1.5rem; font-size: 1rem; }
+.ds-root .btn-primary { background: var(--ds-primary); color: var(--ds-on-primary); box-shadow: none; }
+.ds-root .btn-primary:hover { background: color-mix(in srgb, var(--ds-primary) 92%, white); }
+.ds-root .btn-ghost { background: var(--ds-secondary-container); color: var(--ds-on-secondary-container); border: 0; }
+.ds-root .btn-ghost:hover { background: color-mix(in srgb, var(--ds-secondary-container) 90%, var(--ds-on-secondary-container)); }
+.ds-root .btn-soft { background: var(--ds-secondary-container); color: var(--ds-on-secondary-container); }
+
+/* Fields */
+.ds-root .field { background: var(--ds-surface-container-highest); border: 0; border-radius: var(--ds-r-md); color: var(--ds-on-surface); font: 400 1rem/1.5rem var(--ds-font-body); min-height: 3.25rem; }
+.ds-root .field:focus { box-shadow: inset 0 -0.125rem 0 var(--ds-primary); border-radius: 0.75rem 0.75rem 0.25rem 0.25rem; outline: none; }
+
+/* Rails and grids */
+.ds-root .rail { gap: 1.5rem; }
+.ds-root .rail > * { width: min(18.75rem, 78vw); }
+
+/* Old tables inside cards */
+.ds-root .card table { color: var(--ds-on-surface-variant); }
+.ds-root .card th { font-weight: 500; text-transform: none; letter-spacing: 0; }
+
+/* Account (auth modal, menus) */
+.ds-root .acct-overlay { background: rgba(0, 0, 0, 0.4); }
+.ds-root .acct-sheet { background: var(--ds-surface-container-high); color: var(--ds-on-surface); border-radius: var(--ds-r-xl-plus); border: 0; box-shadow: var(--ds-elev-3); }
+.ds-root .acct-avatar { background: var(--ds-primary-container); color: var(--ds-on-primary-container); }
+.ds-root .acct-error { color: var(--ds-error); }
+
+/* Profile */
+.ds-root .profile-card { background: var(--ds-surface-container-low); border: 0; border-radius: var(--ds-r-xl-plus); box-shadow: none; }

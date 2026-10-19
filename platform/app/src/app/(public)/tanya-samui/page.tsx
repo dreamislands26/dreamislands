@@ -10,11 +10,11 @@ import { Icon } from "../_components/Icon"
 
 export const metadata: Metadata = {
   title: "Tanya Samui Holistic Health Retreat",
-  description: "Tanya Samui on Koh Samui, Thailand — one of the longest-standing properties in the Dream Islands network. Detox protocols, medical wellness, and signature programs since 2009.",
+  description: "Tanya Samui on Koh Samui, Thailand — one of the longest-standing properties in the Dream Islands network. Detox protocols, medical wellness, and signature programmes since 2009.",
   alternates: { canonical: "/tanya-samui" },
   openGraph: {
     title: "Tanya Samui Holistic Health Retreat | Dream Islands",
-    description: "Detox protocols, medical wellness, and signature programs on Koh Samui, Thailand, since 2009.",
+    description: "Detox protocols, medical wellness, and signature programmes on Koh Samui, Thailand, since 2009.",
     url: "https://dreamislands.org/tanya-samui",
   },
 }
@@ -41,7 +41,7 @@ const SPACES = [
     slug: "tanya-wellbeing",
     name: "Tanya Wellness Center",
     tag: "À la carte spa",
-    body: "Movement, mindfulness and spiritual practice: yoga, breathwork, meditation, sound healing, Reiki, and the full massage and beauty menu — bookable as standalone treatments or layered onto any program.",
+    body: "Movement, mindfulness and spiritual practice: yoga, breathwork, meditation, sound healing, Reiki, and the full massage and beauty menu — bookable as standalone treatments or layered onto any programme.",
   },
   {
     slug: "bunya-clinic",
@@ -57,7 +57,7 @@ const INDICATIONS = [
   "Want to support a healthy weight with real structure",
   "Want visibly refreshed skin and a sense of renewed vitality",
   "Want to deepen a meditation or yoga practice with daily guidance",
-  "Are choosing between programs and want the WS to decide for them, not guesswork",
+  "Are choosing between programmes and want the WS to decide for them, not guesswork",
 ]
 
 const FAQ_LINK_LABEL = "See all 23 answers"
@@ -182,7 +182,7 @@ export default async function TanyaSamuiHub() {
             style={{ fontSize: "clamp(38px, 8vw, 68px)", margin: "0 0 20px", color: "#fff", maxWidth: 800 }}
           >
             An oasis of health, harmony{" "}
-            <span className="display-italic" style={{ color: "var(--accent)" }}>and longevity</span> on Koh Samui.
+            <span className="display-italic" style={{ color: "var(--ds-inverse-primary)" }}>and longevity</span> on Koh Samui.
           </h1>
           <p className="body-lg" style={{ marginBottom: 28, maxWidth: 620, color: "rgba(255,255,255,.85)" }}>
             Tanya Samui is the largest wellness ecosystem on the island — a place for restorative rest and
@@ -193,7 +193,7 @@ export default async function TanyaSamuiHub() {
               Take the free Wellness Check-up <Icon.arrow width={18} height={18} />
             </Link>
             <Link href="#programs" className="btn btn-ghost btn-lg" style={{ background: "rgba(255,255,255,.08)", color: "#fff", border: "1px solid rgba(255,255,255,.3)" }}>
-              Browse programs
+              Browse programmes
             </Link>
           </div>
         </div>
@@ -339,7 +339,7 @@ export default async function TanyaSamuiHub() {
       <section id="programs" className="shell" style={{ paddingTop: 64, scrollMarginTop: 90 }}>
         <div className="section-head">
           <div>
-            <div className="eyebrow" style={{ marginBottom: 8 }}>Signature programs</div>
+            <div className="eyebrow" style={{ marginBottom: 8 }}>Signature programmes</div>
             <h2>Pick your <span className="display-italic">protocol</span>.</h2>
           </div>
           <Link href="/tanya-samui/accommodation" className="btn btn-ghost" style={{ padding: "10px 16px", fontSize: 13 }}>
@@ -361,7 +361,7 @@ export default async function TanyaSamuiHub() {
         >
           <div className="eyebrow" style={{ color: "rgba(20,32,27,.6)" }}>Not sure which one?</div>
           <p className="display" style={{ fontSize: "clamp(24px, 5vw, 36px)", margin: "12px 0 20px", maxWidth: 560 }}>
-            <span className="display-italic">Free 2-minute WS</span>, 23 questions, one matched program.
+            <span className="display-italic">Free 2-minute WS</span>, 23 questions, one matched programme.
           </p>
           <Link href="/start" className="btn" style={{ background: "var(--accent-ink)", color: "var(--accent)" }}>
             Get your WS <Icon.arrow width={16} height={16} />

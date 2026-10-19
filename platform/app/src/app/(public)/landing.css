@@ -1,6 +1,6 @@
 ﻿/* Dream Islands brand tokens & global styles.
    Locked to brand spec: bg #1C262A, panels #2C3336, mint #AEE1C0,
-   text #D3D2D2 / #FFFFFF, fonts Optima + Aeroport.
+   text #D3D2D2 / #FFFFFF, fonts Bricolage Grotesque + DM Sans (DS v2).
    Single theme (dark), no toggles. */
 
 /* --- Base reset (extends globals.css) --- */
@@ -41,12 +41,10 @@ body {
   --lean:         #9CAE5C;
 
   /* type */
-  /* accent = Optima, base = Aeroport, mono = Roboto Mono (brand spec).
-     Optima is a humanist sans: fall back to Belleza (same flared-stroke
-     character), never to Palatino/serif. The --font-* inputs are set by
-     next/font on <html> in src/app/layout.tsx. */
-  --font-display: 'Optima', 'Optima nova', var(--font-optima-fallback, 'Candara'), 'Candara', sans-serif;
-  --font-body:    'Aeroport', var(--font-dmsans, -apple-system), -apple-system, 'Segoe UI', sans-serif;
+  /* DS v2 (Figma Typography variables): display = Bricolage Grotesque, body = DM Sans.
+     The --font-* inputs are set by next/font on <html> in src/app/layout.tsx. */
+  --font-display: var(--font-bricolage, 'Bricolage Grotesque'), -apple-system, 'Segoe UI', sans-serif;
+  --font-body:    var(--font-dmsans, 'DM Sans'), -apple-system, 'Segoe UI', sans-serif;
   --font-mono:    'Roboto Mono', var(--font-roboto-mono, ui-monospace), ui-monospace, monospace;
 
   /* spacing & shape */

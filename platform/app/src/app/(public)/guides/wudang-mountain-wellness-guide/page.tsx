@@ -10,12 +10,12 @@ export const dynamic = "force-dynamic"
 export const metadata: Metadata = {
   title: "Wellness Travel Guide: Wudang Mountain, China",
   description:
-    "A practical guide to wellness travel in Wudang Mountain, China — Taiji, Qigong and TCM programs at a UNESCO World Heritage Daoist mountain, what a program actually involves, typical duration and price, and real matched programs.",
+    "A practical guide to wellness travel in Wudang Mountain, China — Taiji, Qigong and TCM programmes at a UNESCO World Heritage Daoist mountain, what a programme actually involves, typical duration and price, and real matched programmes.",
   alternates: { canonical: "/guides/wudang-mountain-wellness-guide" },
   openGraph: {
     title: "Wellness Travel Guide: Wudang Mountain, China | Dream Islands",
     description:
-      "Taiji, Qigong and TCM programs at a UNESCO World Heritage Daoist mountain — what to expect, programme types, duration, price and real matched programs.",
+      "Taiji, Qigong and TCM programmes at a UNESCO World Heritage Daoist mountain — what to expect, programme types, duration, price and real matched programmes.",
     url: "https://dreamislands.org/guides/wudang-mountain-wellness-guide",
   },
 }
@@ -24,14 +24,14 @@ const WHY_WUDANG = [
   "A UNESCO World Heritage Site in Hubei Province, China, and one of the country's most important centers of Daoist culture",
   "The birthplace of Wudang-style internal martial arts, including the lineage that Tai Chi (Taijiquan) traces back to",
   "A working monastic complex, not a recreated tourist set — temples, monks and daily Daoist practice are still active on the mountain",
-  "A genuinely quiet, low-stimulation environment — most programs include a digital-detox or no-devices component built around that",
+  "A genuinely quiet, low-stimulation environment — most programmes include a digital-detox or no-devices component built around that",
 ]
 
 const WHAT_IT_INVOLVES = [
   "Daily Taiji and Qigong instruction, often from teachers trained within the mountain's own lineage",
-  "TCM diagnosis and treatment — pulse and tongue reading, herbal protocols, cupping or acupuncture depending on the program",
-  "Temple visits and, in longer programs, direct exposure to the mountain's monastic community",
-  "In several programs, a structured digital detox or no-devices protocol as part of the daily schedule",
+  "TCM diagnosis and treatment — pulse and tongue reading, herbal protocols, cupping or acupuncture depending on the programme",
+  "Temple visits and, in longer programmes, direct exposure to the mountain's monastic community",
+  "In several programmes, a structured digital detox or no-devices protocol as part of the daily schedule",
   "For the most advanced program, private teacher guidance in inner alchemy (nei gong) rather than group classes",
 ]
 
@@ -100,19 +100,19 @@ const DESTINATION_SLUGS = [
 const FAQS = [
   {
     q: "Do I need prior experience with Taiji or Qigong to visit Wudang Mountain?",
-    a: "No. Most programs, including the 3-Day Mind Reset and 5-Day Dao Wellness, are built for genuine beginners. The 10-Day Deep Internal Practice program is the exception — it's recommended for people who've already done a shorter Wudang program and want to go deeper into inner alchemy (nei gong).",
+    a: "No. Most programmes, including the 3-Day Mind Reset and 5-Day Dao Wellness, are built for genuine beginners. The 10-Day Deep Internal Practice programme is the exception — it's recommended for people who've already done a shorter Wudang programme and want to go deeper into inner alchemy (nei gong).",
   },
   {
-    q: "What's the difference between the Wudang-only programs and the Xi'an & Wudang combined ones?",
-    a: "The Wudang-only programs stay on the mountain for the full duration. The Xi'an & Wudang programs split the stay between Xi'an's ancient-capital culture and TCM diagnostics, and Wudang Mountain's Daoist practice — useful if you want cultural context alongside the mountain retreat.",
+    q: "What's the difference between the Wudang-only programmes and the Xi'an & Wudang combined ones?",
+    a: "The Wudang-only programmes stay on the mountain for the full duration. The Xi'an & Wudang programmes split the stay between Xi'an's ancient-capital culture and TCM diagnostics, and Wudang Mountain's Daoist practice — useful if you want cultural context alongside the mountain retreat.",
   },
   {
-    q: "Is the TCM component in these programs a form of medical treatment?",
-    a: "TCM diagnosis and treatment — pulse and tongue reading, herbal protocols, cupping or acupuncture — is a traditional wellness practice included in several programs. It is not a substitute for medical diagnosis or treatment from a licensed physician. Dream Islands is a Destination Marketing Organization, not a medical institution, and this is not medical advice.",
+    q: "Is the TCM component in these programmes a form of medical treatment?",
+    a: "TCM diagnosis and treatment — pulse and tongue reading, herbal protocols, cupping or acupuncture — is a traditional wellness practice included in several programmes. It is not a substitute for medical diagnosis or treatment from a licensed physician. Dream Islands is a Destination Marketing Organization, not a medical institution, and this is not medical advice.",
   },
   {
     q: "How long should I stay at Wudang Mountain?",
-    a: "3 days is enough for an introduction to the practice and environment. Most people see a more durable shift in practice and in physical/mental state at 5-7 days. The 10-11 day programs are for people who want to go significantly deeper, either into the practice itself or into a combined cultural and wellness itinerary.",
+    a: "3 days is enough for an introduction to the practice and environment. Most people see a more durable shift in practice and in physical/mental state at 5-7 days. The 10-11 day programmes are for people who want to go significantly deeper, either into the practice itself or into a combined cultural and wellness itinerary.",
   },
 ]
 
@@ -154,14 +154,14 @@ export default async function WudangDestinationGuidePage() {
         </h1>
         <p className="body-lg" style={{ marginBottom: 20, maxWidth: 700 }}>
           A working Daoist mountain, not a recreated retreat set. Here's why people come here for wellness
-          specifically, what a program actually involves, and which real programs match.
+          specifically, what a programme actually involves, and which real programmes match.
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 8 }}>
           <Link href="/start" className="btn btn-primary btn-lg">
             Get your WS →
           </Link>
           <Link href="/tracks/island-immersion" className="btn btn-ghost btn-lg">
-            Browse Island Immersion programs
+            Browse Island Immersion programmes
           </Link>
         </div>
       </section>
@@ -184,7 +184,7 @@ export default async function WudangDestinationGuidePage() {
       {/* WHAT IT INVOLVES */}
       <section className="shell" style={{ paddingTop: 24 }}>
         <div className="card" style={{ padding: 28 }}>
-          <h2 style={{ fontSize: 20, marginBottom: 14 }}>What a Wudang program actually involves</h2>
+          <h2 style={{ fontSize: 20, marginBottom: 14 }}>What a Wudang programme actually involves</h2>
           <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: 10 }}>
             {WHAT_IT_INVOLVES.map((c) => (
               <li key={c} className="body-sm" style={{ display: "flex", gap: 10 }}>
@@ -204,7 +204,7 @@ export default async function WudangDestinationGuidePage() {
       <section className="shell" style={{ paddingTop: 56 }}>
         <div className="section-head">
           <div>
-            <div className="eyebrow" style={{ marginBottom: 8 }}>All Wudang programs</div>
+            <div className="eyebrow" style={{ marginBottom: 8 }}>All Wudang programmes</div>
             <h2>Comparing your <span className="display-italic">options</span>.</h2>
           </div>
         </div>
@@ -236,8 +236,8 @@ export default async function WudangDestinationGuidePage() {
         <section className="shell" style={{ paddingTop: 56 }}>
           <div className="section-head">
             <div>
-              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programs</div>
-              <h2>Actual Wudang Mountain <span className="display-italic">programs</span>.</h2>
+              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programmes</div>
+              <h2>Actual Wudang Mountain <span className="display-italic">programmes</span>.</h2>
             </div>
           </div>
           <div className="rail">
@@ -261,7 +261,7 @@ export default async function WudangDestinationGuidePage() {
         >
           <div className="eyebrow" style={{ color: "rgba(255,255,255,.7)" }}>Not sure which one fits?</div>
           <p className="display" style={{ fontSize: "clamp(24px, 5vw, 36px)", margin: "12px 0 20px", maxWidth: 560 }}>
-            <span className="display-italic">Free WS</span>, matched program, real humans on WhatsApp.
+            <span className="display-italic">Free WS</span>, matched programme, real humans on WhatsApp.
           </p>
           <Link href="/start" className="btn" style={{ background: "var(--accent-ink)", color: "var(--accent-deep)" }}>
             Get your WS →

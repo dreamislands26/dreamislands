@@ -6,11 +6,11 @@ import { Icon } from "../_components/Icon"
 
 export const metadata: Metadata = {
   title: "About",
-  description: "Dream Islands is the outcome-driven wellness travel platform for Asia — baseline first, program match second, measured progress third.",
+  description: "Dream Islands is the outcome-driven wellness travel platform for Asia — baseline first, programme match second, measured progress third.",
   alternates: { canonical: "/about" },
   openGraph: {
     title: "About | Dream Islands",
-    description: "The outcome-driven wellness travel platform for Asia — baseline first, program match second, measured progress third.",
+    description: "The outcome-driven wellness travel platform for Asia — baseline first, programme match second, measured progress third.",
     url: "https://dreamislands.org/about",
   },
 }
@@ -26,12 +26,12 @@ const STEPS: Array<[string, string, string]> = [
   [
     "02",
     "Match",
-    "Your goals, baseline and preferences are matched against structured program data to identify the programs that fit you best. Not whoever paid for placement. Not whichever retreat has the best photographs.",
+    "Your goals, baseline and preferences are matched against structured programme data to identify the programmes that fit you best. Not whoever paid for placement. Not whichever retreat has the best photographs.",
   ],
   [
     "03",
     "Journey",
-    "Once booked, Dream Islands stays with you. Your coordinator and AI-powered concierge connect the booking, program, property and your individual journey — before arrival, during the stay and after you return home.",
+    "Once booked, Dream Islands stays with you. Your coordinator and AI-powered concierge connect the booking, programme, property and your individual journey — before arrival, during the stay and after you return home.",
   ],
   [
     "04",
@@ -58,12 +58,12 @@ const JOURNEY_FLOW = [
 ]
 
 const SUPPLY_MODELS: Array<[string, string]> = [
-  ["Dream Islands managed supply", "Our team structures and manages the property, programs, content and commercial data."],
-  ["Partner self-service", "Providers manage their own programs and information through the Dream Islands Partner Platform."],
+  ["Dream Islands managed supply", "Our team structures and manages the property, programmes, content and commercial data."],
+  ["Partner self-service", "Providers manage their own programmes and information through the Dream Islands Partner Platform."],
   ["Connected supply", "Availability and rates can be connected through external APIs and hospitality connectivity infrastructure."],
   [
     "Hybrid supply",
-    "Wellness programs and content can live in Dream Islands while accommodation availability and dynamic rates come from external systems.",
+    "Wellness programmes and content can live in Dream Islands while accommodation availability and dynamic rates come from external systems.",
   ],
 ]
 
@@ -71,7 +71,7 @@ const DISTRIBUTION_FLOW = ["Dream Islands", "AI Concierge", "B2B Agents", "White
 
 const PLATFORM_LAYERS: Array<[string, string]> = [
   ["Wellness intelligence", "Baseline, goals, matching, recommendations and outcomes."],
-  ["Supply", "Properties, programs, availability, rates and commercial terms."],
+  ["Supply", "Properties, programmes, availability, rates and commercial terms."],
   ["Transactions", "Bookings, payments and partner operations."],
   ["Distribution", "Direct guests, agents, white-label partners and external APIs."],
 ]
@@ -161,13 +161,13 @@ export default async function AboutPage() {
         </h1>
         <p className="body-lg" style={{ marginBottom: 20, maxWidth: 760 }}>
           Dream Islands turns wellness travel from a one-off booking into a measurable journey. We
-          establish your baseline, match you to programs based on your goals, support you throughout
+          establish your baseline, match you to programmes based on your goals, support you throughout
           the experience, measure what changed — and use that history to make every next journey more
           relevant.
         </p>
         <p className="body-lg" style={{ marginBottom: 8, maxWidth: 760 }}>
           {locations.length} destinations · {countryCount} countries · {programCount ?? "50+"} standardized
-          wellness programs across Asia.
+          wellness programmes across Asia.
         </p>
         <p className="body" style={{ marginBottom: 32, maxWidth: 760, fontWeight: 600, color: "var(--ink)" }}>
           One journey. Not a collection of retreats.
@@ -302,7 +302,7 @@ export default async function AboutPage() {
           <p className="body-sm" style={{ margin: 0, maxWidth: 680 }}>
             As the platform develops, Dream Islands is being designed to connect with hospitality
             distribution and connectivity systems for dynamic availability and rate exchange. This
-            means a wellness program structured once can eventually be discovered, matched and booked
+            means a wellness programme structured once can eventually be discovered, matched and booked
             across multiple distribution environments.
           </p>
         </div>
@@ -322,7 +322,7 @@ export default async function AboutPage() {
         </h2>
         <div className="card" style={{ padding: 24, marginBottom: 40 }}>
           <p className="body" style={{ marginBottom: 14, maxWidth: 680 }}>
-            AI helps us structure information, understand intent, match programs and maintain
+            AI helps us structure information, understand intent, match programmes and maintain
             continuity across the guest journey. But wellness travel still involves complex decisions,
             logistics and personal circumstances. That&apos;s why every Dream Islands journey can move
             seamlessly from AI assistance to a real human coordinator.
@@ -349,7 +349,7 @@ export default async function AboutPage() {
           The intelligence layer for wellness travel.
         </p>
         <p className="body" style={{ marginBottom: 20, maxWidth: 680 }}>
-          Today, Dream Islands connects guests with standardized wellness programs across Asia. The
+          Today, Dream Islands connects guests with standardized wellness programmes across Asia. The
           platform we&apos;re building connects four things that traditionally live separately:
         </p>
         <div

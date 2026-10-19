@@ -12,12 +12,12 @@ export default async function MyPrograms() {
     <div className="profile-grid">
       {journeys.length === 0 ? (
         <section className="card profile-card" style={{ textAlign: "center", padding: "48px 24px" }}>
-          <h2 className="display" style={{ fontSize: 32, margin: "0 0 10px", color: "var(--ink)" }}>No programs yet</h2>
+          <h2 className="display" style={{ fontSize: 32, margin: "0 0 10px", color: "var(--ink)" }}>No programmes yet</h2>
           <p className="body" style={{ margin: "0 auto 24px", maxWidth: 420 }}>
             Every journey you request or book with us appears here, with its dates, status and goals.
           </p>
           <Link href="/programs" className="btn btn-primary">
-            Browse programs <Icon.arrow width={16} height={16} />
+            Browse programmes <Icon.arrow width={16} height={16} />
           </Link>
         </section>
       ) : (

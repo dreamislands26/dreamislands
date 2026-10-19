@@ -95,7 +95,7 @@ export default function DemoForm() {
         <Field label="Country and city / region" name="country_city" />
         <Field label="Website" name="website" />
       </div>
-      <Field label="Program you want to improve" name="program_to_review" textarea />
+      <Field label="Programme you want to improve" name="program_to_review" textarea />
       <Field label="Operational bottleneck" name="bottleneck" textarea />
 
       <label style={{ display: "flex", gap: 10, alignItems: "flex-start", fontSize: 13, color: "var(--ink-2)" }}>

@@ -1,0 +1,34 @@
+.wrap { position: relative; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 0.5rem; aspect-ratio: 1 / 1; }
+.gridSmall { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+.grid .cell:nth-child(5) { display: none; }
+.cell { position: relative; padding: 0; border: 0; cursor: zoom-in; display: block; min-height: 0; }
+.cell > div { height: 100%; }
+.gridSmall .cell > div { aspect-ratio: 4 / 3; height: auto; }
+.single { aspect-ratio: 4 / 3; }
+.all {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  height: 2.5rem;
+  padding: 0 1rem 0 0.75rem;
+  border-radius: var(--ds-r-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--ds-secondary-container);
+  color: var(--ds-on-secondary-container);
+  font: 500 0.875rem/1.125rem var(--ds-font-body);
+  cursor: pointer;
+}
+.all :global(.ds-icon) { font-size: 1.125rem; }
+.list { display: grid; gap: 0.5rem; }
+.listItem { aspect-ratio: 3 / 2; }
+@media (max-width: 767px) {
+  .grid { grid-template-columns: 1fr; grid-template-rows: none; aspect-ratio: auto; margin: 0 calc(-1 * var(--ds-gutter)); }
+  .grid .cell:not(:first-child) { display: none; }
+  .grid .cell > div { aspect-ratio: 1 / 0.92; border-radius: 0; }
+  .gridSmall { grid-template-columns: 1fr; margin: 0 calc(-1 * var(--ds-gutter)); }
+  .gridSmall .cell:not(:first-child) { display: none; }
+  .gridSmall .cell > div { border-radius: 0; }
+}

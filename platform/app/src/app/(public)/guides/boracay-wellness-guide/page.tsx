@@ -10,12 +10,12 @@ export const dynamic = "force-dynamic"
 export const metadata: Metadata = {
   title: "Wellness Travel Guide: Boracay",
   description:
-    "A practical guide to wellness travel in Boracay — mindfulness and community-wellness retreats at Movenpick Resort & Spa Boracay, what each actually involves, typical duration and price, and real matched programs.",
+    "A practical guide to wellness travel in Boracay — mindfulness and community-wellness retreats at Movenpick Resort & Spa Boracay, what each actually involves, typical duration and price, and real matched programmes.",
   alternates: { canonical: "/guides/boracay-wellness-guide" },
   openGraph: {
     title: "Wellness Travel Guide: Boracay | Dream Islands",
     description:
-      "Mindfulness and community-wellness retreats on Boracay's white sand. What to expect, programme types, duration, price and real matched programs.",
+      "Mindfulness and community-wellness retreats on Boracay's white sand. What to expect, programme types, duration, price and real matched programmes.",
     url: "https://dreamislands.org/guides/boracay-wellness-guide",
   },
 }
@@ -82,7 +82,7 @@ const FAQS = [
     a: "The 7-day version covers the core programme — structured yoga, meditation and personal growth workshops. The 10-day version adds community-driven reflection and peer group workshops on top of that.",
   },
   {
-    q: "Are these programs a substitute for ongoing mental health care?",
+    q: "Are these programmes a substitute for ongoing mental health care?",
     a: "No. The mindfulness and community-wellness programmes in Boracay are a structured wellness reset, not a substitute for therapy or psychiatric care. Dream Islands is a Destination Marketing Organization, not a medical institution, and this is not medical advice.",
   },
 ]
@@ -124,15 +124,15 @@ export default async function BoracayDestinationGuidePage() {
           Wellness travel in <span className="display-italic">Boracay</span>.
         </h1>
         <p className="body-lg" style={{ marginBottom: 20, maxWidth: 700 }}>
-          Mindfulness and community wellness on Boracay's white sand. Here's what each program actually
-          involves and which real programs match.
+          Mindfulness and community wellness on Boracay's white sand. Here's what each programme actually
+          involves and which real programmes match.
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 8 }}>
           <Link href="/start" className="btn btn-primary btn-lg">
             Get your WS →
           </Link>
           <Link href="/tracks/mind-balance" className="btn btn-ghost btn-lg">
-            Browse Mind Balance programs
+            Browse Mind Balance programmes
           </Link>
         </div>
       </section>
@@ -155,7 +155,7 @@ export default async function BoracayDestinationGuidePage() {
       {/* WHAT IT INVOLVES */}
       <section className="shell" style={{ paddingTop: 24 }}>
         <div className="card" style={{ padding: 28 }}>
-          <h2 style={{ fontSize: 20, marginBottom: 14 }}>What a Boracay program actually involves</h2>
+          <h2 style={{ fontSize: 20, marginBottom: 14 }}>What a Boracay programme actually involves</h2>
           <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: 10 }}>
             {WHAT_IT_INVOLVES.map((c) => (
               <li key={c} className="body-sm" style={{ display: "flex", gap: 10 }}>
@@ -175,7 +175,7 @@ export default async function BoracayDestinationGuidePage() {
       <section className="shell" style={{ paddingTop: 56 }}>
         <div className="section-head">
           <div>
-            <div className="eyebrow" style={{ marginBottom: 8 }}>All Boracay programs</div>
+            <div className="eyebrow" style={{ marginBottom: 8 }}>All Boracay programmes</div>
             <h2>Comparing your <span className="display-italic">options</span>.</h2>
           </div>
         </div>
@@ -207,8 +207,8 @@ export default async function BoracayDestinationGuidePage() {
         <section className="shell" style={{ paddingTop: 56 }}>
           <div className="section-head">
             <div>
-              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programs</div>
-              <h2>Actual Boracay <span className="display-italic">programs</span>.</h2>
+              <div className="eyebrow" style={{ marginBottom: 8 }}>Real matched programmes</div>
+              <h2>Actual Boracay <span className="display-italic">programmes</span>.</h2>
             </div>
           </div>
           <div className="rail">
@@ -232,7 +232,7 @@ export default async function BoracayDestinationGuidePage() {
         >
           <div className="eyebrow" style={{ color: "rgba(255,255,255,.7)" }}>Not sure which one fits?</div>
           <p className="display" style={{ fontSize: "clamp(24px, 5vw, 36px)", margin: "12px 0 20px", maxWidth: 560 }}>
-            <span className="display-italic">Free WS</span>, matched program, real humans on WhatsApp.
+            <span className="display-italic">Free WS</span>, matched programme, real humans on WhatsApp.
           </p>
           <Link href="/start" className="btn" style={{ background: "var(--accent-ink)", color: "var(--accent-deep)" }}>
             Get your WS →

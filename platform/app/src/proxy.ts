@@ -30,6 +30,7 @@ const PUBLIC_PATHS = [
   "/destinations",
   "/medical",
   "/sitemap.xml",
+  "/saved",
 ]
 
 const PANEL_HOSTS = new Set(["panel.dreamislands.org"])
@@ -62,6 +63,7 @@ const PUBLIC_HOST_ALLOWED = [
   "/destinations",
   "/medical",
   "/sitemap.xml",
+  "/saved",
 ]
 
 const PANEL_HOST_ALLOWED = [
@@ -100,7 +102,31 @@ function isPublic(pathname: string) {
   return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"))
 }
 
+// Internal preview over a tunnel. Off unless PREVIEW_PASSWORD is set: then every request needs the
+// password (HTTP Basic), and nothing may write, since this server talks to the production database.
+const PREVIEW_PASSWORD = process.env.PREVIEW_PASSWORD
+const PREVIEW_USER = process.env.PREVIEW_USER || "dit"
+const PREVIEW_READ_APIS = [/^\/api\/profile\/session$/, /^\/api\/programs\/[^/]+\/pricing$/]
+
+function previewGuard(request: NextRequest): NextResponse | null {
+  if (!PREVIEW_PASSWORD) return null
+  const [scheme, encoded] = (request.headers.get("authorization") ?? "").split(" ")
+  let given = ""
+  try { given = scheme === "Basic" && encoded ? atob(encoded) : "" } catch {}
+  if (given !== `${PREVIEW_USER}:${PREVIEW_PASSWORD}`) {
+    return new NextResponse("Authentication required", { status: 401, headers: { "WWW-Authenticate": 'Basic realm="DIT preview", charset="UTF-8"' } })
+  }
+  const { pathname, searchParams } = request.nextUrl
+  const readOnly = NextResponse.json({ error: "Read-only preview" }, { status: 503 })
+  if (request.method !== "GET" && request.method !== "HEAD") return readOnly
+  if (pathname.startsWith("/api/") && !PREVIEW_READ_APIS.some((r) => r.test(pathname))) return readOnly
+  if (searchParams.has("session_id")) return readOnly // Stripe return links confirm payments
+  return null
+}
+
 export async function proxy(request: NextRequest) {
+  const blocked = previewGuard(request)
+  if (blocked) return blocked
   const host = normalizeHost(request.headers.get("host"))
   const { pathname } = request.nextUrl
 
@@ -164,5 +190,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|llms.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|llms.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mp4|webm)$).*)"],
 }

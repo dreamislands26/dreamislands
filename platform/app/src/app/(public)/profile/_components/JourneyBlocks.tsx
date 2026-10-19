@@ -128,17 +128,17 @@ export function JourneyDetails({ journey, showStatus }: { journey: CabinetJourne
 /** Block 3: the current program with its goals. */
 export function CurrentProgram({ journey }: { journey: CabinetJourney | null }) {
   return (
-    <section className="card profile-card" aria-label="Current program">
-      <div className="eyebrow" style={{ marginBottom: 14 }}>Current program</div>
+    <section className="card profile-card" aria-label="Current programme">
+      <div className="eyebrow" style={{ marginBottom: 14 }}>Current programme</div>
       {journey ? (
         <JourneyDetails journey={journey} />
       ) : (
         <div>
           <p className="body" style={{ margin: "0 0 18px" }}>
-            No program yet. Pick one that matches your score, or ask us to put one together for you.
+            No programme yet. Pick one that matches your score, or ask us to put one together for you.
           </p>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-            <Link href="/programs" className="btn btn-primary">Browse programs <Icon.arrow width={16} height={16} /></Link>
+            <Link href="/programs" className="btn btn-primary">Browse programmes <Icon.arrow width={16} height={16} /></Link>
           </div>
         </div>
       )}
