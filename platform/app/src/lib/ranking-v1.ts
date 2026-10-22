@@ -111,7 +111,7 @@ export type RankingResult = {
 }
 
 const PROGRAM_SELECT =
-  "id, name, slug, summary, cohort, tier, duration_days, price_usd, outcomes, is_composite, hero_image_url, " +
+  "reality_status, id, name, slug, summary, cohort, tier, duration_days, price_usd, outcomes, is_composite, hero_image_url, " +
   "contraindications, sort_order, market, medical_level, medical_level_verified, cta_type, " +
   "program_properties(role, properties(id, name, island, country, contact_wa, entity_type, certified)), " +
   "program_variants(duration_days, duration_nights, price_basic_usd, active), " +
@@ -257,6 +257,9 @@ const byScore = (a: Scored, b: Scored) =>
   (a.r.sort_order ?? 9999) - (b.r.sort_order ?? 9999) ||
   String(a.r.slug).localeCompare(String(b.r.slug))
 
+/** E10: not-yet-verified or superseded programs never compete for the guest. NULL (unclassified) passes. */
+const BLOCKED_REALITY = new Set(["hold_verify", "superseded_by_verified_product"])
+
 export async function rankPrograms(ctx: GuestCtx): Promise<RankingResult | null> {
   const f = resolveFocus(ctx)
   if (!f) return null // unknown focus -> legacy matcher
@@ -284,6 +287,7 @@ export async function rankPrograms(ctx: GuestCtx): Promise<RankingResult | null>
       ? rows
           .filter(
             (r) =>
+              !BLOCKED_REALITY.has(r.reality_status) &&
               r.medical_level === "medical_wellness" &&
               r.medical_level_verified === true &&
               (r.program_properties ?? []).length > 0 &&
@@ -302,6 +306,7 @@ export async function rankPrograms(ctx: GuestCtx): Promise<RankingResult | null>
   // E1 done by query. E2 medical gate (fail closed): only `wellness` competes for the top-3.
   const eligible = rows.filter((r) => {
     if ((r.program_properties ?? []).length === 0) return false // E1: must have a linked property to send the guest to
+    if (BLOCKED_REALITY.has(r.reality_status)) return false // E10: reality_status gate
     if (isMedicalProperty(r)) return false // legacy safety net stays on
     return r.medical_level === "wellness" // medical_wellness / medical / NULL never enter the wellness top-3
   })
