@@ -6,6 +6,12 @@ import { supabasePublic } from "./supabase-public"
  * Spec: specs/ranking-v1/Ranking_v1_03_report_rules_weights_simulation.md
  * Locale-independent: works on codes only. Price is never an input (E9).
  * Returns null on any data error so the caller can fall back to the legacy matcher.
+ *
+ * Medical boundary (decision 2026-10-11):
+ *  - `wellness` programs compete for the wellness top-3.
+ *  - `medical_wellness` programs NEVER enter the wellness top-3, even when verified.
+ *    For the Longevity focus, verified ones appear in a separate "preventive lane" (screening language, no wellness claims).
+ *  - `medical` programs only appear in the Medical support block (medical signal), without price.
  */
 
 export const RANKING_VERSION = "v1"
@@ -16,13 +22,18 @@ export type GuestCtx = {
   durationDays?: number | null
   subRisk?: number | null
   medicalSignal?: boolean
+  // Set by /api/intake only (not by page re-renders) so each assessment is logged once.
+  userId?: string | null
+  assessmentId?: string | null
+  log?: boolean
 }
 
 type FocusProfile = {
   icp: string | null // guest ICP (null = no automatic ICP)
   trigger: string
   goals: string[] // goals.code
-  outcomes: string[] // outcomes_taxonomy slug
+  outcomes: string[] // outcomes_taxonomy slug; the first one is the guest's primary outcome
+  lane?: boolean // show the controlled medical_wellness lane for this focus
 }
 
 // WS focus -> goal/outcome -> ICP/trigger. NOT via the legacy track/cohort.
@@ -52,6 +63,7 @@ const FOCUS: Record<string, FocusProfile> = {
     trigger: "outcome_aware",
     goals: ["health"],
     outcomes: ["healthy-ageing"],
+    lane: true,
   },
   "Performance & Energy": {
     icp: "performance_active",
@@ -94,6 +106,7 @@ export type RankingResult = {
   programs: RankedProgram[]
   noMatch: boolean
   medicalPathway: Record<string, any>[]
+  lane: RankedProgram[]
   focus: string
 }
 
@@ -125,14 +138,16 @@ function score(row: any, f: { name: string; profile: FocusProfile }, ctx: GuestC
     if (!icpRow.verified) allConfirmed = false
   }
 
-  // Goal fit (25): max of primary outcome 1.0, secondary outcome 0.6, goal-code match 0.8
+  // Goal fit (25): max of outcome match and goal-code match
   let goalFrac = 0
   let goalMatch: string | null = null
   let goalAny = false
   for (const o of row.program_outcomes ?? []) {
     if (!p.outcomes.includes(o.outcome_slug)) continue
     goalAny = true
-    const v = (o.weight === "primary" ? 1 : 0.6) * conf(o.verified)
+    // The guest's first listed outcome is the primary one (1.0); the rest count 0.6. Program weight: primary 1.0, secondary 0.6.
+    const posFactor = p.outcomes.indexOf(o.outcome_slug) === 0 ? 1 : 0.6
+    const v = (o.weight === "primary" ? 1 : 0.6) * posFactor * conf(o.verified)
     if (v > goalFrac) {
       goalFrac = v
       goalMatch = `${o.weight} outcome ${o.outcome_slug}`
@@ -214,6 +229,34 @@ function score(row: any, f: { name: string; profile: FocusProfile }, ctx: GuestC
   }
 }
 
+type Scored = { r: any; s: ReturnType<typeof score> }
+
+function toProgram({ r, s }: Scored): RankedProgram {
+  return {
+    id: r.id,
+    name: r.name,
+    slug: r.slug,
+    summary: r.summary,
+    cohort: r.cohort,
+    tier: r.tier,
+    duration_days: r.duration_days,
+    price_usd: r.price_usd,
+    outcomes: r.outcomes,
+    is_composite: r.is_composite,
+    hero_image_url: r.hero_image_url,
+    program_properties: r.program_properties,
+    program_variants: r.program_variants,
+    ranking: { version: RANKING_VERSION, score: s.total, components: s.components, cta: s.cta, why: s.why },
+  }
+}
+
+const byScore = (a: Scored, b: Scored) =>
+  b.s.total - a.s.total ||
+  (a.s.gap ?? 99) - (b.s.gap ?? 99) ||
+  b.s.nReviews - a.s.nReviews ||
+  (a.r.sort_order ?? 9999) - (b.r.sort_order ?? 9999) ||
+  String(a.r.slug).localeCompare(String(b.r.slug))
+
 export async function rankPrograms(ctx: GuestCtx): Promise<RankingResult | null> {
   const f = resolveFocus(ctx)
   if (!f) return null // unknown focus -> legacy matcher
@@ -235,39 +278,47 @@ export async function rankPrograms(ctx: GuestCtx): Promise<RankingResult | null>
 
   const medicalPathway = ctx.medicalSignal ? await fetchMedicalPathwayFrom(rows) : []
 
-  if (noMapping) return { programs: [], noMatch: true, medicalPathway, focus: f.name }
+  // Controlled preventive lane (Longevity focus only): VERIFIED medical_wellness programs, never mixed into the wellness top-3.
+  const lane: RankedProgram[] =
+    f.profile.lane && !ctx.medicalSignal
+      ? rows
+          .filter(
+            (r) =>
+              r.medical_level === "medical_wellness" &&
+              r.medical_level_verified === true &&
+              (r.program_properties ?? []).length > 0 &&
+              !isMedicalProperty(r) &&
+              (r.program_icps ?? []).some((i: any) => i.icp_code === "preventive_longevity" && i.fit === "primary"),
+          )
+          .map((r) => ({ r, s: score(r, f, ctx) }))
+          .filter((x) => x.s.goalAny)
+          .sort(byScore)
+          .slice(0, 2)
+          .map(toProgram)
+      : []
 
-  // E1 done by query. E2 medical gate (fail closed):
+  if (noMapping) return { programs: [], noMatch: true, medicalPathway, lane, focus: f.name }
+
+  // E1 done by query. E2 medical gate (fail closed): only `wellness` competes for the top-3.
   const eligible = rows.filter((r) => {
+    if ((r.program_properties ?? []).length === 0) return false // E1: must have a linked property to send the guest to
     if (isMedicalProperty(r)) return false // legacy safety net stays on
-    if (r.medical_level === "wellness") return true
-    if (r.medical_level === "medical_wellness") {
-      const isPreventive = (r.program_icps ?? []).some((i: any) => i.icp_code === "preventive_longevity" && i.fit === "primary")
-      return r.medical_level_verified === true && isPreventive && !ctx.medicalSignal
-    }
-    return false // 'medical' or NULL (unclassified)
+    return r.medical_level === "wellness" // medical_wellness / medical / NULL never enter the wellness top-3
   })
 
-  const scored = eligible.map((r) => ({ r, s: score(r, f, ctx) }))
+  const scored: Scored[] = eligible.map((r) => ({ r, s: score(r, f, ctx) }))
 
   // E4 goal gate: with >= 3 goal-relevant programs, goal-fit 0 is not eligible for the top-3
   const relevant = scored.filter((x) => x.s.goalAny)
   // If nothing is goal-relevant at all there is no close match (never pad with unrelated programs)
-  if (relevant.length === 0) return { programs: [], noMatch: true, medicalPathway, focus: f.name }
+  if (relevant.length === 0) return { programs: [], noMatch: true, medicalPathway, lane, focus: f.name }
   const pool = relevant.length >= 3 ? relevant : scored
 
-  pool.sort(
-    (a, b) =>
-      b.s.total - a.s.total ||
-      (a.s.gap ?? 99) - (b.s.gap ?? 99) ||
-      b.s.nReviews - a.s.nReviews ||
-      (a.r.sort_order ?? 9999) - (b.r.sort_order ?? 9999) ||
-      String(a.r.slug).localeCompare(String(b.r.slug)),
-  )
+  pool.sort(byScore)
 
   // E8 diversity: at most 2 of 3 from one property
   const perProperty = new Map<string, number>()
-  const top: typeof pool = []
+  const top: Scored[] = []
   for (const x of pool) {
     const pid = x.r.program_properties?.[0]?.properties?.id ?? `none:${x.r.id}`
     const n = perProperty.get(pid) ?? 0
@@ -277,27 +328,10 @@ export async function rankPrograms(ctx: GuestCtx): Promise<RankingResult | null>
     if (top.length === 3) break
   }
 
-  const programs: RankedProgram[] = top.map(({ r, s }) => ({
-    id: r.id,
-    name: r.name,
-    slug: r.slug,
-    summary: r.summary,
-    cohort: r.cohort,
-    tier: r.tier,
-    duration_days: r.duration_days,
-    price_usd: r.price_usd,
-    outcomes: r.outcomes,
-    is_composite: r.is_composite,
-    hero_image_url: r.hero_image_url,
-    program_properties: r.program_properties,
-    program_variants: r.program_variants,
-    ranking: { version: RANKING_VERSION, score: s.total, components: s.components, cta: s.cta, why: s.why },
-  }))
-
-  return { programs, noMatch: false, medicalPathway, focus: f.name }
+  return { programs: top.map(toProgram), noMatch: false, medicalPathway, lane, focus: f.name }
 }
 
-/** Separate Medical support block. No price field on purpose (E9: price never competes with wellness). */
+/** Separate Medical support block. No price field on purpose (E9: price never competes with wellness programs). */
 async function fetchMedicalPathwayFrom(rows: any[]) {
   return rows
     .filter((r) => r.medical_level === "medical")

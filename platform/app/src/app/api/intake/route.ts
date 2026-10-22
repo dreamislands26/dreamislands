@@ -154,6 +154,9 @@ export async function POST(req: Request) {
     }
 
     const bundle = await fetchMatchedBundle(payload.cohort, {
+      userId: user.id,
+      assessmentId: assessment?.id ?? null,
+      log: true,
       focus: payload.focus ?? null,
       intent: payload.intent ?? null,
       durationDays: payload.recommended_duration ?? null,
@@ -222,7 +225,7 @@ export async function POST(req: Request) {
     }
 
     const res = NextResponse.json(
-      { success: true, user, assessment, matched_programs: programs, medical_pathway: bundle.medicalPathway, no_close_match: bundle.noMatch, ranking_version: bundle.version, saved_to_profile: savedToProfile },
+      { success: true, user, assessment, matched_programs: programs, medical_pathway: bundle.medicalPathway, preventive_lane: bundle.lane, no_close_match: bundle.noMatch, ranking_version: bundle.version, saved_to_profile: savedToProfile },
       { headers: cors },
     )
     // Lets a sign-in within 7 days claim this result (see quiz-cookie).
