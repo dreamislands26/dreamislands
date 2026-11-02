@@ -1,6 +1,6 @@
 // S1 · Главная · Mobile (Figma 150:24912, revision 18.10.2026). Own layout, not a squeezed desktop.
 import { goalIcon, homeRoutes, routeHref, routeMatch } from "../_lib/routes"
-import Link from "next/link"
+import Link from "@/lib/i18n-link"
 import { COUNTRIES, countrySlug } from "../_lib/countries"
 import { outcomeLabel, type CatalogProgram, type CatalogProperty, type GuestReview, type Outcome } from "../_lib/catalog"
 import { ButtonLink, Facts, Icon, Stars } from "../ds/ui"

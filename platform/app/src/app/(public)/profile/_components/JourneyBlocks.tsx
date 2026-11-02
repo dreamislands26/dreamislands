@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from "@/lib/i18n-link"
 import type { CabinetJourney, CabinetReport, GuestCabinet } from "@/lib/guest-cabinet"
 import { formatDay, formatStay } from "@/lib/stay-format"
 import { Icon } from "../../_components/Icon"

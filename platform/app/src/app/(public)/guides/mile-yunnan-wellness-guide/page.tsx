@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from "@/lib/i18n-link"
 import type { Metadata } from "next"
 import { supabaseAdmin } from "@/lib/supabase-server"
 import { type DbProgramRow } from "../../_lib/programMapping"

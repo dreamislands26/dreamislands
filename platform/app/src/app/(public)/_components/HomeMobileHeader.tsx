@@ -1,7 +1,7 @@
 "use client"
 // S1 mobile header: fixed, transparent over the hero; once the hero is scrolled past it takes
 // the background colour and the "Find program" button turns green (Figma 97:2767, Oleg 17.10.2026).
-import Link from "next/link"
+import Link from "@/lib/i18n-link"
 import { Children, useEffect, useRef, useState, type ReactNode } from "react"
 import { Account, MobileMenu } from "../ds/chrome"
 import m from "./homeMobile.module.css"

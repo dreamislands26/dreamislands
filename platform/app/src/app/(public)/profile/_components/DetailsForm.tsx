@@ -1,6 +1,6 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/lib/i18n-nav"
 import { useState } from "react"
 import { useAccount } from "../../_components/account/AuthProvider"
 

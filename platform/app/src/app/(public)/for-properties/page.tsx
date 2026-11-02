@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from "@/lib/i18n-link"
 import type { Metadata } from "next"
 import PlatformTabs from "./_components/PlatformTabs"
 import DemoForm from "./_components/DemoForm"

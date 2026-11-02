@@ -1,6 +1,6 @@
 // Shared by the catalog page (server) and the mobile search (client).
 export type LiteProgram = { cohort: number; country: string | null; minDays: number; minPrice: number; outcomes: string[] }
-export type SearchState = { q?: string; track?: string; goal?: string; length?: string; country?: string; pmin?: number; pmax?: number }
+export type SearchState = { q?: string; track?: string; goal?: string; length?: string; country?: string; pmin?: number; pmax?: number; from?: string; when?: string; date?: string; flex?: string }
 
 export function searchHref(st: SearchState) {
   const q = new URLSearchParams()

@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from "@/lib/i18n-link"
 import type { Metadata } from "next"
 import ReserveModal from "../../../../_components/ReserveModal"
 import { MEDICAL_SITE } from "@/lib/medical-routes"

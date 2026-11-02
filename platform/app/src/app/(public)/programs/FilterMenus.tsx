@@ -1,5 +1,5 @@
 "use client"
-import Link from "next/link"
+import Link from "@/lib/i18n-link"
 import { useEffect, useRef, useState } from "react"
 import { Button, Icon } from "../ds/ui"
 import c from "./catalog.module.css"

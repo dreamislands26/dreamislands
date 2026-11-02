@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from "@/lib/i18n-link"
 import Logo from "@/components/Logo"
 
 export default function Brand({ size = 40, href = "/" }: { size?: number; href?: string }) {

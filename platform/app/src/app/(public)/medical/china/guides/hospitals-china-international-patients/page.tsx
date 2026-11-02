@@ -1,5 +1,5 @@
 import GuideLayout, { guideMetadata, type GuideSection } from "../_guide"
-import Link from "next/link"
+import Link from "@/lib/i18n-link"
 import { MEDICAL_HOSPITALS } from "@/lib/medical-routes"
 
 const NAMES: Record<string, string> = {

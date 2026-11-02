@@ -1,9 +1,12 @@
 "use client"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/lib/i18n-nav"
 import { useState } from "react"
 import { Icon } from "./ui"
 import s from "./search.module.css"
 import o from "./overlay.module.css"
+import t from "./tripsearch.module.css"
+import { parseIntent } from "./intent"
+import CityInput from "./CityInput"
 
 const GOALS = [
   { v: "", l: "Sleep, stress, energy…" },
@@ -19,21 +22,100 @@ const LENGTHS = [
   { v: "week", l: "6 to 9 days" },
   { v: "long", l: "10 days or more" },
 ]
+const FLEX = [
+  { v: "exact", l: "Exact date" },
+  { v: "3", l: "± 3 days" },
+  { v: "month", l: "Anytime that month" },
+]
 
-/** Desktop search: three segments and one action. Segments are native selects for accessibility. */
-export default function SearchBar({ countries, wide }: { countries: string[]; wide?: boolean }) {
+export type OutcomeTag = { slug: string; label: string; icon?: string }
+export type SearchInitial = { goals?: string[]; country?: string; length?: string; date?: string; flex?: string; from?: string }
+
+/** Desktop search. With `outcomes` (the /programs page) it shows the multi-goal tag cloud plus start date and
+ *  departure city; without them (home) it keeps the compact three-segment bar. */
+export default function SearchBar({ countries, wide, outcomes, initial }: { countries: string[]; wide?: boolean; outcomes?: OutcomeTag[]; initial?: SearchInitial }) {
   const router = useRouter()
   const [goal, setGoal] = useState("")
-  const [where, setWhere] = useState("")
-  const [length, setLength] = useState("")
+  const [goals, setGoals] = useState<string[]>(initial?.goals ?? [])
+  const [where, setWhere] = useState(initial?.country ?? "")
+  const [length, setLength] = useState(initial?.length ?? "")
+  const [date, setDate] = useState(initial?.date ?? "")
+  const [flex, setFlex] = useState(initial?.flex ?? "exact")
+  const [from, setFrom] = useState(initial?.from ?? "")
+  const today = new Date().toISOString().slice(0, 10)
+  const toggle = (slug: string) => setGoals((g) => (g.includes(slug) ? g.filter((x) => x !== slug) : [...g, slug]))
   function submit(e: React.FormEvent) {
     e.preventDefault()
     const q = new URLSearchParams()
-    if (goal) q.set("track", goal)
+    if (outcomes) {
+      if (goals.length) q.set("goal", goals.join(","))
+    } else if (goal) q.set("track", goal)
     if (where) q.set("country", where)
     if (length) q.set("length", length)
+    if (outcomes) {
+      if (date) {
+        q.set("date", date)
+        if (flex !== "exact") q.set("flex", flex)
+      }
+      if (from.trim()) q.set("from", from.trim())
+    }
     router.push(`/programs${q.toString() ? `?${q}` : ""}`)
   }
+
+  if (outcomes) {
+    return (
+      <form className={t.trip} onSubmit={submit} role="search">
+        <div>
+          <div className={t.cloudHead}>
+            <h2 className={t.cloudTitle}>What do you want to improve?</h2>
+            <span className={t.cloudHint}>Pick one or more. Programmes that cover more of your goals come first.</span>
+          </div>
+          <div className={t.cloud} style={{ marginTop: "0.75rem" }}>
+            {outcomes.map((g) => (
+              <button key={g.slug} type="button" className={goals.includes(g.slug) ? `${t.tag} ${t.tagOn}` : t.tag} aria-pressed={goals.includes(g.slug)} onClick={() => toggle(g.slug)}>
+                {g.icon && <Icon name={g.icon} size={18} />}{g.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className={t.row}>
+          <label className={t.field}>
+            <span className={t.label}>Where</span>
+            <select className={t.input} value={where} onChange={(e) => setWhere(e.target.value)}>
+              <option value="">Any destination in Asia</option>
+              {countries.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </label>
+          <label className={t.field}>
+            <span className={t.label}>How long</span>
+            <select className={t.input} value={length} onChange={(e) => setLength(e.target.value)}>
+              {LENGTHS.map((g) => <option key={g.v} value={g.v}>{g.l}</option>)}
+            </select>
+          </label>
+          <label className={t.field}>
+            <span className={t.label}>Start date</span>
+            <input className={t.input} type="date" min={today} value={date} onChange={(e) => setDate(e.target.value)} suppressHydrationWarning />
+          </label>
+          <label className={t.field}>
+            <span className={t.label}>Flexibility</span>
+            <select className={t.input} value={flex} onChange={(e) => setFlex(e.target.value)} disabled={!date}>
+              {FLEX.map((g) => <option key={g.v} value={g.v}>{g.l}</option>)}
+            </select>
+          </label>
+          <label className={t.field}>
+            <span className={t.label}>Departing from</span>
+            <CityInput className={t.input} value={from} onChange={setFrom} />
+          </label>
+          <button type="submit" className={s.go} style={{ justifyContent: "center" }}>
+            <Icon name="search" />
+            Find my programme
+          </button>
+        </div>
+        <p className={t.note}>Our team confirms availability and flights from your city once you pick a programme.</p>
+      </form>
+    )
+  }
+
   return (
     <form className={wide ? `${s.bar} ${s.barWide}` : s.bar} onSubmit={submit} role="search">
       <label className={s.segment}>
@@ -76,10 +158,16 @@ export function SearchBarMobile({ countries, track, country, length, q: q0 }: { 
   function submit(e: React.FormEvent) {
     e.preventDefault()
     const p = new URLSearchParams()
-    if (q.trim()) p.set("q", q.trim())
-    if (goal) p.set("track", goal)
-    if (where) p.set("country", where)
-    if (len) p.set("length", len)
+    const it = q.trim() ? parseIntent(q, countries) : null
+    if (q.trim() && !it?.recognized) p.set("q", q.trim())
+    const g = goal || it?.track || ""
+    const w = where || it?.country || ""
+    const l = len || it?.length || ""
+    if (g) p.set("track", g)
+    if (w) p.set("country", w)
+    if (l) p.set("length", l)
+    if (it?.from) p.set("from", it.from)
+    if (it?.when) p.set("when", it.when)
     setOpen(false)
     router.push(`/programs${p.toString() ? `?${p}` : ""}`)
   }

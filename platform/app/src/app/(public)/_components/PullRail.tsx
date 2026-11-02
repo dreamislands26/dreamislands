@@ -3,7 +3,7 @@
 // rail hits its end, pulling further drags the tab in with the finger, then stretches it, and past
 // the threshold it morphs into a circle. Letting go on the circle opens the full list; otherwise the
 // tab slides back out. Native scrolling is never blocked, so the rail always scrolls back.
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/lib/i18n-nav"
 import { useEffect, useRef, type CSSProperties, type ReactNode } from "react"
 import p from "./pullRail.module.css"
 

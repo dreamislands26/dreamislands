@@ -160,6 +160,16 @@ export default async function ProgramDetailPage({
       .map((m) => ({ url: m.public_url, alt: m.alt_en || m.alt_ru || m.title_ru || program.name }))
   }
 
+  // Partner-quoted price (e.g. CHF), kept in price_points with source=supplier; USD on the site is derived from it.
+  const { data: spRow } = await supabaseAdmin
+    .from("price_points")
+    .select("amount, currency")
+    .eq("entity_type", "program")
+    .eq("entity_id", program.id)
+    .eq("tier", "base")
+    .eq("source", "supplier")
+    .maybeSingle()
+  const supplierPrice = spRow ? { amount: Number((spRow as any).amount), currency: String((spRow as any).currency) } : null
   const activeVariants = (program.program_variants ?? []).filter((v) => v.active)
   const lowestPrice = activeVariants.length > 0 ? Math.min(...activeVariants.map((v) => v.price_basic_usd)) : null
   const primaryProperty = program.program_properties?.[0]?.properties
@@ -179,8 +189,8 @@ export default async function ProgramDetailPage({
       ? {
           offers: {
             "@type": "Offer",
-            priceCurrency: "USD",
-            price: lowestPrice,
+            priceCurrency: supplierPrice?.currency ?? "USD",
+            price: supplierPrice?.amount ?? lowestPrice,
             availability: "https://schema.org/InStock",
             url: `https://dreamislands.org/programs/${program.slug}`,
           },
@@ -231,7 +241,7 @@ export default async function ProgramDetailPage({
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script dangerouslySetInnerHTML={{ __html: dataLayerScript("view_program", { program_id: program.id, program_name: program.name, property_id: primaryProperty?.id, property_name: primaryProperty?.name, destination_country: primaryProperty?.country }) }} />
-      <ProgramView program={program} accommodations={accommodations} confirmedBooking={confirmedBooking} galleryImages={galleryImages} reviews={reviewsForView} related={related} />
+      <ProgramView program={program} accommodations={accommodations} confirmedBooking={confirmedBooking} galleryImages={galleryImages} reviews={reviewsForView} related={related} supplierPrice={supplierPrice} />
     </>
   )
 }

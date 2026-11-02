@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from "@/lib/i18n-link"
 import type { Metadata } from "next"
 import { COUNTRIES } from "../_lib/countries"
 import { GOALS, loadOutcomes, loadPrograms, outcomeLabel } from "../_lib/catalog"
@@ -38,7 +38,7 @@ const PRICES = [
 const TRACK_ORDER = [1, 2, 3, 4, 7]
 const isMedical = (slug: string | null, name: string) => /medical|surgery|outpatient|bm-package/i.test(slug ?? "") || /medical/i.test(name)
 
-type SP = { track?: string; country?: string; length?: string; price?: string; goal?: string; q?: string; pmin?: string; pmax?: string }
+type SP = { track?: string; country?: string; length?: string; price?: string; goal?: string; q?: string; pmin?: string; pmax?: string; from?: string; when?: string; date?: string; flex?: string }
 
 function href(sp: SP, patch: Partial<SP>) {
   const next = { ...sp, ...patch }
@@ -52,11 +52,28 @@ export default async function ProgramsPage({ searchParams }: { searchParams: Pro
   const sp = await searchParams
   const [all, outcomes] = await Promise.all([loadPrograms(), loadOutcomes()])
   const wellness = all.filter((p) => !isMedical(p.slug, p.name))
+  // ItemList JSON-LD: the full wellness catalogue, independent of the active filters.
+  const programsItemList = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Wellness programmes in Asia",
+    url: "https://dreamislands.org/programs",
+    numberOfItems: wellness.filter((p) => p.slug).length,
+    itemListElement: wellness
+      .filter((p) => p.slug)
+      .map((p, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        url: `https://dreamislands.org/programs/${p.slug}`,
+        name: p.name,
+      })),
+  }
   const track = GOALS.find((g) => g.track === sp.track)
   const country = COUNTRIES.find((k) => k === sp.country)
   const length = LENGTHS.find((l) => l.key === sp.length)
   const price = PRICES.find((l) => l.key === sp.price)
-  const goal = outcomes.find((o) => o.slug === sp.goal)
+  const goals = (sp.goal ?? "").split(",").map((x) => x.trim()).filter((x) => outcomes.some((o) => o.slug === x))
+  const goal = outcomes.find((o) => o.slug === goals[0])
   const q = (sp.q ?? "").trim().toLowerCase()
   // Price range bounds for the mobile filters: cheapest program, and a cap that keeps the histogram readable
   const prices = all.filter((p) => !isMedical(p.slug, p.name) && p.minPrice > 0).map((p) => p.minPrice).sort((a, b) => a - b)
@@ -72,9 +89,9 @@ export default async function ProgramsPage({ searchParams }: { searchParams: Pro
       (!price || price.test(p.minPrice)) &&
       (!pmin || p.minPrice >= pmin) &&
       (!pmax || p.minPrice <= pmax) &&
-      (!goal || p.outcomes.includes(goal.slug)) &&
+      (!goals.length || goals.some((g) => p.outcomes.includes(g))) &&
       (!q || `${p.name} ${p.location} ${p.trackFull} ${p.tags.join(" ")}`.toLowerCase().includes(q)),
-  )
+  ).sort((a, b) => (goals.length > 1 ? goals.filter((g) => b.outcomes.includes(g)).length - goals.filter((g) => a.outcomes.includes(g)).length : 0))
   const countries = new Set(wellness.map((p) => p.country).filter(Boolean)).size
   const filtered = !!(track || country || length || price || goal || q || pmin || pmax)
   const shown = COUNTRIES.filter((k) => wellness.some((p) => p.country === k))
@@ -99,7 +116,7 @@ export default async function ProgramsPage({ searchParams }: { searchParams: Pro
     }
   }
   const points: MapPoint[] = [...pins.values()]
-  const mState = { q: sp.q, track: sp.track, goal: goal?.slug, length: length?.key, country, pmin, pmax }
+  const mState = { q: sp.q, track: sp.track, goal: goals.length ? goals.join(",") : undefined, length: length?.key, country, pmin, pmax, from: sp.from, when: sp.when, date: sp.date, flex: sp.flex }
   // Same categories as the home chips (shared routes), with the broader tracks mixed in mid-row
   const routes = searchRoutes(homeRoutes(outcomes, wellness), TRACK_ORDER.map((n) => GOALS.find((g) => g.cohort === n)!).map((g) => ({
     label: wellness.find((p) => p.cohort === g.cohort)?.trackFull ?? g.chip, track: g.track, cohort: g.cohort,
@@ -114,6 +131,10 @@ export default async function ProgramsPage({ searchParams }: { searchParams: Pro
 
   return (
     <>
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(programsItemList).replace(/</g, "\\u003c") }}
+    />
     {/* Mobile: search with map and a results sheet (Figma 110:5430) */}
     <div className={c.mobile}>
       <MobileSearch
@@ -156,7 +177,13 @@ export default async function ProgramsPage({ searchParams }: { searchParams: Pro
       <header className={x.pageHead} style={{ maxWidth: "none" }}>
         <p className={`${x.overline} ${c.desktopOnly}`} style={{ margin: 0 }}><Facts items={[`${wellness.length} programmes`, `${countries} countries`]} /></p>
         <h1 className="ds-display-s">Find your programme</h1>
-        <div className={c.searchDesktop}><SearchBar countries={COUNTRIES} /></div>
+        <div className={c.searchDesktop}>
+          <SearchBar
+            countries={COUNTRIES}
+            outcomes={outcomes.filter((o) => wellness.some((p) => p.outcomes.includes(o.slug))).map((o) => ({ slug: o.slug, label: outcomeLabel(o), icon: goalIcon(o.slug) }))}
+            initial={{ goals, country, length: length?.key, date: sp.date, flex: sp.flex, from: sp.from }}
+          />
+        </div>
         <div className={c.searchMobile}>
           <SearchBarMobile countries={shown} track={sp.track} country={country} length={length?.key} q={sp.q} />
         </div>
@@ -187,6 +214,11 @@ export default async function ProgramsPage({ searchParams }: { searchParams: Pro
         )}
       </p>
 
+      {(sp.from || sp.when || sp.date) && (
+        <p className="ds-body-s ds-muted" style={{ margin: "0 0 1rem" }}>
+          Your plan: {[sp.from && `flying from ${sp.from}`, sp.date && `starting ${sp.date}${sp.flex === "3" ? " (± 3 days)" : sp.flex === "month" ? " (any day that month)" : ""}`, !sp.date && sp.when && `in ${sp.when}`].filter(Boolean).join(", ")}. Our team confirms availability and flights once you pick a programme.
+        </p>
+      )}
       {list.length > 0 ? (
         <div className={cs.gridCards}>
           {list.map((p, i) => <ProgramCard key={p.id} program={p} showTrack={false} priority={i < 4} />)}
