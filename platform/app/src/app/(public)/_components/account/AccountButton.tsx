@@ -1,6 +1,6 @@
 "use client"
 
-import Link from "next/link"
+import Link from "@/lib/i18n-link"
 import { useEffect, useRef, useState } from "react"
 import { initialsOf, useAccount } from "./AuthProvider"
 

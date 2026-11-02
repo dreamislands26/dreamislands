@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from "@/lib/i18n-link"
 import { Icon } from "../../_components/Icon"
 import { JourneyDetails } from "../_components/JourneyBlocks"
 import { loadProfile } from "../_components/load"

@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from "@/lib/i18n-link"
 import { supabaseAdmin } from "@/lib/supabase-server"
 import type { Metadata } from "next"
 

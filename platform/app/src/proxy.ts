@@ -1,5 +1,6 @@
 ﻿import { NextResponse, type NextRequest } from "next/server"
 import { createServerClient } from "@supabase/ssr"
+import { isIndexable, stripLocale } from "@/lib/i18n"
 
 const PUBLIC_PATHS = [
   "/",
@@ -128,7 +129,20 @@ export async function proxy(request: NextRequest) {
   const blocked = previewGuard(request)
   if (blocked) return blocked
   const host = normalizeHost(request.headers.get("host"))
-  const { pathname } = request.nextUrl
+  // /zh/... and /id/... are served by the same routes: strip the prefix, rewrite, and pass the locale in headers.
+  const loc = stripLocale(request.nextUrl.pathname)
+  const pathname = loc.path
+  const locale = loc.locale
+  const rewriteUrl = request.nextUrl.clone()
+  rewriteUrl.pathname = pathname
+  const mkRes = () => {
+    const h = new Headers(request.headers)
+    h.set("x-locale", locale)
+    h.set("x-pathname", pathname)
+    const res = locale === "en" ? NextResponse.next({ request: { headers: h } }) : NextResponse.rewrite(rewriteUrl, { request: { headers: h } })
+    if (!isIndexable(locale)) res.headers.set("X-Robots-Tag", "noindex, follow")
+    return res
+  }
 
   if (PUBLIC_HOSTS.has(host) && !pathMatches(pathname, PUBLIC_HOST_ALLOWED)) {
     return new NextResponse("Not found", { status: 404 })
@@ -137,7 +151,7 @@ export async function proxy(request: NextRequest) {
     return new NextResponse("Not found", { status: 404 })
   }
 
-  let response = NextResponse.next({ request })
+  let response = mkRes()
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -151,7 +165,7 @@ export async function proxy(request: NextRequest) {
           for (const { name, value } of cookiesToSet) {
             request.cookies.set(name, value)
           }
-          response = NextResponse.next({ request })
+          response = mkRes()
           for (const { name, value, options } of cookiesToSet) {
             response.cookies.set(name, value, options)
           }

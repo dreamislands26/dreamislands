@@ -5,7 +5,7 @@
 // Swiping to a card of another place switches the dark pin and pans the map to it. Close, a tap on the
 // empty map or a swipe down on a card deselects. Dragging the map lowers the results sheet. Leaflet
 // loads on the client only.
-import Link from "next/link"
+import Link from "@/lib/i18n-link"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import "leaflet/dist/leaflet.css"

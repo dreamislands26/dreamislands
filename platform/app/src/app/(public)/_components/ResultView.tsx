@@ -1,6 +1,6 @@
 "use client"
 // Wellness Journey result (S3). Used at the end of /start and on /matched/[id].
-import Link from "next/link"
+import Link from "@/lib/i18n-link"
 import { useState } from "react"
 import { useAccount } from "./account/AuthProvider"
 import { COHORT_LABELS, type LandingProgram } from "../_lib/programMapping"

@@ -164,3 +164,8 @@
 @media (prefers-reduced-motion: reduce) {
   .tab, .tabLabel, .tabbarMin .tabLabel, .tabsCap, .searchCircle, .tabbar { transition: none; }
 }
+
+/* Footer social links */
+.footerSocial { display: flex; gap: 0.5rem; margin-top: 0.25rem; }
+.footerSocialLink { width: 2.5rem; height: 2.5rem; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: var(--ds-on-surface-variant); text-decoration: none; }
+.footerSocialLink:hover { color: var(--ds-on-surface); background: color-mix(in srgb, var(--ds-on-surface) 8%, transparent); }

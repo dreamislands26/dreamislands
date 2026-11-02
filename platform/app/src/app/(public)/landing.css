@@ -737,3 +737,25 @@ h1, h2 { font-family: var(--font-display); font-weight: 400; letter-spacing: -.0
    (the two columns used to push the text past the card edge at 390px). */
 .about-tanya { grid-template-columns: minmax(140px, 220px) 1fr; }
 @media (max-width: 599px) { .about-tanya { grid-template-columns: 1fr; } }
+
+/* Floating Support (Cura) button: stacked above the WhatsApp button */
+.fab-support {
+  position: fixed;
+  bottom: 92px;
+  right: 16px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--ds-primary, #1f6f5c);
+  color: var(--ds-on-primary, #fff);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 12px 28px -8px rgba(0, 0, 0, .35);
+  z-index: 39;
+  text-decoration: none;
+  transition: transform .2s;
+}
+.fab-support:hover { transform: scale(1.05); }
+@media (min-width: 900px) { .fab-support { bottom: 92px; right: 24px; } }
+/* Phones: sit above the tab bar */
+@media (max-width: 767px) { .fab-support { bottom: calc(6.75rem + env(safe-area-inset-bottom)); } }

@@ -1,4 +1,6 @@
 import type { Metadata } from "next"
+import { alternatesFor, HTML_LANG } from "@/lib/i18n"
+import { getLocale, getPathname } from "@/lib/i18n-server"
 import Script from "next/script"
 import { Belleza, Bricolage_Grotesque, DM_Sans, Roboto_Mono } from "next/font/google"
 import "./globals.css"
@@ -7,16 +9,13 @@ const SITE_NAME = "Dream Islands"
 const DEFAULT_TITLE = "Dream Islands — Wellness Travel for Asia"
 const DEFAULT_DESCRIPTION = "We score your wellbeing then match you to a retreat that actually moves the number."
 
-export const metadata: Metadata = {
+const baseMetadata: Metadata = {
   metadataBase: new URL("https://dreamislands.org"),
   title: {
     default: DEFAULT_TITLE,
     template: "%s | Dream Islands",
   },
   description: DEFAULT_DESCRIPTION,
-  alternates: {
-    canonical: "/",
-  },
   openGraph: {
     type: "website",
     siteName: SITE_NAME,
@@ -41,11 +40,18 @@ const robotoMono = Roboto_Mono({ subsets: ["latin"], variable: "--font-roboto-mo
 
 const ANALYTICS_OFF = process.env.NEXT_PUBLIC_DISABLE_ANALYTICS === "1"
 
-export default function RootLayout({
+// Canonical / hreflang are per request (the old fixed canonical "/" pointed every page at the home page).
+export async function generateMetadata(): Promise<Metadata> {
+  const [locale, path] = await Promise.all([getLocale(), getPathname()])
+  return { ...baseMetadata, alternates: alternatesFor(path, locale) }
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const locale = await getLocale()
   return (
-    <html lang="en" className={`${dmSans.variable} ${belleza.variable} ${bricolage.variable} ${robotoMono.variable}`}>
+    <html lang={HTML_LANG[locale]} className={`${dmSans.variable} ${belleza.variable} ${bricolage.variable} ${robotoMono.variable}`}>
       <body>
         <Script
           id="consent-default"

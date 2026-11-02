@@ -135,6 +135,7 @@ export default function ProgramView({
   galleryImages,
   reviews,
   related,
+  supplierPrice,
 }: {
   program: ProgramDetail
   accommodations: AccommodationItem[]
@@ -142,6 +143,7 @@ export default function ProgramView({
   galleryImages: { url: string; alt: string }[]
   reviews: ProgramReview[]
   related: CatalogProgram[]
+  supplierPrice?: { amount: number; currency: string } | null
 }) {
   const cohort = COHORT_LABELS[program.cohort]
   const properties = program.program_properties.map((pp) => pp.properties).filter(Boolean)
@@ -336,6 +338,7 @@ export default function ProgramView({
             placeLine={`${flag} ${placeParts.join(", ")}`.trim()}
             variants={variants.map((v) => ({ id: v.id, label: v.label, duration_days: v.duration_days, duration_nights: v.duration_nights, price_basic_usd: Number(v.price_basic_usd) || 0, checkout: v.price_basic_thb != null && Number(v.price_basic_thb) > 0 }))}
             waHref={waHref}
+            supplierPrice={supplierPrice}
           />
         </div>
 

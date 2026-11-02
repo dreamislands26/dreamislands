@@ -1,5 +1,5 @@
 import Image from "next/image"
-import Link from "next/link"
+import Link from "@/lib/i18n-link"
 import type { Metadata } from "next"
 import { supabaseAdmin } from "@/lib/supabase-server"
 import ReserveModal from "../../_components/ReserveModal"

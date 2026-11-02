@@ -1,6 +1,6 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/lib/i18n-nav"
 import { useEffect } from "react"
 import { Icon } from "../Icon"
 import AuthForm, { authTitle, type AuthReason } from "./AuthForm"

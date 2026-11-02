@@ -1,6 +1,6 @@
 "use client"
 
-import Link from "next/link"
+import Link from "@/lib/i18n-link"
 import { useEffect, useRef, type ReactNode } from "react"
 import { track } from "../../_lib/track"
 

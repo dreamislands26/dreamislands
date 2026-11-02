@@ -1,5 +1,5 @@
 import Image from "next/image"
-import Link from "next/link"
+import Link from "@/lib/i18n-link"
 import type { ReactNode } from "react"
 import type { LandingProgram } from "../_lib/programMapping"
 import { Facts, Icon, Stars, TrackChip, ButtonLink, cx, type TrackKey } from "./ui"

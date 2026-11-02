@@ -2,7 +2,7 @@
 // In-site history for the on-page back arrows. window.history.length also counts pages from other
 // sites (Telegram, search, an old tab), so router.back() could leave the site. We keep a per-tab
 // stack of paths visited here and only step back when the previous entry is ours.
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname, useRouter } from "@/lib/i18n-nav"
 import { useEffect } from "react"
 
 const KEY = "di_nav_stack"

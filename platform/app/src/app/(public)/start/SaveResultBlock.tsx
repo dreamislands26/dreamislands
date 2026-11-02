@@ -1,7 +1,7 @@
 "use client"
 
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+import Link from "@/lib/i18n-link"
+import { useRouter } from "@/lib/i18n-nav"
 import { Icon } from "../_components/Icon"
 import AuthForm from "../_components/account/AuthForm"
 

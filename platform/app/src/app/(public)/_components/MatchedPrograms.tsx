@@ -1,6 +1,6 @@
 "use client"
 import Image from "next/image"
-import Link from "next/link"
+import Link from "@/lib/i18n-link"
 import { useState, type ReactNode } from "react"
 import { COHORT_LABELS } from "../_lib/programMapping"
 import { Icon } from "./Icon"

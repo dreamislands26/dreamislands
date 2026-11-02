@@ -1,5 +1,5 @@
 "use client"
-import Link from "next/link"
+import Link from "@/lib/i18n-link"
 import { useState } from "react"
 import { useAccount } from "../_components/account/AuthProvider"
 import { useSaved, type SavedItem } from "../ds/saved"

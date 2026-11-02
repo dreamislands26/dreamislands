@@ -1,5 +1,5 @@
 import Image from "next/image"
-import Link from "next/link"
+import Link from "@/lib/i18n-link"
 import { supabaseAdmin } from "@/lib/supabase-server"
 import Brand from "./Brand"
 import { Icon } from "./Icon"

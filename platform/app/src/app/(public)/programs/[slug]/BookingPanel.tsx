@@ -7,7 +7,8 @@
 //  - CF7: request sent; CF8: payment didn't go through (?booking=cancelled)
 // Payloads to /api/bookings/public are unchanged from production.
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
+import { useRouter } from "@/lib/i18n-nav"
 import { getAttribution, getGaClientId, getSessionId, track } from "../../_lib/track"
 import { Badge, Button, Chip, Facts, Icon, IconButton, Radio, TextField, cx } from "../../ds/ui"
 import { Dialog, overlayStyles as o } from "../../ds/overlay"
@@ -43,6 +44,7 @@ export default function BookingPanel({
   variants,
   waHref,
   placeLine,
+  supplierPrice,
 }: {
   programId: string
   programName: string
@@ -52,6 +54,7 @@ export default function BookingPanel({
   variants: PanelVariant[]
   waHref: string
   placeLine?: string
+  supplierPrice?: { amount: number; currency: string } | null
 }) {
   const router = useRouter()
   const params = useSearchParams()
@@ -68,6 +71,8 @@ export default function BookingPanel({
   const [open, setOpen] = useState(false)
   const [failed, setFailed] = useState(params.get("booking") === "cancelled")
   const price = v?.price_basic_usd ?? 0
+  const fmtSup = (n: number) => `${supplierPrice!.currency} ${Math.round(n).toLocaleString("en-US")}`
+  const sup = supplierPrice ? fmtSup(supplierPrice.amount) : null
   const deposit = Math.round(price * (DEPOSIT_PCT / 100))
   const meta = { program_id: programId, property_id: propertyId, property_name: propertyName, destination_country: country }
 
@@ -94,9 +99,10 @@ export default function BookingPanel({
         </div>
         <div className={s.card}>
           <div className={s.priceRow}>
-            <span className="ds-headline-s">{hasUsd ? `From ${usd(Math.min(...variants.map((x) => x.price_basic_usd).filter((n) => n > 0)))}` : "Price on request"}</span>
+            <span className="ds-headline-s">{sup ? `From ${sup}` : hasUsd ? `From ${usd(Math.min(...variants.map((x) => x.price_basic_usd).filter((n) => n > 0)))}` : "Price on request"}</span>
             <span className="ds-body-m ds-muted"><Facts items={[hasUsd ? "per person" : null, `${days} days`]} /></span>
           </div>
+          {sup && price > 0 && <p className="ds-body-m ds-muted" style={{ margin: 0 }}>About {usd(price)} at today&apos;s exchange rate. Your coordinator confirms the final price.</p>}
           {variants.length > 1 && (
             <div className={s.lengths} role="radiogroup" aria-label="Programme length">
               {variants.map((x) => (
@@ -117,10 +123,10 @@ export default function BookingPanel({
           </p>
           {price > 0 && (
             <div className={o.summary}>
-              <div className={o.sumRow}><span>Programme, {days} days</span><span>{usd(price)}</span></div>
+              <div className={o.sumRow}><span>Programme, {days} days</span><span>{sup ?? usd(price)}</span></div>
               {priced && <div className={o.sumRow}><span>Deposit today</span><span>{usd(deposit)}</span></div>}
               <div className={o.sumRow}><span>Two Wellness Score check-ins</span><span>Included</span></div>
-              <div className={cx(o.sumRow, o.sumTotal)}><span>Total, {pax} {pax === 1 ? "guest" : "guests"}</span><span>{usd(price * pax)}</span></div>
+              <div className={cx(o.sumRow, o.sumTotal)}><span>Total, {pax} {pax === 1 ? "guest" : "guests"}</span><span>{supplierPrice ? fmtSup(supplierPrice.amount * pax) : usd(price * pax)}</span></div>
             </div>
           )}
         </div>
@@ -131,7 +137,7 @@ export default function BookingPanel({
       <div className={s.bar}>
         <div className={s.barPrice}>
           <span className={s.barTop}>
-            <strong>{price > 0 ? usd(price) : "On request"}</strong>
+            <strong>{sup ? `from ${sup}` : price > 0 ? usd(price) : "On request"}</strong>
             <span className="ds-sep" />
             <span>{days} days</span>
           </span>
