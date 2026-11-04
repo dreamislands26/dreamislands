@@ -13,6 +13,7 @@ import { TRACK_ICONS, goalIcon, homeRoutes, searchRoutes } from "../_lib/routes"
 import CatalogMap, { type MapPoint } from "./CatalogMap"
 import ResultsSheet from "./ResultsSheet"
 import { coordsFor } from "../_lib/places"
+import { mapToken } from "@/lib/map-points"
 import x from "../ds/sections.module.css"
 import c from "./catalog.module.css"
 
@@ -146,7 +147,7 @@ export default async function ProgramsPage({ searchParams }: { searchParams: Pro
         chips={mChips}
         trackCohort={track?.cohort}
       />
-      <div className={c.map}><CatalogMap points={points} /></div>
+      <div className={c.map}><CatalogMap points={points} token={mapToken()} /></div>
       <ResultsSheet head={<ResultsHead count={list.length} q={sp.q} clearHref={filtered ? "/programs" : undefined} />}>
         {list.length > 0 ? (
           <div className={c.list}>
