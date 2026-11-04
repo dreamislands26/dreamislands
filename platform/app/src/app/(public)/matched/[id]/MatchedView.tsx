@@ -1,6 +1,6 @@
 "use client"
 
-import Link from "next/link"
+import Link from "@/lib/i18n-link"
 import { COHORT_LABELS } from "../../_lib/programMapping"
 import MatchedPrograms, { type MatchedProgram } from "../../_components/MatchedPrograms"
 import { useAccount } from "../../_components/account/AuthProvider"

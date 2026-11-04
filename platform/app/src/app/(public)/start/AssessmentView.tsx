@@ -3,8 +3,8 @@
 // resume from where you left off. Scoring and the /api/intake payload are
 // unchanged from production.
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+import Link from "@/lib/i18n-link"
+import { useRouter } from "@/lib/i18n-nav"
 import { WBS_QUESTIONS, WBS_SECTION_LABELS, computeWbs, type WbsAnswers, type WbsQuestion, type WbsResult, type WbsSection } from "@/lib/wbs"
 import { track } from "../_lib/track"
 import MatchedPrograms, { type MatchedProgram } from "../_components/MatchedPrograms"
