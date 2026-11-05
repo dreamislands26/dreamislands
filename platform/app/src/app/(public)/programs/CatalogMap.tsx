@@ -26,6 +26,9 @@ const usd = (n: number) => "$" + n.toLocaleString("en-US")
 const DETAIL_ZOOM = 4.5 // below it, one pin per country (the Asia overview sits around 3.5)
 const PLACE_ZOOM = 8 // a tapped pin zooms in at least this far
 const REFINE_TIMEOUT_MS = 2500
+// Two price pins closer than this on screen (px) would overlap, so they merge
+const MERGE_X = 64
+const MERGE_Y = 32
 const GROUP_KM = 60 // places chained closer than this form one group (an island, a stretch of coast)
 
 /** Pin thumbnail source: our photos go through the image optimiser at 256px (a 48px thumb at 3x is 144px; 256 is the next size the optimiser makes). */
@@ -164,7 +167,7 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
       type Mk = import("leaflet").Marker
       type Shown = { mk: Mk; ph?: Mk; min: number; key?: string }
       const markers = new Map<string, Shown>()
-      const placeList: Shown[] = []
+      let placeList: Shown[] = []
       const countryList: Shown[] = []
       let current: string | null = null
       // The selected pin is marked by a class, not a new icon, so its photos animate instead of reloading
@@ -209,6 +212,8 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
         if (key === current) return
         if (current) mark(current, false)
         current = key
+        // The selected place always stands alone, so the merged pins around it are worked out again
+        if (map && map.getZoom() >= DETAIL_ZOOM) recluster()
         declutter()
         const p = key ? points.find((x) => x.key === key) : undefined
         if (p && map) {
@@ -236,13 +241,54 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
         if (onAdd) for (const x of [mk, ph]) x?.on("add", onAdd)
         return { mk, ph }
       }
-      const places = L.layerGroup(points.flatMap((p) => {
+      for (const p of points) {
         const { mk, ph } = pair(p.at, p.label, pinPhotos(p.programs), () => select(p.key), () => { if (current === p.key) mark(p.key, true) })
-        const x = { mk, ph, min: p.min, key: p.key }
-        markers.set(p.key, x)
-        placeList.push(x)
-        return ph ? [ph, mk] : [mk]
-      }))
+        markers.set(p.key, { mk, ph, min: p.min, key: p.key })
+      }
+      // Places whose prices would overlap at this zoom merge into one pin: the cheapest price, the
+      // photos of all of them. The selected place goes first and keeps its own pin; the places it would
+      // cover step under it (they are next in the carousel anyway). Worked out on every zoom and pick.
+      const places = L.layerGroup()
+      const recluster = () => {
+        if (!map) return
+        const z = map.getZoom()
+        places.clearLayers()
+        placeList = []
+        const groups: { pts: MapPoint[]; at: import("leaflet").Point }[] = []
+        for (const p of [...points].sort((a, b) => Number(b.key === current) - Number(a.key === current) || a.min - b.min)) {
+          const q = map.project(p.at, z)
+          const g = groups.find((g) => Math.abs(g.at.x - q.x) < MERGE_X && Math.abs(g.at.y - q.y) < MERGE_Y)
+          if (g) g.pts.push(p)
+          else groups.push({ pts: [p], at: q })
+        }
+        for (const { pts } of groups) {
+          const best = pts[0]
+          const x = pts.length === 1 || best.key === current ? markers.get(best.key)! : { ...pair(best.at, best.label, pinPhotos(pts.flatMap((p) => p.programs)), () => openGroup(pts)), min: best.min }
+          places.addLayer(x.mk)
+          if (x.ph) places.addLayer(x.ph)
+          placeList.push(x)
+        }
+      }
+      // A merged pin zooms in until its places part; places that never part (same spot) open the cheapest
+      const openGroup = (pts: MapPoint[]) => {
+        if (!map) return
+        const MAX = 18
+        let need = 0
+        for (const a of pts) for (const b of pts) {
+          if (a === b) continue
+          const d = map.project(a.at, MAX).subtract(map.project(b.at, MAX))
+          const ratio = Math.max(Math.abs(d.x) / MERGE_X, Math.abs(d.y) / MERGE_Y)
+          if (ratio >= 1) need = Math.max(need, MAX - Math.log2(ratio) + 0.25)
+        }
+        if (!need) return select(pts[0].key)
+        const z = Math.min(MAX, Math.max(need, map.getZoom() + 1))
+        // Into the middle of the map that shows: between the search bar and the half-open results sheet
+        // (the same room frame() leaves), not the middle of the screen under the sheet
+        const h = window.innerHeight
+        const shift = h / 2 - (118 + h * 0.46 - 16) / 2
+        const target = map.project(L.latLngBounds(pts.map((p) => p.at)).getCenter(), z).add([0, Math.round(shift)])
+        map.flyTo(map.unproject(target, z), z, { duration: 0.6 })
+      }
       const byCountry = new Map<string, MapPoint[]>()
       for (const p of points) byCountry.set(p.country, [...(byCountry.get(p.country) ?? []), p])
       const countries = L.layerGroup([...byCountry.values()].flatMap((ps) => {
@@ -255,7 +301,7 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
       }))
       const sync = () => {
         if (!map) return
-        if (map.getZoom() >= DETAIL_ZOOM) { countries.remove(); places.addTo(map) }
+        if (map.getZoom() >= DETAIL_ZOOM) { countries.remove(); recluster(); places.addTo(map) }
         else { places.remove(); countries.addTo(map); if (current) select(null) }
         declutter()
       }
@@ -296,18 +342,34 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
 
 type Card = MapProgram & { key: string }
 
-/** Card carousel (Figma 214:30519): centred 348px cards, neighbours peeking, snapped one by one. Opens at
- *  the selected place; settling on another place's card tells the map to switch the pin. */
+/** Card carousel (Figma 214:30519): centred 348px cards, neighbours peeking, snapped one by one. A place
+ *  with several programmes shows them as one long card (the programmes side by side, a counter on each
+ *  photo); swiping still stops on every programme. Opens at the selected place; settling on another
+ *  place's card tells the map to switch the pin. */
 function PlaceCards({ cards, selected, jump, onPlace, onClose }: { cards: Card[]; selected: string; jump: number; onPlace: (key: string) => void; onClose: () => void }) {
   const wrap = useRef<HTMLDivElement>(null)
+  // Programmes of one place in a row (cards come place by place)
+  const groups = useMemo(() => cards.reduce<Card[][]>((gs, c) => {
+    const last = gs[gs.length - 1]
+    if (last && last[0].key === c.key) last.push(c)
+    else gs.push([c])
+    return gs
+  }, []), [cards])
+  // Every programme card in carousel order, with its centre in scroll coordinates
+  const centres = (w: HTMLElement) => {
+    const left = w.getBoundingClientRect().left - w.scrollLeft
+    return Array.from(w.querySelectorAll<HTMLElement>(`.${m.card}`)).map((e) => {
+      const r = e.getBoundingClientRect()
+      return r.left - left + r.width / 2
+    })
+  }
   // A place picked on the map heads a newly ordered carousel: go to it at once (a smooth scroll would
   // run past the reordered cards)
   useEffect(() => {
     const w = wrap.current
     if (!w) return
-    const i = cards.findIndex((c) => c.key === selected)
-    const card = w.children[i] as HTMLElement | undefined
-    if (card) w.scrollTo({ left: card.offsetLeft - (w.clientWidth - card.offsetWidth) / 2, behavior: "auto" })
+    const at = centres(w)[cards.findIndex((c) => c.key === selected)]
+    if (at !== undefined) w.scrollTo({ left: at - w.clientWidth / 2, behavior: "auto" })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jump])
   // When a swipe settles, follow the centred card's place
@@ -320,7 +382,7 @@ function PlaceCards({ cards, selected, jump, onPlace, onClose }: { cards: Card[]
       t = window.setTimeout(() => {
         const mid = w.scrollLeft + w.clientWidth / 2
         let best = 0, dist = Infinity
-        Array.from(w.children).forEach((el, i) => { const e = el as HTMLElement; const d = Math.abs(e.offsetLeft + e.offsetWidth / 2 - mid); if (d < dist) { dist = d; best = i } })
+        centres(w).forEach((c, i) => { const d = Math.abs(c - mid); if (d < dist) { dist = d; best = i } })
         const key = cards[best]?.key
         if (key && key !== selected) onPlace(key)
       }, 120)
@@ -347,12 +409,15 @@ function PlaceCards({ cards, selected, jump, onPlace, onClose }: { cards: Card[]
   }
   return (
     <div ref={wrap} className={m.cards}>
-      {cards.map((p) => (
+      {groups.map((g) => (
+        <div key={g[0].key} className={m.group}>
+        {g.map((p, i) => (
         <article key={p.id} className={m.card}>
           <Photo src={p.image} alt={p.name} className={m.photo} sizes="100vw">
             <div className={m.grab} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
               <span className={m.handle} aria-hidden />
             </div>
+            {g.length > 1 ? <span className={m.count}>{i + 1} of {g.length}</span> : null}
             <div className={m.actions}>
               <MiniSave item={{ kind: "program", id: p.id, title: p.name, href: p.href, image: p.image, meta: [p.flag, p.place[0]].filter(Boolean).join(" "), price: p.price }} />
               <button type="button" className={m.mini} aria-label="Close" onClick={onClose}><Icon name="close" /></button>
@@ -367,6 +432,8 @@ function PlaceCards({ cards, selected, jump, onPlace, onClose }: { cards: Card[]
             <span className={m.line}>{p.price}{p.duration ? <><i className={m.dot} aria-hidden />{p.duration}</> : null}</span>
           </Link>
         </article>
+        ))}
+        </div>
       ))}
     </div>
   )
