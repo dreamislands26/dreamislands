@@ -14,3 +14,5 @@ next-env.d.ts
 *.bak-*
 .claude/
 tsconfig.tsbuildinfo
+
+# Local test data (partner applications)

@@ -7,6 +7,7 @@ import {
   HomeFilled,
   LineChartOutlined,
   MedicineBoxOutlined,
+  SolutionOutlined,
   TeamOutlined,
   UserOutlined,
 } from "@ant-design/icons"
@@ -72,8 +73,9 @@ export default async function AdminLayout({
   children: React.ReactNode
 }) {
   const user = await getSessionUser()
+  const items = [...navItems.slice(0, 3), { key: "/admin/applications", href: "/admin/applications", icon: <SolutionOutlined />, label: "Applications" }, ...navItems.slice(3)]
   return (
-    <Shell email={user?.email ?? null} navItems={navItems} brand="DIT Platform">
+    <Shell email={user?.email ?? null} navItems={items} brand="DIT Platform">
       {children}
     </Shell>
   )
