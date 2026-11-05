@@ -49,7 +49,7 @@ export function ProgramCard({ program: p, showTrack = true, rating, priority, wi
   const place = p.place?.length ? p.place : p.country ? [p.country] : []
   const stars = rating ?? p.rating
   return (
-    <article className={cx(s.program, wide && s.programWide)}>
+    <article className={cx(s.program, wide && s.programWide)} data-preview-title={p.name} data-preview-place={place.join(", ")} data-preview-price={p.price}>
       <Photo src={p.hero_image_url} alt={p.name} priority={priority} sizes={wide ? "100vw" : "(max-width: 768px) 45vw, 240px"}>
         <div className={s.overlayRow}>
           {showTrack ? <TrackChip track={COHORT_TRACK[p.cohort] ?? "reset"}>{p.trackFull}</TrackChip> : <span />}
@@ -100,7 +100,7 @@ export function ProgramCard({ program: p, showTrack = true, rating, priority, wi
 /** DS "Place card": photo, name, region, from-price + count. No heart in the component. */
 export function PlaceCard({ href, name, region, from, count, image, priority, className }: { id?: string; href: string; name: string; region?: ReactNode; from?: string | null; count?: string | null; image: string | null; priority?: boolean; className?: string }) {
   return (
-    <article className={cx(s.place, className)}>
+    <article className={cx(s.place, className)} data-preview-title={name}>
       <Photo src={image} alt={name} priority={priority} />
       <div className={s.text}>
         <h3 className={s.title}>
@@ -119,7 +119,7 @@ export function PlaceCard({ href, name, region, from, count, image, priority, cl
 
 export function CountryCard({ href, name, flag, meta, from, image }: { href: string; name: string; flag?: string; meta?: ReactNode; from?: string | null; image: string | null }) {
   return (
-    <Link href={href} className={s.country}>
+    <Link href={href} className={s.country} data-preview-title={name}>
       <Photo src={image} alt={name} sizes="(max-width: 768px) 200px, 280px">
         <div className={s.countryScrim} />
         <p className={s.countryName}>{flag ? <><Flag of={flag} /> {name}</> : name}</p>

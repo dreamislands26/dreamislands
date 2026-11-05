@@ -16,6 +16,6 @@ export default function Results({ className, count = 6, wide, children }: { clas
 
   useEffect(() => endNavigation(), [query])
 
-  if (pending === "results") return <CardsSkeleton className={className} count={count} wide={wide} />
+  if (pending?.kind === "results") return <CardsSkeleton className={className} count={count} wide={wide} />
   return <>{children}</>
 }

@@ -5,6 +5,7 @@ import { dataLayerScript } from "../../_lib/track"
 import { countrySlug } from "../../_lib/countries"
 import { dayRange, enOnly, loadGallery, loadPrograms, loadProperties, loadReviews, loadRooms, money, shortLine, type CatalogProgram } from "../../_lib/catalog"
 import { GENERIC_FAQ, PLACE_CONTENT } from "../../_lib/placeContent"
+import { TANYA_SLUGS } from "../../_lib/tanya"
 import { ButtonLink, Facts, Faq, Icon, InfoCard, ListItem, Route, SectionHead, SeeAll } from "../../ds/ui"
 import { PlaceCard, ProgramCard, ReviewCard, ScoreCard, cardStyles as cs } from "../../ds/cards"
 import Gallery from "../../ds/Gallery"
@@ -50,7 +51,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export const dynamic = "force-dynamic"
 
 // Tanya ecosystem has its own full section — send visitors there instead of a generic page.
-const TANYA_SLUGS = new Set(["tanya-core", "bunya-clinic", "tanya-wellbeing"])
 const WA_DEFAULT = "https://wa.me/message/HOF2AFIBDYY5J1"
 
 function durationRails(list: CatalogProgram[], placeName: string) {

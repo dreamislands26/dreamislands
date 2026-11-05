@@ -12,6 +12,9 @@ export function outcomeIcon(tag: string): string | null {
   return null
 }
 
+/** Material Symbols icon per track (key = COHORT_LABELS name). */
+export const TRACK_ICONS: Record<string, string> = { Reset: "spa", Performance: "sprint", Mind: "psychology_alt", Immersion: "beach_access", SportChill: "surfing" }
+
 export const COHORT_LABELS: Record<number, { name: string; fullName: string; tagline: string; color: string }> = {
   1: { name: "Reset", fullName: "Reset & Recovery", tagline: "Detox & recovery", color: "var(--reset)" },
   2: { name: "Performance", fullName: "Performance", tagline: "Energy & fitness", color: "var(--accent)" },
