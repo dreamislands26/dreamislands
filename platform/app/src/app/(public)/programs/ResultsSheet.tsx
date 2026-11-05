@@ -18,14 +18,22 @@ export default function ResultsSheet({ head, children }: { head: ReactNode; chil
   const [pos, setPos] = useState<Record<Snap, number> | null>(null)
   const [away, setAway] = useState(false)
 
-  // Resting points in px from the top of the viewport
+  // Resting points in px from the top of the viewport. The bottom is where position: fixed; bottom: 0
+  // sits, not window.innerHeight: on iOS the browser bars come and go, and innerHeight measured with
+  // them hidden left the collapsed sheet (and its count) under the bottom bar. Measured again whenever
+  // the sheet is about to move on its own (map drag, card closed), when the viewport changes.
   const measure = useCallback(() => {
-    const vh = window.innerHeight
+    const probe = document.createElement("div")
+    probe.style.cssText = "position:fixed;left:0;bottom:0;width:1px;height:1px;visibility:hidden;pointer-events:none"
+    document.body.appendChild(probe)
+    const vh = Math.round(probe.getBoundingClientRect().bottom)
+    probe.remove()
     const bar = document.querySelector("[data-search-top]")?.getBoundingClientRect().bottom ?? 120
     // No tab bar on the search screen: keep the collapsed count clear of the home indicator instead
     const tabs = document.querySelector("[data-tabbar]")?.getBoundingClientRect().height ?? 28
     const peek = (sheet.current?.querySelector("[data-sheet-head]") as HTMLElement | null)?.offsetHeight ?? 76
-    setPos({ full: Math.round(bar), half: Math.round(vh * 0.46), collapsed: Math.round(vh - tabs - peek) })
+    const next = { full: Math.round(bar), half: Math.round(vh * 0.46), collapsed: Math.round(vh - tabs - peek) }
+    setPos((p) => (p && p.full === next.full && p.half === next.half && p.collapsed === next.collapsed ? p : next))
   }, [])
 
   useEffect(() => {
@@ -39,10 +47,16 @@ export default function ResultsSheet({ head, children }: { head: ReactNode; chil
     html.style.overflow = "hidden"
     measure()
     window.addEventListener("resize", measure)
-    const onDrag = () => setSnap("collapsed")
+    window.visualViewport?.addEventListener("resize", measure)
+    // The full sheet meets the search bar: follow its height (fonts, the filter dot, iOS bars)
+    const top = document.querySelector("[data-search-top]")
+    const ro = top ? new ResizeObserver(measure) : undefined
+    if (top) ro?.observe(top)
+    const onDrag = () => { measure(); setSnap("collapsed") }
     // A selected map pin shows its own card: the sheet and the tab bar step aside until it closes
     const onSelect = (e: Event) => {
       const on = !!(e as CustomEvent<string | null>).detail
+      if (!on) measure()
       setAway(on)
       if (on) html.dataset.mapCard = "1"
       else delete html.dataset.mapCard
@@ -52,6 +66,8 @@ export default function ResultsSheet({ head, children }: { head: ReactNode; chil
     return () => {
       html.style.overflow = prev
       window.removeEventListener("resize", measure)
+      window.visualViewport?.removeEventListener("resize", measure)
+      ro?.disconnect()
       window.removeEventListener(MAP_DRAG, onDrag)
       window.removeEventListener(MAP_SELECT, onSelect)
       delete html.dataset.mapCard
