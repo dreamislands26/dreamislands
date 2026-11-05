@@ -2,7 +2,6 @@
 
 import { CheckCircleFilled, ClockCircleFilled, CloseCircleFilled } from "@ant-design/icons"
 import {
-  Alert,
   App,
   Card,
   Descriptions,
@@ -45,7 +44,7 @@ const CHECK_ICON = {
   missing: <CloseCircleFilled style={{ color: "#d9d9d9" }} />,
 }
 
-export default function ApplicationsView({ enabled, rows }: { enabled: boolean; rows: PartnerApplication[] }) {
+export default function ApplicationsView({ rows }: { rows: PartnerApplication[] }) {
   const router = useRouter()
   const { message } = App.useApp()
   const [openId, setOpenId] = useState<string | null>(null)
@@ -106,25 +105,18 @@ export default function ApplicationsView({ enabled, rows }: { enabled: boolean; 
     <Space direction="vertical" size={16} style={{ width: "100%" }}>
       <div>
         <Title level={3} style={{ margin: 0 }}>Partner applications</Title>
-        <Text type="secondary">Each application from /partners/apply opens a CRM record and a primary partner profile.</Text>
+        <Text type="secondary">Each application from the partner login page opens a CRM record and a primary partner profile.</Text>
       </div>
-      {!enabled ? (
-        <Alert type="info" showIcon message="Local test" description="Partner applications are stored in a local file and are off on this server. Set PARTNER_APPLICATIONS_STORE=file to try them." />
-      ) : (
-        <>
-          <Alert type="warning" showIcon message="Local test: records live in .data/partner-applications.json on this machine, not in the database." />
-          <Card styles={{ body: { padding: 0 } }}>
-            <Table
-              rowKey="id"
-              columns={columns}
-              dataSource={rows}
-              pagination={false}
-              locale={{ emptyText: <Empty description="No applications yet" /> }}
-              onRow={(r) => ({ onClick: () => setOpenId(r.id), style: { cursor: "pointer" } })}
-            />
-          </Card>
-        </>
-      )}
+      <Card styles={{ body: { padding: 0 } }}>
+        <Table
+          rowKey="id"
+          columns={columns}
+          dataSource={rows}
+          pagination={false}
+          locale={{ emptyText: <Empty description="No applications yet" /> }}
+          onRow={(r) => ({ onClick: () => setOpenId(r.id), style: { cursor: "pointer" } })}
+        />
+      </Card>
 
       <Drawer open={!!open} onClose={() => setOpenId(null)} width={640} title={open?.property.name}>
         {open && (

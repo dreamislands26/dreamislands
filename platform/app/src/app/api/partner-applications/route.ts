@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
 import {
-  applicationsEnabled,
   createApplication,
   OFFERINGS,
   PROPERTY_TYPES,
@@ -8,7 +7,7 @@ import {
   type ApplicationInput,
 } from "@/lib/partner-applications"
 
-// Public partner application (local test, see src/lib/partner-applications.ts).
+// Public partner application: creates the CRM record and the primary profile (src/lib/partner-applications.ts).
 
 function bad(message: string, status = 400) {
   return NextResponse.json({ success: false, error: message }, { status })
@@ -34,7 +33,6 @@ const num = (v: unknown) => {
 const list = (v: unknown) => (Array.isArray(v) ? v.slice(0, 20) : [])
 
 export async function POST(req: Request) {
-  if (!applicationsEnabled()) return bad("not found", 404)
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "local"
   if (isRateLimited(ip)) return bad("too many requests, please try again later", 429)
 
@@ -76,6 +74,11 @@ export async function POST(req: Request) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.contact.email)) return bad("A valid email is required")
   if (body.consent !== true) return bad("Please agree to be contacted")
 
-  const row = await createApplication(input)
-  return NextResponse.json({ success: true, id: row.id, profile: row.profile })
+  try {
+    const row = await createApplication(input)
+    return NextResponse.json({ success: true, id: row.id, profile: row.profile })
+  } catch (e) {
+    console.error("[partner-applications] create", e)
+    return bad("Could not send the application, please try again", 500)
+  }
 }

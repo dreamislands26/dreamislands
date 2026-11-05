@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server"
 import { getSessionUser } from "@/lib/auth"
-import { applicationsEnabled, moveApplication, STAGES, type Stage } from "@/lib/partner-applications"
+import { moveApplication, STAGES, type Stage } from "@/lib/partner-applications"
 
-// Move a partner application along the CRM stages (local test, see src/lib/partner-applications.ts).
+// Move a partner application along the CRM stages (src/lib/partner-applications.ts).
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!applicationsEnabled()) return NextResponse.json({ success: false, error: "not found" }, { status: 404 })
   const me = await getSessionUser()
   if (!me || me.role !== "admin") return NextResponse.json({ success: false, error: "forbidden" }, { status: 403 })
 

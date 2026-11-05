@@ -95,10 +95,10 @@ export default function ApplyForm() {
           <section className={s.block}>
             <h2 className="ds-title-l">Your property</h2>
             <div className={s.grid}>
-              <TextField label="Property name" name="name" required className={s.wide} />
-              <TextField label="Country" name="country" required autoComplete="country-name" />
-              <TextField label="City or island" name="city" />
-              <TextField label="Website" name="website" type="url" inputMode="url" placeholder="https://" className={s.wide} />
+              <TextField label="Property name *" name="name" required placeholder="Lotus Bay Retreat" className={s.wide} />
+              <TextField label="Country *" name="country" required autoComplete="country-name" placeholder="Thailand" />
+              <TextField label="City or island" name="city" placeholder="Koh Samui" />
+              <TextField label="Website" name="website" type="url" inputMode="url" placeholder="https://yourproperty.com" className={s.wide} />
             </div>
             <div className={s.group}>
               <p className="ds-label-l">Type</p>
@@ -126,8 +126,8 @@ export default function ApplyForm() {
             {programs.map((p, i) => (
               <div key={i} className={s.row}>
                 <TextField label="Programme" value={p.name} onChange={(e) => editProgram(i, { name: e.target.value })} placeholder="7-day detox" className={s.rowMain} />
-                <TextField label="Nights" value={p.nights} onChange={(e) => editProgram(i, { nights: e.target.value })} type="number" inputMode="numeric" min={1} />
-                <TextField label="From, USD" value={p.priceFrom} onChange={(e) => editProgram(i, { priceFrom: e.target.value })} type="number" inputMode="numeric" min={1} />
+                <TextField label="Nights" value={p.nights} onChange={(e) => editProgram(i, { nights: e.target.value })} type="number" inputMode="numeric" min={1} placeholder="7" />
+                <TextField label="From, USD" value={p.priceFrom} onChange={(e) => editProgram(i, { priceFrom: e.target.value })} type="number" inputMode="numeric" min={1} placeholder="2500" />
                 {programs.length > 1 && <IconButton icon="close" label="Remove programme" className={s.remove} onClick={() => setPrograms((rows) => rows.filter((_, k) => k !== i))} />}
               </div>
             ))}
@@ -139,7 +139,7 @@ export default function ApplyForm() {
             <p className="ds-body-m ds-muted">Therapists, doctors, coaches and teachers who lead your programmes.</p>
             {practitioners.map((p, i) => (
               <div key={i} className={`${s.row} ${s.rowTwo}`}>
-                <TextField label="Name" value={p.name} onChange={(e) => editPractitioner(i, { name: e.target.value })} className={s.rowMain} />
+                <TextField label="Name" value={p.name} onChange={(e) => editPractitioner(i, { name: e.target.value })} placeholder="Dr. Anan Suwan" className={s.rowMain} />
                 <TextField label="Speciality" value={p.specialty} onChange={(e) => editPractitioner(i, { specialty: e.target.value })} placeholder="Ayurveda doctor" />
                 {practitioners.length > 1 && <IconButton icon="close" label="Remove practitioner" className={s.remove} onClick={() => setPractitioners((rows) => rows.filter((_, k) => k !== i))} />}
               </div>
@@ -150,10 +150,10 @@ export default function ApplyForm() {
           <section className={s.block}>
             <h2 className="ds-title-l">Contact</h2>
             <div className={s.grid}>
-              <TextField label="Your name" name="contact_name" required autoComplete="name" />
+              <TextField label="Your name *" name="contact_name" required autoComplete="name" placeholder="Alex Carter" />
               <TextField label="Role" name="contact_role" autoComplete="organization-title" placeholder="General manager" />
-              <TextField label="Email" name="contact_email" type="email" required autoComplete="email" />
-              <TextField label="Phone or WhatsApp" name="contact_phone" type="tel" autoComplete="tel" />
+              <TextField label="Email *" name="contact_email" type="email" required autoComplete="email" placeholder="alex@yourproperty.com" />
+              <TextField label="Phone or WhatsApp" name="contact_phone" type="tel" autoComplete="tel" placeholder="+66 81 234 5678" />
             </div>
             <div className={s.group}>
               <p className="ds-label-l">How did you find us?</p>

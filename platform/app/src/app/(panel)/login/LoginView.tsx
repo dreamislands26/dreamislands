@@ -8,7 +8,7 @@ const { Title, Text, Paragraph } = Typography
 
 type Mode = "password" | "magic"
 
-export default function LoginView({ nextPath, applyUrl }: { nextPath: string; applyUrl?: string | null }) {
+export default function LoginView({ nextPath, applyUrl }: { nextPath: string; applyUrl: string }) {
   const { notification } = App.useApp()
   const [mode, setMode] = useState<Mode>("password")
   const [loading, setLoading] = useState(false)
@@ -149,7 +149,7 @@ export default function LoginView({ nextPath, applyUrl }: { nextPath: string; ap
           </>
         )}
 
-        {applyUrl && (
+        {(
           <>
             <Divider plain style={{ margin: "20px 0 16px" }}>
               <Text type="secondary" style={{ fontSize: 13 }}>New partner?</Text>

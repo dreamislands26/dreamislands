@@ -1,20 +1,12 @@
 // Partner application → CRM record + primary partner profile (Mark's vision interview, B1).
 //
-// LOCAL TEST ONLY. The site has one Supabase project and it is production, so this does not touch the
-// database: records live in a JSON file under `.data/` on the machine that runs the server. Everything
-// is off unless PARTNER_APPLICATIONS_STORE=file is set; without it the page and both APIs answer 404.
-// The table this would become is drafted in supabase-migrations/24_partner_applications.draft.sql.
+// Tables: supabase-migrations/24_partner_applications.sql. Service role only (RLS on, no policies):
+// the public form writes through /api/partner-applications, the admin reads on gated server pages.
 import "server-only"
-import { promises as fs } from "fs"
-import path from "path"
-import { randomUUID } from "crypto"
+import { supabaseAdmin } from "./supabase-server"
 import { OFFERINGS, STAGES, type Stage } from "./partner-application-options"
 
 export * from "./partner-application-options"
-
-export const applicationsEnabled = () => process.env.PARTNER_APPLICATIONS_STORE === "file"
-
-const FILE = path.join(process.cwd(), ".data", "partner-applications.json")
 
 export type ApplicationInput = {
   property: { name: string; type: string; country: string; city: string; website: string }
@@ -67,51 +59,112 @@ export function primaryProfile(a: ApplicationInput): PartnerApplication["profile
   return { cohorts, medical, completeness, checks }
 }
 
-async function readAll(): Promise<PartnerApplication[]> {
-  try {
-    return JSON.parse(await fs.readFile(FILE, "utf8")) as PartnerApplication[]
-  } catch (e) {
-    if ((e as NodeJS.ErrnoException).code === "ENOENT") return []
-    throw e
+type Row = {
+  id: string
+  property_name: string
+  property_type: string | null
+  country: string
+  city: string | null
+  website: string | null
+  offerings: string[]
+  programs: ApplicationInput["programs"]
+  practitioners: ApplicationInput["practitioners"]
+  contact_name: string
+  contact_role: string | null
+  contact_email: string
+  contact_phone: string | null
+  source: string | null
+  cohorts: number[]
+  medical: boolean
+  completeness: number
+  checks: Check[]
+  stage: Stage
+  owner_email: string | null
+  created_at: string
+  partner_application_stage_events?: { stage: Stage; changed_by: string; created_at: string }[]
+}
+
+const SELECT = "*, partner_application_stage_events(stage, changed_by, created_at)"
+
+function fromRow(r: Row): PartnerApplication {
+  return {
+    id: r.id,
+    createdAt: r.created_at,
+    property: { name: r.property_name, type: r.property_type ?? "", country: r.country, city: r.city ?? "", website: r.website ?? "" },
+    offerings: r.offerings,
+    programs: r.programs,
+    practitioners: r.practitioners,
+    contact: { name: r.contact_name, role: r.contact_role ?? "", email: r.contact_email, phone: r.contact_phone ?? "" },
+    source: r.source ?? "",
+    crm: {
+      stage: r.stage,
+      owner: r.owner_email,
+      history: (r.partner_application_stage_events ?? [])
+        .map((e) => ({ stage: e.stage, at: e.created_at, by: e.changed_by }))
+        .sort((a, b) => a.at.localeCompare(b.at)),
+    },
+    profile: { cohorts: r.cohorts, medical: r.medical, completeness: r.completeness, checks: r.checks },
   }
 }
 
-async function writeAll(rows: PartnerApplication[]) {
-  await fs.mkdir(path.dirname(FILE), { recursive: true })
-  const tmp = `${FILE}.${process.pid}.tmp`
-  await fs.writeFile(tmp, JSON.stringify(rows, null, 2))
-  await fs.rename(tmp, FILE)
+export async function listApplications(): Promise<PartnerApplication[]> {
+  const { data, error } = await supabaseAdmin.from("partner_applications").select(SELECT).order("created_at", { ascending: false })
+  if (error) throw new Error(error.message)
+  return (data as Row[]).map(fromRow)
 }
 
-export async function listApplications() {
-  return (await readAll()).sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+async function getApplication(id: string) {
+  const { data, error } = await supabaseAdmin.from("partner_applications").select(SELECT).eq("id", id).maybeSingle()
+  if (error) throw new Error(error.message)
+  return data ? fromRow(data as Row) : null
 }
 
 export async function createApplication(input: ApplicationInput): Promise<PartnerApplication> {
-  const now = new Date().toISOString()
-  const row: PartnerApplication = {
-    ...input,
-    id: randomUUID(),
-    createdAt: now,
-    crm: { stage: "new", owner: null, history: [{ stage: "new", at: now, by: "application form" }] },
-    profile: primaryProfile(input),
-  }
-  const rows = await readAll()
-  rows.push(row)
-  await writeAll(rows)
-  return row
+  const profile = primaryProfile(input)
+  const { data, error } = await supabaseAdmin
+    .from("partner_applications")
+    .insert({
+      property_name: input.property.name,
+      property_type: input.property.type || null,
+      country: input.property.country,
+      city: input.property.city || null,
+      website: input.property.website || null,
+      offerings: input.offerings,
+      programs: input.programs,
+      practitioners: input.practitioners,
+      contact_name: input.contact.name,
+      contact_role: input.contact.role || null,
+      contact_email: input.contact.email,
+      contact_phone: input.contact.phone || null,
+      source: input.source || null,
+      cohorts: profile.cohorts,
+      medical: profile.medical,
+      completeness: profile.completeness,
+      checks: profile.checks,
+      stage: "new",
+      consent_at: new Date().toISOString(),
+    })
+    .select("id")
+    .single()
+  if (error) throw new Error(error.message)
+  const { error: evErr } = await supabaseAdmin
+    .from("partner_application_stage_events")
+    .insert({ application_id: data.id, stage: "new", changed_by: "application form" })
+  if (evErr) console.error("[partner-applications] stage event", evErr.message)
+  return (await getApplication(data.id))!
 }
 
 export async function moveApplication(id: string, stage: Stage, by: string) {
   if (!STAGES.some((s) => s.key === stage)) throw new Error("unknown stage")
-  const rows = await readAll()
-  const row = rows.find((r) => r.id === id)
+  const row = await getApplication(id)
   if (!row) return null
-  if (row.crm.stage !== stage) {
-    row.crm.stage = stage
-    row.crm.history.push({ stage, at: new Date().toISOString(), by })
-    if (!row.crm.owner) row.crm.owner = by
-    await writeAll(rows)
-  }
-  return row
+  if (row.crm.stage === stage) return row
+  const { error } = await supabaseAdmin
+    .from("partner_applications")
+    .update({ stage, owner_email: row.crm.owner ?? by, updated_at: new Date().toISOString() })
+    .eq("id", id)
+  if (error) throw new Error(error.message)
+  const { error: evErr } = await supabaseAdmin.from("partner_application_stage_events").insert({ application_id: id, stage, changed_by: by })
+  if (evErr) throw new Error(evErr.message)
+  return getApplication(id)
 }

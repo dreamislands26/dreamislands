@@ -30,6 +30,14 @@
 .wide { grid-column: 1 / -1; }
 .group { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.5rem; }
 .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+/* Chips sit on a white block here: give unselected ones the field fill so they read as buttons */
+.chips > button:not([aria-pressed="true"]) { background: var(--ds-surface-container-highest); }
+.chips > button:not([aria-pressed="true"]):hover { background: color-mix(in srgb, var(--ds-on-surface) 8%, var(--ds-surface-container-highest)); }
+/* Example hints must not read as filled-in answers */
+.form input::placeholder { opacity: 0.45; }
+/* No spinner arrows in the nights and price fields */
+.form input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+.form input[type="number"]::-webkit-inner-spin-button, .form input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
 /* Repeatable rows: programmes (name, nights, price) and practitioners (name, speciality) */
 .row { display: grid; grid-template-columns: minmax(0, 1fr) 6.5rem 8.5rem; gap: 0.75rem; align-items: center; position: relative; }
