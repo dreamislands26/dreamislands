@@ -252,3 +252,9 @@
 .infoLabel { font: 500 0.75rem/1rem var(--ds-font-body); color: var(--ds-on-surface-variant); letter-spacing: 0.1px; }
 .infoTitle { font: 500 1rem/1.25rem var(--ds-font-body); color: var(--ds-on-surface); margin: 0; }
 .infoText { font: 400 0.875rem/1.25rem var(--ds-font-body); color: var(--ds-on-surface-variant); margin: 0; }
+
+/* Skeleton: loading placeholder, soft opacity pulse; still when the OS asks for reduced motion */
+.skeleton { display: block; width: 100%; height: 1rem; border-radius: var(--ds-r-full); background: var(--ds-surface-container-highest); animation: skeletonPulse 1.6s ease-in-out infinite; }
+.skeletonBlock { height: auto; border-radius: var(--ds-r-xl-plus); }
+@keyframes skeletonPulse { 50% { opacity: 0.5; } }
+@media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }

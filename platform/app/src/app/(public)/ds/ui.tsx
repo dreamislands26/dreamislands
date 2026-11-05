@@ -260,3 +260,8 @@ export function InfoCard({ icon, label, title, text, children }: { icon?: string
     </div>
   )
 }
+
+/** Loading placeholder: a pulsing line (text) or block (photo, button). Size it with className. */
+export function Skeleton({ shape = "line", className }: { shape?: "line" | "block"; className?: string }) {
+  return <span className={cx(s.skeleton, shape === "block" && s.skeletonBlock, className)} aria-hidden />
+}
