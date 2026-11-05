@@ -1,5 +1,6 @@
 /* Mobile search (Figma 110:5430) and its filters sheet (Figma 231:6999) */
-.top { position: sticky; top: 0; z-index: 40; background: var(--ds-surface); padding-top: env(safe-area-inset-top); }
+/* Above the results sheet (z 45): the search and the chips stay in sight however far the sheet goes */
+.top { position: sticky; top: 0; z-index: 46; background: var(--ds-surface); padding-top: env(safe-area-inset-top); }
 .bar { display: flex; align-items: center; gap: 1rem; padding: 0.5rem 0.75rem; }
 .round { background: var(--ds-surface-container-high) !important; flex: none; }
 /* Icon pinned left, text centred in the pill, Label/Large on-surface (Figma Search bar) */

@@ -48,6 +48,10 @@ export default function ResultsSheet({ head, children }: { head: ReactNode; chil
     measure()
     window.addEventListener("resize", measure)
     window.visualViewport?.addEventListener("resize", measure)
+    // The full sheet meets the search bar: follow its height (fonts, the filter dot, iOS bars)
+    const top = document.querySelector("[data-search-top]")
+    const ro = top ? new ResizeObserver(measure) : undefined
+    if (top) ro?.observe(top)
     const onDrag = () => { measure(); setSnap("collapsed") }
     // A selected map pin shows its own card: the sheet and the tab bar step aside until it closes
     const onSelect = (e: Event) => {
@@ -63,6 +67,7 @@ export default function ResultsSheet({ head, children }: { head: ReactNode; chil
       html.style.overflow = prev
       window.removeEventListener("resize", measure)
       window.visualViewport?.removeEventListener("resize", measure)
+      ro?.disconnect()
       window.removeEventListener(MAP_DRAG, onDrag)
       window.removeEventListener(MAP_SELECT, onSelect)
       delete html.dataset.mapCard
