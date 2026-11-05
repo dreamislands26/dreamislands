@@ -9,7 +9,8 @@
 // token) for property-level points and splits each city into its properties; if that fails or is slow,
 // the city pins stay.
 import Link from "@/lib/i18n-link"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { getPending, getServerPending, subscribe } from "@/lib/nav-pending"
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react"
 import { createPortal } from "react-dom"
 import "leaflet/dist/leaflet.css"
 import { Photo, SUPABASE_HOST } from "../ds/cards"
@@ -144,6 +145,8 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
   // the carousel back to it.
   const [origin, setOrigin] = useState<string | null>(null)
   const [jump, setJump] = useState(0)
+  const next = useSyncExternalStore(subscribe, getPending, getServerPending)
+  const leaving = !!next && next.kind !== "results"
   const selectRef = useRef<(key: string | null, fromCarousel?: boolean) => void>(() => {})
   // All cards, place by place outward from the picked place (route), cheapest program first within a place
   const cards = useMemo(() => (origin ? route(points, origin) : points).flatMap((p) => [...p.programs].sort((a, b) => a.minPrice - b.minPrice).map((prog) => ({ ...prog, place: prog.place, key: p.key }))), [points, origin])
@@ -376,7 +379,9 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
   return (
     <>
       <div ref={el} className={m.map} />
-      {selected && createPortal(<PlaceCards cards={cards} selected={selected} jump={jump} onPlace={(k) => selectRef.current(k, true)} onClose={() => selectRef.current(null)} />, document.body)}
+      {/* The carousel lives on <body>, over every page: it steps aside while another page loads, or it
+          would sit on top of that page's loading screen */}
+      {selected && !leaving && createPortal(<PlaceCards cards={cards} selected={selected} jump={jump} onPlace={(k) => selectRef.current(k, true)} onClose={() => selectRef.current(null)} />, document.body)}
     </>
   )
 }
@@ -453,7 +458,7 @@ function PlaceCards({ cards, selected, jump, onPlace, onClose }: { cards: Card[]
       {groups.map((g) => (
         <div key={g[0].key} className={m.group}>
         {g.map((p, i) => (
-        <article key={p.id} className={m.card}>
+        <article key={p.id} className={m.card} data-preview-title={p.name} data-preview-place={p.place.join(", ")} data-preview-price={p.price}>
           <Photo src={p.image} alt={p.name} className={m.photo} sizes="100vw">
             <div className={m.grab} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
               <span className={m.handle} aria-hidden />
