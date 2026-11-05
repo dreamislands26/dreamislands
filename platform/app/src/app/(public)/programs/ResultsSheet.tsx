@@ -2,7 +2,8 @@
 // Results sheet over the catalogue map (mobile). Three resting points: collapsed (only the count at the
 // tab bar), half (default, Figma 110:5430) and full (the list scrolls). Dragging snaps to the nearest
 // point, a flick moves one point; moving the map drops the sheet to collapsed; while a map pin is
-// selected the sheet steps aside for the place card.
+// selected the sheet steps aside for the place card. The head (count, clear filters) is the top of the
+// list: in the full sheet it scrolls away with the cards, so only the search bar and filters stay.
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import m from "./resultsSheet.module.css"
 
@@ -137,11 +138,13 @@ export default function ResultsSheet({ head, children }: { head: ReactNode; chil
       data-away={away ? "1" : undefined}
       style={y === undefined ? undefined : { transform: `translateY(${y}px)`, ["--full" as string]: `${pos!.full}px` }}
     >
-      <div data-sheet-head className={m.head} onClick={() => snap === "collapsed" && setSnap("half")}>
-        <span className={m.handle} aria-hidden />
-        {head}
+      <div ref={list} className={m.list}>
+        <div data-sheet-head className={m.head} onClick={() => snap === "collapsed" && setSnap("half")}>
+          <span className={m.handle} aria-hidden />
+          {head}
+        </div>
+        {children}
       </div>
-      <div ref={list} className={m.list}>{children}</div>
     </div>
   )
 }
