@@ -2,6 +2,7 @@ import AttributionInit from "./_components/AttributionInit"
 import MetricoolTracker from "./_components/MetricoolTracker"
 import ConsentBanner from "./_components/ConsentBanner"
 import WhatsAppFab from "./_components/WhatsAppFab"
+import PageTransition from "./ds/PageTransition"
 import SupportFab from "./_components/SupportFab"
 import AuthProvider from "./_components/account/AuthProvider"
 import { Footer, MobileTopBar, NavigationBar, NavTracker, TopAppBar } from "./ds/chrome"
@@ -32,7 +33,9 @@ export default async function PublicLayout({
         <ConsentBanner />
         <TopAppBar />
         <MobileTopBar />
-        <main className="ds-main">{children}</main>
+        <main className="ds-main">
+          <PageTransition>{children}</PageTransition>
+        </main>
         <Footer />
         <WhatsAppFab />
         <SupportFab />

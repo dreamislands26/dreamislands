@@ -5,6 +5,9 @@
 // Swiping to a card of another place switches the dark pin and pans the map to it. Close, a tap on the
 // empty map or a swipe down on a card deselects. Dragging the map lowers the results sheet. Leaflet
 // loads on the client only.
+// The page renders city-level pins. Before drawing, the map asks /api/map/points (with the page's
+// token) for property-level points and splits each city into its properties; if that fails or is slow,
+// the city pins stay.
 import Link from "@/lib/i18n-link"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { createPortal } from "react-dom"
@@ -22,9 +25,47 @@ export type MapPoint = { key: string; at: [number, number]; label: string; count
 const usd = (n: number) => "$" + n.toLocaleString("en-US")
 const DETAIL_ZOOM = 4.5 // below it, one pin per country (the Asia overview sits around 3.5)
 const PLACE_ZOOM = 8 // a tapped pin zooms in at least this far
+const REFINE_TIMEOUT_MS = 2500
 
-export default function CatalogMap({ points }: { points: MapPoint[] }) {
+/** City pins -> property pins where /api/map/points knows the property; the rest keep their city pin. */
+async function refine(points: MapPoint[], token: string | undefined): Promise<MapPoint[]> {
+  const ids = points.flatMap((p) => p.programs.map((x) => x.id))
+  if (!token || !ids.length) return points
+  const ctrl = new AbortController()
+  const timer = window.setTimeout(() => ctrl.abort(), REFINE_TIMEOUT_MS)
+  try {
+    const r = await fetch("/api/map/points", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-map-token": token },
+      body: JSON.stringify({ ids }),
+      signal: ctrl.signal,
+    })
+    if (!r.ok) return points
+    const { p } = (await r.json()) as { p: Record<string, [string, number, number]> }
+    const out = new Map<string, MapPoint>()
+    for (const pt of points) {
+      for (const prog of pt.programs) {
+        const hit = p[prog.id]
+        const key = hit ? hit[0] : pt.key
+        const prev = out.get(key)
+        if (!prev) out.set(key, { ...pt, key, at: hit ? [hit[1], hit[2]] : pt.at, min: prog.minPrice, label: usd(prog.minPrice), programs: [prog] })
+        else {
+          prev.programs.push(prog)
+          if (prog.minPrice < prev.min) Object.assign(prev, { min: prog.minPrice, label: usd(prog.minPrice) })
+        }
+      }
+    }
+    return [...out.values()]
+  } catch {
+    return points
+  } finally {
+    window.clearTimeout(timer)
+  }
+}
+
+export default function CatalogMap({ points: initial, token }: { points: MapPoint[]; token?: string }) {
   const el = useRef<HTMLDivElement>(null)
+  const [points, setPoints] = useState(initial)
   const [selected, setSelected] = useState<string | null>(null)
   // Bumped when a pin (not the carousel) picks the place, so the carousel jumps to it
   const [jump, setJump] = useState(0)
@@ -36,8 +77,9 @@ export default function CatalogMap({ points }: { points: MapPoint[] }) {
     let map: import("leaflet").Map | undefined
     let cancelled = false
     let ro: ResizeObserver | undefined
-    import("leaflet").then((L) => {
+    Promise.all([import("leaflet"), refine(initial, token)]).then(([L, points]) => {
       if (cancelled || !el.current) return
+      setPoints(points)
       map = L.map(el.current, { zoomControl: false, attributionControl: true, scrollWheelZoom: false, zoomSnap: 0.25 })
       map.attributionControl.setPrefix(false)
       L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, attribution: "© OpenStreetMap" }).addTo(map)
@@ -105,7 +147,7 @@ export default function CatalogMap({ points }: { points: MapPoint[] }) {
       setSelected(null)
       window.dispatchEvent(new CustomEvent(MAP_SELECT, { detail: null }))
     }
-  }, [points])
+  }, [initial, token])
 
   return (
     <>

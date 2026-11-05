@@ -1,0 +1,50 @@
+/* Loading skeletons. Two page templates shown while another page loads (ds/PageTransition): a list
+   page and a programme/property page; and skeleton cards in place of results that reload on the
+   same page (ds/Results). Kept to a few shapes. min-height keeps the footer below the fold. */
+
+.screen { animation: appear 0.2s ease-out both; }
+.list, .detail { min-height: 80vh; }
+@keyframes appear { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .screen { animation: none; } }
+
+/* List: title, two lines of text, a grid of cards */
+.list { padding-top: 2.5rem; padding-bottom: 4rem; }
+.title { width: 40%; height: 2rem; }
+.text { width: 60%; margin-top: 1rem; }
+.textShort { width: 35%; margin-top: 0.5rem; }
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem 1.5rem; margin-top: 2.5rem; }
+.card { display: flex; flex-direction: column; gap: 0.75rem; }
+.photo { aspect-ratio: 4 / 3; }
+.photoSquare { aspect-ratio: 1 / 1; }
+.cardLine { width: 80%; }
+.cardLineShort { width: 45%; }
+
+/* Programme / property: gallery next to the info column */
+.detail { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3rem; padding-top: 1.5rem; padding-bottom: 4rem; }
+.gallery { aspect-ratio: 1 / 1; }
+.info { display: flex; flex-direction: column; gap: 1rem; padding-top: 0.5rem; }
+.crumb { width: 25%; }
+.detailTitle { width: 75%; height: 2rem; }
+.line { width: 100%; }
+.lineShort { width: 55%; }
+.button { height: 3.5rem; margin-top: 1rem; border-radius: var(--ds-r-full); }
+
+@media (max-width: 1023px) {
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 767px) {
+  .list { padding-top: 1.5rem; }
+  .title { width: 60%; }
+  .text { width: 90%; }
+  .textShort { width: 60%; }
+  .grid { grid-template-columns: minmax(0, 1fr); gap: 2rem; margin-top: 2rem; }
+
+  /* Full-width photo, then the sheet over it, as on the real page */
+  .detail.detail { display: block; padding: 0; }
+  .gallery { aspect-ratio: auto; height: 22.5rem; border-radius: 0; }
+  .info { position: relative; align-items: center; margin-top: -1.75rem; padding: 1.5rem 1.5rem 0; border-radius: 2.25rem 2.25rem 0 0; background: var(--ds-surface); }
+  .crumb { display: none; }
+  .detailTitle { width: 70%; }
+  .button { display: none; }
+}

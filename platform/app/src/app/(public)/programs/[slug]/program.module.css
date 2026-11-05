@@ -14,6 +14,8 @@
 .highlights { display: flex; flex-direction: column; }
 .mobileOnlyTitle, .factsMobile, .stats, .todoList, .hostList, .knownList, .mobileInline { display: none; }
 .desktopOnly { display: block; }
+/* The gallery column stretches to the height of the info column next to it */
+.top > .desktopOnly { align-self: stretch; }
 .desktopInline { display: inline; }
 .desktopBlock { display: block; }
 

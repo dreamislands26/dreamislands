@@ -1,4 +1,5 @@
 "use client"
+import { startNavigation } from "@/lib/nav-pending"
 import { useEffect, useRef, useState } from "react"
 import { useRouter } from "@/lib/i18n-nav"
 import { Icon } from "./ui"
@@ -18,6 +19,7 @@ const LENGTHS = [
 /** Home hero search: one row. Goals open a tag popover (multi-select), then where, start date, departure city, length. */
 export default function HeroSearch({ countries, outcomes }: { countries: string[]; outcomes: OutcomeTag[] }) {
   const router = useRouter()
+  const go = (href: string) => { startNavigation(href); router.push(href) }
   const tr = useT()
   const [goals, setGoals] = useState<string[]>([])
   const [open, setOpen] = useState(false)
@@ -48,7 +50,7 @@ export default function HeroSearch({ countries, outcomes }: { countries: string[
     if (length) q.set("length", length)
     if (date) q.set("date", date)
     if (from.trim()) q.set("from", from.trim())
-    router.push(`/programs${q.toString() ? `?${q}` : ""}`)
+    go(`/programs${q.toString() ? `?${q}` : ""}`)
   }
 
   return (

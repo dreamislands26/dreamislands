@@ -25,7 +25,7 @@ async function legacyMatched(cohort: number | null | undefined) {
   const { data } = await supabaseAdmin
     .from("programs")
     .select(
-      "id, name, slug, summary, cohort, tier, duration_days, price_usd, outcomes, is_composite, hero_image_url, " +
+      "id, name, slug, summary, cohort, tier, duration_days, price_usd, outcomes, is_composite, hero_image_url, reality_status, " +
         "program_properties(role, properties(id, name, island, country, contact_wa, entity_type)), " +
         "program_variants(duration_days, duration_nights, price_basic_usd, active)",
     )
@@ -35,7 +35,9 @@ async function legacyMatched(cohort: number | null | undefined) {
     .order("price_usd", { ascending: true })
     .limit(40)
   // Wellness top-3 only. Medical pathway programs are surfaced by a separate, intent-driven layer (not by price).
-  const rows = ((data ?? []) as any[]).filter((r) => !isMedicalPathway(r)).slice(0, 3)
+  const rows = ((data ?? []) as any[])
+    .filter((r) => !isMedicalPathway(r) && r.reality_status !== "hold_verify" && r.reality_status !== "superseded_by_verified_product")
+    .slice(0, 3)
   const heroes = await resolveHeroes(rows)
   return rows.map((r, i) => ({ ...r, hero_image_url: heroes[i].url }))
 }

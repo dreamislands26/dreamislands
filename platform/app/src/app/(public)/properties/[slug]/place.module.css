@@ -7,6 +7,8 @@
 .lede { margin: 0; font: 400 1rem/1.5rem var(--ds-font-body); color: var(--ds-on-surface-variant); }
 .factsMobile, .stats { display: none; }
 .desktopOnly { display: block; }
+/* The gallery column stretches to the height of the info column next to it */
+.top > .desktopOnly { align-self: stretch; }
 .page { }
 .eco { }
 .titleActions { display: flex; gap: 0.25rem; flex: none; }
