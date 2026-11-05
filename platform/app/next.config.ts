@@ -16,7 +16,18 @@ const nextConfig: NextConfig = {
       { source: "/destinations/china/medical", destination: "/medical/china", statusCode: 301 },
     ]
   },
+  // Files in public/ (videos, logos, flags, icons...) were served with max-age=0, so every visit re-checked
+  // them. One day fresh, then up to a week served from cache while the browser re-checks in the background.
+  // Replacing a file under the same name therefore reaches returning visitors within a day.
+  async headers() {
+    const cache = [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }]
+    return ["video", "brand", "images", "icons", "flags", "mascots"].map((dir) => ({ source: `/${dir}/:path*`, headers: cache }))
+  },
   images: {
+    // Optimised images (/_next/image) stay cached for 3 days instead of 4 hours. To refresh them on demand,
+    // POST /api/revalidate?images=1 (deletes .next/cache/images); a NEW photo should get a new file name,
+    // because browsers keep the old copy for up to this long.
+    minimumCacheTTL: 259200,
     remotePatterns: [
       {
         protocol: "https",
