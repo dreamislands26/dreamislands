@@ -147,7 +147,10 @@
   .content { gap: 2rem; }
   .after { gap: 2rem; padding-top: 2rem; }
   .ctaRow { margin-top: 1rem; }
-  .roomCta.roomCta { height: 2rem; padding: 0 0.875rem; font-size: 0.8125rem; }
+  /* A room's button shrinks to its arrow; the name and facts get the room back and wrap */
+  .roomCta.roomCta { width: 2.5rem; height: 2.5rem; padding: 0; justify-content: center; }
+  .roomCtaText { display: none; }
+  .oneLine { white-space: normal; }
   .h2 { margin: 0 0 0.25rem; font: 700 1.125rem/1.2 var(--ds-font-display); letter-spacing: 0; }
   .ratings .h2 { margin-bottom: 0.75rem; }
   .newBox { flex-direction: column; align-items: flex-start; gap: 0.375rem; padding: 1.25rem; margin-top: 0.5rem; }

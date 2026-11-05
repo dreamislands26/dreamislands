@@ -267,7 +267,7 @@ export default function ProgramView({
               <div>
                 <h2 className={s.h2}>Where you stay</h2>
                 {accommodations.map((a) => (
-                  <ListItem key={a.id} icon={a.has_pool ? "pool" : "bed"} headline={<span className={s.oneLine}>{enOnly(a.room_type) ?? a.room_type}</span>} supporting={<span className={s.oneLine}><Facts items={[a.capacity ? `Up to ${a.capacity} ${a.capacity === 1 ? "guest" : "guests"}` : null, shortLine(enOnly(a.description), 48)]} /></span>} trailing={<ButtonLink href="#reserve" variant="tonal" className={s.roomCta}>Check dates</ButtonLink>} />
+                  <ListItem key={a.id} icon={a.has_pool ? "pool" : "bed"} headline={<span className={s.oneLine}>{enOnly(a.room_type) ?? a.room_type}</span>} supporting={<span className={s.oneLine}><Facts items={[a.capacity ? `Up to ${a.capacity} ${a.capacity === 1 ? "guest" : "guests"}` : null, shortLine(enOnly(a.description), 48)]} /></span>} trailing={<ButtonLink href="#reserve" variant="tonal" trailingIcon="arrow_forward" aria-label="Check dates" className={s.roomCta}><span className={s.roomCtaText}>Check dates</span></ButtonLink>} />
                 ))}
               </div>
             )}
