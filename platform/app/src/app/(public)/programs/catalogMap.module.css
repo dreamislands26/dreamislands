@@ -38,8 +38,10 @@
    long card: no gap, the corners and shadow on the group, 8px between the photos. */
 .cards { --card: min(21.75rem, calc(100vw - 2.625rem)); position: fixed; left: 0; right: 0; bottom: calc(0.75rem + env(safe-area-inset-bottom)); z-index: 60; display: flex; gap: 0.5rem; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding: 0.75rem calc((100vw - var(--card)) / 2) 2rem; margin-bottom: -2rem; overscroll-behavior-x: contain; touch-action: pan-x; transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1); animation: rise 0.28s cubic-bezier(0.2, 0, 0, 1); }
 .cards::-webkit-scrollbar { display: none; }
-.card { flex: none; width: var(--card); padding: 0.5rem 0.5rem 0; scroll-snap-align: center; scroll-snap-stop: always; border-radius: 1.5rem; overflow: hidden; background: var(--ds-surface-bright); box-shadow: var(--ds-elev-4); }
-.group { flex: none; display: flex; border-radius: 1.5rem; overflow: hidden; background: var(--ds-surface-bright); box-shadow: var(--ds-elev-4); }
+.card { flex: none; width: var(--card); padding: 0.5rem 0.5rem 0; scroll-snap-align: center; scroll-snap-stop: always; border-radius: 1.5rem; overflow: hidden; overflow: clip; background: var(--ds-surface-bright); box-shadow: var(--ds-elev-4); }
+/* overflow: clip, not hidden: hidden makes the group a scroll container of its own, and the cards in it
+   stop snapping in the carousel */
+.group { flex: none; display: flex; border-radius: 1.5rem; overflow: hidden; overflow: clip; background: var(--ds-surface-bright); box-shadow: var(--ds-elev-4); }
 .group .card { border-radius: 0; box-shadow: none; }
 /* Inner edges of a long card: 4px each side, so the photos are 8px apart like the outer inset */
 .group .card + .card { padding-left: 0.25rem; }

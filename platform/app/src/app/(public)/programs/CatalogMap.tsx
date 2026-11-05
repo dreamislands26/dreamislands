@@ -29,6 +29,10 @@ const REFINE_TIMEOUT_MS = 2500
 // Two price pins closer than this on screen (px) would overlap, so they merge
 const MERGE_X = 64
 const MERGE_Y = 32
+const APART_MAX = 16 // a picked place zooms in at most this far to stand apart from its neighbours
+// A picked place clears its neighbours with its photo too: the pill (28px) and the 48px photo on it
+const APART_X = 64
+const APART_Y = 84
 const GROUP_KM = 60 // places chained closer than this form one group (an island, a stretch of coast)
 
 /** Pin thumbnail source: our photos go through the image optimiser at 256px (a 48px thumb at 3x is 144px; 256 is the next size the optimiser makes). */
@@ -208,21 +212,42 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
           if (box) taken.push(box)
         }
       }
+      // The zoom (from z0 up) at which a place stands apart from the places it would cover at z0, up to
+      // APART_MAX; places at the same spot never part and stay under it
+      const apart = (p: MapPoint, z0: number) => {
+        if (!map) return z0
+        let need = z0
+        for (const b of points) {
+          if (b === p) continue
+          const d = map.project(p.at, z0).subtract(map.project(b.at, z0))
+          const ratio = Math.max(Math.abs(d.x) / APART_X, Math.abs(d.y) / APART_Y)
+          if (ratio >= 1 || ratio === 0) continue
+          const z = Math.ceil((z0 - Math.log2(ratio)) * 4 + 1) / 4
+          if (z <= APART_MAX) need = Math.max(need, z)
+        }
+        return need
+      }
       const select = (key: string | null, fromCarousel = false) => {
         if (key === current) return
         if (current) mark(current, false)
         current = key
-        // The selected place always stands alone, so the merged pins around it are worked out again
-        if (map && map.getZoom() >= DETAIL_ZOOM) recluster()
-        declutter()
+        if (!map) return
         const p = key ? points.find((x) => x.key === key) : undefined
-        if (p && map) {
+        // A pin tapped from far away zooms in to the place; the carousel keeps the zoom. Either way the
+        // map comes closer if the place would cover its neighbours, so what the carousel shows next is
+        // on the map too.
+        const z = p ? apart(p, fromCarousel ? map.getZoom() : Math.max(map.getZoom(), PLACE_ZOOM)) : map.getZoom()
+        // The selected place stands alone, so the merged pins around it are worked out again: now if
+        // the zoom stays, else when the map gets there (zoomend)
+        if (z === map.getZoom() && z >= DETAIL_ZOOM) recluster()
+        declutter()
+        if (p) {
           mark(p.key, true)
-          // A pin tapped from far away zooms in to the place; the carousel keeps the zoom. The pin
-          // stays in view above the cards.
-          const z = fromCarousel ? map.getZoom() : Math.max(map.getZoom(), PLACE_ZOOM)
-          const target = map.project(p.at, z).add([0, Math.round(window.innerHeight * 0.18)])
-          map.flyTo(map.unproject(target, z), z, { duration: z !== map.getZoom() ? 0.7 : 0.45 })
+          // The pin stays in view above the cards. Near and at the same zoom the map just slides there;
+          // flyTo would arc out and back in
+          const target = map.unproject(map.project(p.at, z).add([0, Math.round(window.innerHeight * 0.18)]), z)
+          if (z === map.getZoom() && map.getBounds().contains(target)) map.panTo(target, { animate: true, duration: 0.45 })
+          else map.flyTo(target, z, { duration: z !== map.getZoom() ? 0.7 : 0.45 })
         }
         setSelected(key)
         if (!fromCarousel) {
@@ -248,12 +273,15 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
       // Places whose prices would overlap at this zoom merge into one pin: the cheapest price, the
       // photos of all of them. The selected place goes first and keeps its own pin; the places it would
       // cover step under it (they are next in the carousel anyway). Worked out on every zoom and pick.
+      // Only what changed comes off or onto the map: a pin that stays keeps its element, so its photos do
+      // not pop in again. A merge of the same places is the same pin.
       const places = L.layerGroup()
+      const merged = new Map<string, Shown>()
+      let clusteredAt = NaN
       const recluster = () => {
         if (!map) return
         const z = map.getZoom()
-        places.clearLayers()
-        placeList = []
+        clusteredAt = z
         const groups: { pts: MapPoint[]; at: import("leaflet").Point }[] = []
         for (const p of [...points].sort((a, b) => Number(b.key === current) - Number(a.key === current) || a.min - b.min)) {
           const q = map.project(p.at, z)
@@ -261,13 +289,21 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
           if (g) g.pts.push(p)
           else groups.push({ pts: [p], at: q })
         }
-        for (const { pts } of groups) {
+        const next = groups.map(({ pts }) => {
           const best = pts[0]
-          const x = pts.length === 1 || best.key === current ? markers.get(best.key)! : { ...pair(best.at, best.label, pinPhotos(pts.flatMap((p) => p.programs)), () => openGroup(pts)), min: best.min }
-          places.addLayer(x.mk)
-          if (x.ph) places.addLayer(x.ph)
-          placeList.push(x)
-        }
+          if (pts.length === 1 || best.key === current) return markers.get(best.key)!
+          const id = pts.map((p) => p.key).join("|")
+          let x = merged.get(id)
+          if (!x) {
+            x = { ...pair(best.at, best.label, pinPhotos(pts.flatMap((p) => p.programs)), () => openGroup(pts)), min: best.min }
+            merged.set(id, x)
+          }
+          return x
+        })
+        const keep = new Set<import("leaflet").Layer>(next.flatMap((x) => (x.ph ? [x.mk, x.ph] : [x.mk])))
+        for (const l of places.getLayers()) if (!keep.has(l)) places.removeLayer(l)
+        for (const l of keep) if (!places.hasLayer(l)) places.addLayer(l)
+        placeList = next
       }
       // A merged pin zooms in until its places part; places that never part (same spot) open the cheapest
       const openGroup = (pts: MapPoint[]) => {
@@ -301,7 +337,12 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
       }))
       const sync = () => {
         if (!map) return
-        if (map.getZoom() >= DETAIL_ZOOM) { countries.remove(); recluster(); places.addTo(map) }
+        if (map.getZoom() >= DETAIL_ZOOM) {
+          countries.remove()
+          // Leaflet ends every flyTo with zoomend, also at the same zoom
+          if (map.getZoom() !== clusteredAt || !map.hasLayer(places)) recluster()
+          places.addTo(map)
+        }
         else { places.remove(); countries.addTo(map); if (current) select(null) }
         declutter()
       }
