@@ -28,10 +28,10 @@ const PLACE_ZOOM = 8 // a tapped pin zooms in at least this far
 const REFINE_TIMEOUT_MS = 2500
 const GROUP_KM = 60 // places chained closer than this form one group (an island, a stretch of coast)
 
-/** Pin thumbnail source: our photos go through the image optimiser at 96px (a 40px thumb at 2x). */
+/** Pin thumbnail source: our photos go through the image optimiser at 128px (a 40px thumb at 3x). */
 function thumbSrc(src: string) {
   try {
-    if (new URL(src).hostname === SUPABASE_HOST) return `/_next/image?url=${encodeURIComponent(src)}&w=96&q=75`
+    if (new URL(src).hostname === SUPABASE_HOST) return `/_next/image?url=${encodeURIComponent(src)}&w=128&q=75`
   } catch {}
   return src
 }
