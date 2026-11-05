@@ -7,11 +7,13 @@ import {
   HomeFilled,
   LineChartOutlined,
   MedicineBoxOutlined,
+  SolutionOutlined,
   TeamOutlined,
   UserOutlined,
 } from "@ant-design/icons"
 import Shell, { type NavItem } from "../_components/Shell"
 import { getSessionUser } from "@/lib/auth"
+import { applicationsEnabled } from "@/lib/partner-applications"
 
 const navItems: NavItem[] = [
   { key: "/admin", href: "/admin", icon: <HomeOutlined />, label: "Overview" },
@@ -72,8 +74,12 @@ export default async function AdminLayout({
   children: React.ReactNode
 }) {
   const user = await getSessionUser()
+  // Partner applications are a local test for now (see src/lib/partner-applications.ts)
+  const items = applicationsEnabled()
+    ? [...navItems.slice(0, 3), { key: "/admin/applications", href: "/admin/applications", icon: <SolutionOutlined />, label: "Applications" }, ...navItems.slice(3)]
+    : navItems
   return (
-    <Shell email={user?.email ?? null} navItems={navItems} brand="DIT Platform">
+    <Shell email={user?.email ?? null} navItems={items} brand="DIT Platform">
       {children}
     </Shell>
   )
