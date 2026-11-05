@@ -1,6 +1,6 @@
 "use client"
 
-import { App, Alert, Button, Card, Form, Input, Segmented, Space, Typography } from "antd"
+import { App, Alert, Button, Card, Divider, Form, Input, Segmented, Space, Typography } from "antd"
 import { useState } from "react"
 import { supabaseBrowser } from "@/lib/supabase"
 
@@ -8,7 +8,7 @@ const { Title, Text, Paragraph } = Typography
 
 type Mode = "password" | "magic"
 
-export default function LoginView({ nextPath }: { nextPath: string }) {
+export default function LoginView({ nextPath, applyUrl }: { nextPath: string; applyUrl?: string | null }) {
   const { notification } = App.useApp()
   const [mode, setMode] = useState<Mode>("password")
   const [loading, setLoading] = useState(false)
@@ -146,6 +146,17 @@ export default function LoginView({ nextPath }: { nextPath: string }) {
                 </Button>
               </Form>
             )}
+          </>
+        )}
+
+        {applyUrl && (
+          <>
+            <Divider plain style={{ margin: "20px 0 16px" }}>
+              <Text type="secondary" style={{ fontSize: 13 }}>New partner?</Text>
+            </Divider>
+            <Button block href={applyUrl}>
+              Apply to become a partner
+            </Button>
           </>
         )}
       </Card>
