@@ -6,3 +6,8 @@
 @media (prefers-reduced-motion: reduce) {
   .screen, .screen :global(.ant-skeleton) { animation: none; }
 }
+
+/* List pages: count title, subtitle, table cells */
+.title { width: 200px !important; min-width: 0 !important; display: block !important; margin-bottom: 6px; }
+.sub { width: 320px !important; min-width: 0 !important; }
+.cell { max-width: 140px; }

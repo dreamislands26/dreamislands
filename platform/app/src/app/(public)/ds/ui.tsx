@@ -1,5 +1,5 @@
 import Link from "@/lib/i18n-link"
-import type { ComponentProps, ReactNode } from "react"
+import type { CSSProperties, ComponentProps, ReactNode } from "react"
 import s from "./ui.module.css"
 
 const cx = (...c: (string | false | null | undefined)[]) => c.filter(Boolean).join(" ")
@@ -262,6 +262,6 @@ export function InfoCard({ icon, label, title, text, children }: { icon?: string
 }
 
 /** Loading placeholder: a pulsing line (text) or block (photo, button). Size it with className. */
-export function Skeleton({ shape = "line", className }: { shape?: "line" | "block"; className?: string }) {
-  return <span className={cx(s.skeleton, shape === "block" && s.skeletonBlock, className)} aria-hidden />
+export function Skeleton({ shape = "line", className, style }: { shape?: "line" | "block"; className?: string; style?: CSSProperties }) {
+  return <span className={cx(s.skeleton, shape === "block" && s.skeletonBlock, className)} style={style} aria-hidden />
 }

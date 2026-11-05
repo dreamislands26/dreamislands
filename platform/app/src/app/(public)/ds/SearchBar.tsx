@@ -2,7 +2,7 @@
 import { startNavigation } from "@/lib/nav-pending"
 import { useRouter } from "@/lib/i18n-nav"
 import { useState } from "react"
-import { Icon } from "./ui"
+import { Icon, Skeleton } from "./ui"
 import s from "./search.module.css"
 import o from "./overlay.module.css"
 import t from "./tripsearch.module.css"
@@ -34,7 +34,8 @@ export type SearchInitial = { goals?: string[]; country?: string; length?: strin
 
 /** Desktop search. With `outcomes` (the /programs page) it shows the multi-goal tag cloud plus start date and
  *  departure city; without them (home) it keeps the compact three-segment bar. */
-export default function SearchBar({ countries, wide, outcomes, initial }: { countries: string[]; wide?: boolean; outcomes?: OutcomeTag[]; initial?: SearchInitial }) {
+/** `loading`: skeleton tags in place of the goals while the catalogue loads (ds/shells). */
+export default function SearchBar({ countries, wide, outcomes, initial, loading }: { countries: string[]; wide?: boolean; outcomes?: OutcomeTag[]; initial?: SearchInitial; loading?: boolean }) {
   const router = useRouter()
   const go = (href: string) => { startNavigation(href); router.push(href) }
   const [goal, setGoal] = useState("")
@@ -73,6 +74,7 @@ export default function SearchBar({ countries, wide, outcomes, initial }: { coun
             <span className={t.cloudHint}>Pick one or more. Programmes that cover more of your goals come first.</span>
           </div>
           <div className={t.cloud} style={{ marginTop: "0.75rem" }}>
+            {loading && [7, 8, 6, 7.5, 11, 9, 6.5].map((w, i) => <Skeleton key={i} shape="block" className={t.tagSkeleton} style={{ width: `${w}rem` }} />)}
             {outcomes.map((g) => (
               <button key={g.slug} type="button" className={goals.includes(g.slug) ? `${t.tag} ${t.tagOn}` : t.tag} aria-pressed={goals.includes(g.slug)} onClick={() => toggle(g.slug)}>
                 {g.icon && <Icon name={g.icon} size={18} />}{g.label}

@@ -2,6 +2,7 @@
 // set and order (Oleg, 19.10.2026). Each route is one catalogue filter: a goal (outcomes_taxonomy) or
 // a track (cohort).
 import { outcomeLabel, type CatalogProgram, type Outcome } from "./catalog"
+import { TRACK_ICONS } from "./programMapping"
 
 export type Route = { key: string; label: string; icon: string; goal?: string; track?: string; cohort?: number }
 
@@ -15,7 +16,8 @@ export const GOAL_ICONS: Record<string, string> = {
   "rebuild-your-body": "fitness_center",
   "healthy-ageing": "eco",
 }
-export const TRACK_ICONS: Record<string, string> = { Reset: "spa", Performance: "sprint", Mind: "psychology_alt", Immersion: "beach_access", SportChill: "surfing" }
+// Kept in programMapping (no server imports) so client components can use it too
+export { TRACK_ICONS }
 export const goalIcon = (slug: string) => GOAL_ICONS[slug] ?? "spa"
 
 /** Home order: design trio first, then the remaining live goals. */

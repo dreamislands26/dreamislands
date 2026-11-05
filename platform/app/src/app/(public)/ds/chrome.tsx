@@ -1,6 +1,7 @@
 "use client"
 import Link from "@/lib/i18n-link"
 import { usePathname } from "@/lib/i18n-nav"
+import { useShownPath } from "@/lib/nav-pending"
 import { useEffect, useRef, useState } from "react"
 import { initialsOf, useAccount } from "../_components/account/AuthProvider"
 import { COUNTRIES, countrySlug } from "../_lib/countries"
@@ -206,7 +207,7 @@ const FOCUS = /^\/start(\/|$)/
 const OWN_MOBILE_BAR = [/^\/programs$/, /^\/programs\/[^/]+$/, /^\/properties\/[^/]+$/, /^\/destinations\/[^/]+\/medical$/, /^\/start/]
 
 export function MobileTopBar() {
-  const pathname = usePathname()
+  const pathname = useShownPath(usePathname())
   const t = useT()
   // Home draws the logo inside its hero (Figma S1 mobile).
   if (pathname === "/" || OWN_MOBILE_BAR.some((r) => r.test(pathname))) return null
@@ -280,7 +281,7 @@ export function NavTracker() {
 }
 
 export function NavigationBar() {
-  const pathname = usePathname()
+  const pathname = useShownPath(usePathname())
   const collapsed = useCollapsedOnScroll()
   const tr = useT()
   // Detail pages and the Wellness Journey own the bottom edge (action bar / focus mode).
