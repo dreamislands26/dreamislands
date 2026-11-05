@@ -26,6 +26,51 @@ const usd = (n: number) => "$" + n.toLocaleString("en-US")
 const DETAIL_ZOOM = 4.5 // below it, one pin per country (the Asia overview sits around 3.5)
 const PLACE_ZOOM = 8 // a tapped pin zooms in at least this far
 const REFINE_TIMEOUT_MS = 2500
+const GROUP_KM = 60 // places chained closer than this form one group (an island, a stretch of coast)
+
+/** Rough distance in km; good enough to order places a few hundred km apart. */
+function km(a: [number, number], b: [number, number]) {
+  const x = (b[1] - a[1]) * Math.cos(((a[0] + b[0]) / 2) * (Math.PI / 180))
+  return Math.hypot(x, b[0] - a[0]) * 111.32
+}
+
+/** Carousel order from the place tapped on the map, nearest first, in two levels of clusters:
+ *  - a group: places chained less than GROUP_KM apart (an island, a city); the carousel finishes the
+ *    current group before leaving it, swiping each time to the nearest place not shown yet;
+ *  - a country (the cluster the zoomed-out map shows as one pin): the rest of the country comes next,
+ *    again nearest to the last card, so the map pans a little at a time.
+ *  When the country is done, the carousel moves to the country nearest to the tapped place. */
+function route(points: MapPoint[], start: string): MapPoint[] {
+  const origin = points.find((p) => p.key === start)
+  if (!origin) return points
+  let cur: MapPoint = origin
+  let country = origin.country
+  const group = new Map<string, number>()
+  points.forEach((p, i) => {
+    if (group.has(p.key)) return
+    group.set(p.key, i)
+    const queue = [p]
+    while (queue.length) {
+      const q = queue.pop()!
+      for (const o of points) if (!group.has(o.key) && km(q.at, o.at) < GROUP_KM) { group.set(o.key, i); queue.push(o) }
+    }
+  })
+  const out = [cur]
+  const left = points.filter((p) => p !== cur)
+  while (left.length) {
+    const inGroup = left.filter((p) => group.get(p.key) === group.get(cur.key))
+    const inCountry = left.filter((p) => p.country === country)
+    const pool = inGroup.length ? inGroup : inCountry.length ? inCountry : left
+    const from = pool === left ? origin : cur
+    const next = pool.reduce((a, b) => (km(from.at, b.at) < km(from.at, a.at) ? b : a))
+    // A group can cross a border (Singapore and Bintan); the country only changes when a new one starts
+    if (pool === left) country = next.country
+    out.push(next)
+    left.splice(left.indexOf(next), 1)
+    cur = next
+  }
+  return out
+}
 
 /** City pins -> property pins where /api/map/points knows the property; the rest keep their city pin. */
 async function refine(points: MapPoint[], token: string | undefined): Promise<MapPoint[]> {
@@ -67,11 +112,13 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
   const el = useRef<HTMLDivElement>(null)
   const [points, setPoints] = useState(initial)
   const [selected, setSelected] = useState<string | null>(null)
-  // Bumped when a pin (not the carousel) picks the place, so the carousel jumps to it
+  // The place last picked by a pin (not the carousel): the carousel starts there. Bumping jump scrolls
+  // the carousel back to it.
+  const [origin, setOrigin] = useState<string | null>(null)
   const [jump, setJump] = useState(0)
   const selectRef = useRef<(key: string | null, fromCarousel?: boolean) => void>(() => {})
-  // All cards, place by place (cheapest place first), cheapest program first within a place
-  const cards = useMemo(() => [...points].sort((a, b) => a.min - b.min).flatMap((p) => [...p.programs].sort((a, b) => a.minPrice - b.minPrice).map((prog) => ({ ...prog, place: prog.place, key: p.key }))), [points])
+  // All cards, place by place outward from the picked place (route), cheapest program first within a place
+  const cards = useMemo(() => (origin ? route(points, origin) : points).flatMap((p) => [...p.programs].sort((a, b) => a.minPrice - b.minPrice).map((prog) => ({ ...prog, place: prog.place, key: p.key }))), [points, origin])
 
   useEffect(() => {
     let map: import("leaflet").Map | undefined
@@ -101,7 +148,10 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
           map.flyTo(map.unproject(target, z), z, { duration: z !== map.getZoom() ? 0.7 : 0.45 })
         }
         setSelected(key)
-        if (!fromCarousel) setJump((n) => n + 1)
+        if (!fromCarousel) {
+          if (key) setOrigin(key)
+          setJump((n) => n + 1)
+        }
         window.dispatchEvent(new CustomEvent(MAP_SELECT, { detail: key }))
       }
       selectRef.current = select
@@ -163,15 +213,14 @@ type Card = MapProgram & { key: string }
  *  the selected place; settling on another place's card tells the map to switch the pin. */
 function PlaceCards({ cards, selected, jump, onPlace, onClose }: { cards: Card[]; selected: string; jump: number; onPlace: (key: string) => void; onClose: () => void }) {
   const wrap = useRef<HTMLDivElement>(null)
-  const opened = useRef(false)
-  // Jump to the place picked on the map (instant on open, smooth afterwards)
+  // A place picked on the map heads a newly ordered carousel: go to it at once (a smooth scroll would
+  // run past the reordered cards)
   useEffect(() => {
     const w = wrap.current
     if (!w) return
     const i = cards.findIndex((c) => c.key === selected)
     const card = w.children[i] as HTMLElement | undefined
-    if (card) w.scrollTo({ left: card.offsetLeft - (w.clientWidth - card.offsetWidth) / 2, behavior: opened.current ? "smooth" : "auto" })
-    opened.current = true
+    if (card) w.scrollTo({ left: card.offsetLeft - (w.clientWidth - card.offsetWidth) / 2, behavior: "auto" })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jump])
   // When a swipe settles, follow the centred card's place
