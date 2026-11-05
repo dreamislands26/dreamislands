@@ -47,9 +47,10 @@
 /* A room's name and facts stay on one line next to its button */
 .oneLine { display: block; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* Things to know: each item an info block, marked (i) */
-.knownCard { position: relative; padding-right: 2rem; }
-.knownInfo.knownInfo { position: absolute; top: 0; right: 0; font-size: 1.25rem; color: var(--ds-on-surface-variant); }
-.known { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
+/* Cards like the hosts' (Meet your hosts), the (i) in the corner */
+.knownCard { position: relative; padding: 1.5rem 3.5rem 1.5rem 1.5rem; border-radius: var(--ds-r-xl-plus); background: var(--ds-surface-container-low); }
+.knownInfo.knownInfo { position: absolute; top: 1.5rem; right: 1.5rem; font-size: 1.25rem; color: var(--ds-on-surface-variant); }
+.known { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
 .known h3 { margin: 0 0 0.25rem; font: 500 0.875rem/1.125rem var(--ds-font-body); color: var(--ds-on-surface); }
 .known p { margin: 0; font: 400 0.875rem/1.25rem var(--ds-font-body); color: var(--ds-on-surface-variant); }
 .known a { color: var(--ds-primary); }
