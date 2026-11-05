@@ -12,6 +12,7 @@ import { searchHref } from "./searchHref"
 import { TRACK_ICONS, goalIcon, homeRoutes, searchRoutes } from "../_lib/routes"
 import CatalogMap, { type MapPoint } from "./CatalogMap"
 import ResultsSheet from "./ResultsSheet"
+import Results from "../ds/Results"
 import { coordsFor } from "../_lib/places"
 import { mapToken } from "@/lib/map-points"
 import x from "../ds/sections.module.css"
@@ -149,6 +150,7 @@ export default async function ProgramsPage({ searchParams }: { searchParams: Pro
       />
       <div className={c.map}><CatalogMap points={points} token={mapToken()} /></div>
       <ResultsSheet head={<ResultsHead count={list.length} q={sp.q} clearHref={filtered ? "/programs" : undefined} />}>
+        <Results className={c.list} count={3} wide>
         {list.length > 0 ? (
           <div className={c.list}>
             {list.map((p, i) => (
@@ -167,6 +169,7 @@ export default async function ProgramsPage({ searchParams }: { searchParams: Pro
             </div>
           </div>
         )}
+        </Results>
         <div className={c.prompt}>
           <JourneyPrompt title="Not sure which one fits?" sub="Take your Wellness Journey and the list sorts itself by match." cta="Take the Wellness Journey" />
         </div>
@@ -220,6 +223,7 @@ export default async function ProgramsPage({ searchParams }: { searchParams: Pro
           Your plan: {[sp.from && `flying from ${sp.from}`, sp.date && `starting ${sp.date}${sp.flex === "3" ? " (± 3 days)" : sp.flex === "month" ? " (any day that month)" : ""}`, !sp.date && sp.when && `in ${sp.when}`].filter(Boolean).join(", ")}. Our team confirms availability and flights once you pick a programme.
         </p>
       )}
+      <Results className={cs.gridCards} count={8}>
       {list.length > 0 ? (
         <div className={cs.gridCards}>
           {list.map((p, i) => <ProgramCard key={p.id} program={p} showTrack={false} priority={i < 4} />)}
@@ -234,6 +238,7 @@ export default async function ProgramsPage({ searchParams }: { searchParams: Pro
           </div>
         </div>
       )}
+      </Results>
 
       <section className={`${x.sectionLoose} ${c.desktopOnly}`}>
         <div className={x.block}>

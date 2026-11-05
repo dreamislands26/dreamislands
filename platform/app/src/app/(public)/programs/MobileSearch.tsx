@@ -2,6 +2,7 @@
 // Mobile search (Figma 110:5430): back, search pill, filters button, track chips; the filters open in the
 // DS Bottom sheet (Figma 231:6999) with Goal (two rows scrolling together), Price range, Duration and
 // Country, and a live "Show N programs".
+import { startNavigation } from "@/lib/nav-pending"
 import Link from "@/lib/i18n-link"
 import { useRouter } from "@/lib/i18n-nav"
 import { useMemo, useState } from "react"
@@ -33,6 +34,7 @@ export default function MobileSearch({ programs, outcomes, countries, bounds, st
   trackCohort?: number
 }) {
   const router = useRouter()
+  const go = (href: string, opts: { scroll: boolean }) => { startNavigation(href); router.replace(href, opts) }
   const back = useSafeBack("/")
   const [q, setQ] = useState(state.q ?? "")
   const [open, setOpen] = useState(false)
@@ -58,7 +60,7 @@ export default function MobileSearch({ programs, outcomes, countries, bounds, st
 
   const apply = () => {
     setOpen(false)
-    router.replace(searchHref({
+    go(searchHref({
       ...state, goal: goals.length ? goals.join(",") : undefined, length, country,
       date: date || undefined, flex: date && flex !== "exact" ? flex : undefined, from: from.trim() || undefined,
       pmin: price[0] > bounds[0] ? price[0] : undefined,
@@ -76,7 +78,7 @@ export default function MobileSearch({ programs, outcomes, countries, bounds, st
         <form className={m.pill} role="search" onSubmit={(e) => {
           e.preventDefault()
           const it = q.trim() ? parseIntent(q, countries) : null
-          router.replace(searchHref({
+          go(searchHref({
             ...state,
             q: it?.recognized ? undefined : (q.trim() || undefined),
             track: it?.track ?? state.track,

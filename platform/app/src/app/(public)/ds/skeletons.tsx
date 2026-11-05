@@ -10,6 +10,22 @@ function Screen({ className, children }: { className: string; children: React.Re
   )
 }
 
+/** Skeleton cards inside a real grid or list (ds/Results). */
+export function CardsSkeleton({ className, count, wide }: { className: string; count: number; wide?: boolean }) {
+  return (
+    <div className={`${className} ${s.screen}`} role="status" aria-busy="true">
+      <span className="ds-visually-hidden">Loading</span>
+      {Array.from({ length: count }, (_, i) => (
+        <div key={i} className={s.card}>
+          <Skeleton shape="block" className={wide ? s.photo : s.photoSquare} />
+          <Skeleton className={s.cardLine} />
+          <Skeleton className={s.cardLineShort} />
+        </div>
+      ))}
+    </div>
+  )
+}
+
 /** Loading screen for list pages: home, catalogues, destinations, guides. */
 export function ListSkeleton() {
   return (

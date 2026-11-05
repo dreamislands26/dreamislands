@@ -1,4 +1,5 @@
 "use client"
+import { startNavigation } from "@/lib/nav-pending"
 import { useRouter } from "@/lib/i18n-nav"
 import { useState } from "react"
 import { Icon } from "./ui"
@@ -35,6 +36,7 @@ export type SearchInitial = { goals?: string[]; country?: string; length?: strin
  *  departure city; without them (home) it keeps the compact three-segment bar. */
 export default function SearchBar({ countries, wide, outcomes, initial }: { countries: string[]; wide?: boolean; outcomes?: OutcomeTag[]; initial?: SearchInitial }) {
   const router = useRouter()
+  const go = (href: string) => { startNavigation(href); router.push(href) }
   const [goal, setGoal] = useState("")
   const [goals, setGoals] = useState<string[]>(initial?.goals ?? [])
   const [where, setWhere] = useState(initial?.country ?? "")
@@ -59,7 +61,7 @@ export default function SearchBar({ countries, wide, outcomes, initial }: { coun
       }
       if (from.trim()) q.set("from", from.trim())
     }
-    router.push(`/programs${q.toString() ? `?${q}` : ""}`)
+    go(`/programs${q.toString() ? `?${q}` : ""}`)
   }
 
   if (outcomes) {
@@ -148,6 +150,7 @@ export default function SearchBar({ countries, wide, outcomes, initial }: { coun
 /** Mobile search (DS "Search bar / Mobile"): a pill with the current filters. Tap opens a sheet with the same fields. */
 export function SearchBarMobile({ countries, track, country, length, q: q0 }: { countries: string[]; track?: string; country?: string; length?: string; q?: string }) {
   const router = useRouter()
+  const go = (href: string) => { startNavigation(href); router.push(href) }
   const [open, setOpen] = useState(false)
   const [q, setQ] = useState(q0 ?? "")
   const [goal, setGoal] = useState(track ?? "")
@@ -169,7 +172,7 @@ export function SearchBarMobile({ countries, track, country, length, q: q0 }: { 
     if (it?.from) p.set("from", it.from)
     if (it?.when) p.set("when", it.when)
     setOpen(false)
-    router.push(`/programs${p.toString() ? `?${p}` : ""}`)
+    go(`/programs${p.toString() ? `?${p}` : ""}`)
   }
   return (
     <>
