@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { supabaseAdmin } from "@/lib/supabase-server"
 import { getSessionUser } from "@/lib/auth"
+import { withCatalogRevalidate } from "@/lib/catalog-revalidate"
 
 type ReplacePayload = {
   links?: Array<{ service_id: string; is_included?: boolean; sort_order?: number }>
@@ -25,7 +26,7 @@ export async function GET(
 }
 
 // PUT replaces the full set of links for a program (idempotent).
-export async function PUT(
+async function putHandler(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
@@ -63,3 +64,6 @@ export async function PUT(
 
   return NextResponse.json({ success: true, count: links.length })
 }
+
+// Saved catalog changes drop the public site cache (lib/catalog-revalidate.ts).
+export const PUT = withCatalogRevalidate(putHandler)

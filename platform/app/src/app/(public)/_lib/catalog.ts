@@ -1,5 +1,5 @@
 // Read-only loaders shared by the DS v2 pages. Never writes.
-import { supabaseAdmin } from "@/lib/supabase-server"
+import { supabaseCatalog as supabaseAdmin } from "@/lib/supabase-catalog" // cached public catalog reads
 import { mapProgram, type DbProgramRow, type LandingProgram } from "./programMapping"
 import { resolveHeroes } from "./programMappingResolved"
 

@@ -21,6 +21,7 @@ export async function resolveHeroes(rows: HeroRow[]): Promise<Array<{ url: strin
       rows.flatMap((r) => (r.program_properties ?? []).map((pp) => pp.properties?.id).filter(Boolean) as string[]),
     ),
   )
+  const ctxPromise = heroCtx() // independent of the queries below: run it alongside them
   const photos = new Map<string, string>()
   const ents = new Map<string, string | null>()
   if (ids.length) {
@@ -43,7 +44,7 @@ export async function resolveHeroes(rows: HeroRow[]): Promise<Array<{ url: strin
       if (m.public_url && !VIDEO.test(m.public_url) && !photos.has(m.property_id)) photos.set(m.property_id, m.public_url)
     }
   }
-  const ctx = await heroCtx()
+  const ctx = await ctxPromise
   return rows.map((r) =>
     resolveProgramHero(
       {

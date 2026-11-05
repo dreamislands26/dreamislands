@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { supabaseAdmin } from "@/lib/supabase-server"
 import { getSessionUser } from "@/lib/auth"
 import { isValidSlug } from "@/lib/slug"
+import { withCatalogRevalidate } from "@/lib/catalog-revalidate"
 
 type PatchServicePayload = {
   name?: string
@@ -20,7 +21,7 @@ function bad(message: string, status = 400) {
   return NextResponse.json({ success: false, error: message }, { status })
 }
 
-export async function PATCH(
+async function patchHandler(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
@@ -66,7 +67,7 @@ export async function PATCH(
   return NextResponse.json({ success: true, service: data })
 }
 
-export async function DELETE(
+async function deleteHandler(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
@@ -78,3 +79,7 @@ export async function DELETE(
   if (error) return bad(error.message)
   return NextResponse.json({ success: true })
 }
+
+// Saved catalog changes drop the public site cache (lib/catalog-revalidate.ts).
+export const PATCH = withCatalogRevalidate(patchHandler)
+export const DELETE = withCatalogRevalidate(deleteHandler)

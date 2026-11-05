@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { supabaseAdmin, supabaseServer } from "@/lib/supabase-server"
 import { getSessionUser } from "@/lib/auth"
 import { cleanCohortSelection, fetchCohortCatalog, syncPropertyTracks } from "@/lib/cohorts"
+import { withCatalogRevalidate } from "@/lib/catalog-revalidate"
 
 type CreatePropertyPayload = {
   name?: string
@@ -60,7 +61,7 @@ export async function GET(req: Request) {
   return NextResponse.json({ success: true, properties: data ?? [] }, { headers: cors })
 }
 
-export async function POST(req: Request) {
+async function postHandler(req: Request) {
   const me = await getSessionUser()
   if (!me || me.role !== "admin") return badJson("forbidden", 403)
 
@@ -99,3 +100,6 @@ export async function POST(req: Request) {
   await syncPropertyTracks(data.id, data.cohort_tags ?? [])
   return NextResponse.json({ success: true, property: data }, { headers: cors })
 }
+
+// Saved catalog changes drop the public site cache (lib/catalog-revalidate.ts).
+export const POST = withCatalogRevalidate(postHandler)

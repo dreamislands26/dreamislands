@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { supabaseAdmin } from "@/lib/supabase-server"
 import { getSessionUser } from "@/lib/auth"
+import { withCatalogRevalidate } from "@/lib/catalog-revalidate"
 
 function bad(message: string, status = 400) {
   return NextResponse.json({ success: false, error: message }, { status })
@@ -11,7 +12,7 @@ function bad(message: string, status = 400) {
 // suffix. Linked program_properties, program_variants, program_schedule_items,
 // and program_services are duplicated. Slug uniqueness is enforced by suffixing
 // "-copy-2", "-copy-3", … on collision.
-export async function POST(
+async function postHandler(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
@@ -121,3 +122,6 @@ export async function POST(
 
   return NextResponse.json({ success: true, program: newProgram })
 }
+
+// Saved catalog changes drop the public site cache (lib/catalog-revalidate.ts).
+export const POST = withCatalogRevalidate(postHandler)

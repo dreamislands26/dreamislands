@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { supabaseAdmin } from "@/lib/supabase-server"
 import { getSessionUser } from "@/lib/auth"
 import { isValidSlug, slugify } from "@/lib/slug"
+import { withCatalogRevalidate } from "@/lib/catalog-revalidate"
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -99,7 +100,7 @@ export async function GET(req: Request) {
   return NextResponse.json({ success: true, programs: data ?? [] }, { headers: cors })
 }
 
-export async function POST(req: Request) {
+async function postHandler(req: Request) {
   const me = await getSessionUser()
   if (!me || me.role !== "admin") return badJson("forbidden", 403)
 
@@ -172,3 +173,6 @@ export async function POST(req: Request) {
 
   return NextResponse.json({ success: true, program }, { headers: cors })
 }
+
+// Saved catalog changes drop the public site cache (lib/catalog-revalidate.ts).
+export const POST = withCatalogRevalidate(postHandler)

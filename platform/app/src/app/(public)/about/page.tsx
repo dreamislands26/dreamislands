@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Link from "@/lib/i18n-link"
 import type { Metadata } from "next"
-import { supabaseAdmin } from "@/lib/supabase-server"
+import { supabaseCatalog as supabaseAdmin } from "@/lib/supabase-catalog" // cached public catalog reads
 import { Icon } from "../_components/Icon"
 
 export const metadata: Metadata = {

@@ -1,6 +1,6 @@
 import Link from "@/lib/i18n-link"
 import type { Metadata } from "next"
-import { supabaseAdmin } from "@/lib/supabase-server"
+import { supabaseCatalog as supabaseAdmin } from "@/lib/supabase-catalog" // cached public catalog reads
 import { type DbProgramRow } from "../../_lib/programMapping"
 import { mapProgramsResolved } from "../../_lib/programMappingResolved"
 import ProgramCard from "../../_components/ProgramCard"
