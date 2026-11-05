@@ -3,6 +3,7 @@ import MetricoolTracker from "./_components/MetricoolTracker"
 import ConsentBanner from "./_components/ConsentBanner"
 import WhatsAppFab from "./_components/WhatsAppFab"
 import PageTransition from "./ds/PageTransition"
+import { ICON_FONT_HREF } from "./ds/icon-font"
 import SupportFab from "./_components/SupportFab"
 import AuthProvider from "./_components/account/AuthProvider"
 import { Footer, MobileTopBar, NavigationBar, NavTracker, TopAppBar } from "./ds/chrome"
@@ -20,10 +21,10 @@ export default async function PublicLayout({
   return (
     <LocaleProvider locale={locale} messages={getMessages(locale)}>
     <div className="ds-root">
-      {/* Material Symbols Rounded, Light. Hoisted to <head> by React. */}
+      {/* Material Symbols Rounded, Light, only the glyphs in ds/icon-font.ts. Hoisted to <head> by React. */}
       <link
         rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300,0..1,0&display=block"
+        href={ICON_FONT_HREF}
         precedence="default"
       />
       <AuthProvider>

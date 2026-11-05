@@ -14,6 +14,10 @@ export default async function Root() {
   const isPanel = PANEL_HOSTS.has(host)
   const isPublic = PUBLIC_HOSTS.has(host)
 
+  // The catalog does not depend on who is signed in: start it together with the session check.
+  const catalog = isPanel ? null : Promise.all([loadPrograms(), loadProperties(), loadOutcomes(), loadReviews()])
+  catalog?.catch(() => {}) // a redirect below may leave it unawaited; the await further down still rethrows
+
   const user = await getSessionUser()
 
   if (isPanel) {
@@ -29,7 +33,7 @@ export default async function Root() {
     if (user?.role === "partner") redirect("/partner")
   }
 
-  const [programs, props, outcomes, reviews] = await Promise.all([loadPrograms(), loadProperties(), loadOutcomes(), loadReviews()])
+  const [programs, props, outcomes, reviews] = await catalog!
   const tanya = props.find((p) => p.slug === "tanya-core") ?? null
   const chinaImage = props.find((p) => p.slug === "wudang-mountain-wellness-center")?.image_url ?? null
   const tanyaPhotos = tanya ? (await loadGallery({ property_id: tanya.id }, "Tanya Samui")).slice(0, 3).map((g) => g.url) : []

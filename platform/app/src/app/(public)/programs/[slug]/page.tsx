@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation"
-import { supabaseAdmin } from "@/lib/supabase-server"
+import { supabaseCatalog as supabaseAdmin } from "@/lib/supabase-catalog" // cached public catalog reads
 import { resolveHeroes } from "../../_lib/programMappingResolved"
 import { confirmCheckoutSession } from "@/lib/checkout-confirm"
 import ProgramView, { type ProgramDetail, type AccommodationItem, type ProgramReview } from "./ProgramView"
@@ -96,79 +96,79 @@ export default async function ProgramDetailPage({
   if (error || !data) notFound()
 
   const program = data as unknown as ProgramDetail
-  const [pageHero] = await resolveHeroes([program as any])
-  program.hero_image_url = pageHero.url
-
-  const { data: reviewRows } = await supabaseAdmin
-    .from("reviews")
-    .select("*, programs(name, slug)")
-    .eq("status", "published")
-    .in("visibility", ["both", "en"])
-    .not("rating", "is", null)
-    .order("created_at", { ascending: false })
-  const programReviews = ((reviewRows ?? []) as any[]).filter((r) => {
-    const progs = Array.isArray(r.programs) ? r.programs : [r.programs]
-    return progs.some((p: any) => p?.slug === program.slug)
-  })
-
-  const confirmedBooking =
-    sp.booking === "paid" && sp.session_id
-      ? await confirmCheckoutSession(sp.session_id, program.id)
-      : null
 
   // Pull accommodations for all linked properties
   const propertyIds = program.program_properties
     .map((pp) => pp.properties?.id)
     .filter((x): x is string => typeof x === "string")
 
-  let accommodations: AccommodationItem[] = []
-  if (propertyIds.length > 0) {
-    const { data: accData } = await supabaseAdmin
-      .from("accommodation_rates")
-      .select("id, property_id, room_type, capacity, has_pool, price_thb_per_night, description, sort_order, properties(id, name)")
-      .in("property_id", propertyIds)
-      .eq("active", true)
-      .order("property_id")
-      .order("sort_order")
-    accommodations = (accData ?? []) as unknown as AccommodationItem[]
-  }
-
-  // Gallery photos: prefer photos tied directly to this program, fall back to the primary property's gallery.
-  let galleryImages: { url: string; alt: string }[] = []
-  const { data: programMedia } = await supabaseAdmin
-    .from("media_assets")
-    .select("public_url, alt_en, alt_ru, title_ru")
-    .eq("program_id", program.id)
-    .eq("active", true)
-    .eq("asset_type", "gallery")
-    .order("sort_order")
-
-  if (programMedia && programMedia.length > 0) {
-    galleryImages = (programMedia as unknown as Array<{ public_url: string; alt_en?: string | null; alt_ru: string | null; title_ru: string | null }>)
+  type MediaRow = { public_url: string; alt_en?: string | null; alt_ru: string | null; title_ru: string | null }
+  const toGallery = (rows: MediaRow[]) =>
+    rows
       .filter((m) => m.public_url && m.public_url.startsWith("http"))
       .map((m) => ({ url: m.public_url, alt: m.alt_en || m.alt_ru || m.title_ru || program.name }))
-  } else if (propertyIds.length > 0) {
-    const { data: propMedia } = await supabaseAdmin
-      .from("media_assets")
-      .select("public_url, alt_en, alt_ru, title_ru")
-      .in("property_id", propertyIds)
-      .eq("active", true)
-      .eq("asset_type", "gallery")
-      .order("sort_order")
-    galleryImages = ((propMedia ?? []) as unknown as Array<{ public_url: string; alt_en?: string | null; alt_ru: string | null; title_ru: string | null }>)
-      .filter((m) => m.public_url && m.public_url.startsWith("http"))
-      .map((m) => ({ url: m.public_url, alt: m.alt_en || m.alt_ru || m.title_ru || program.name }))
-  }
 
-  // Partner-quoted price (e.g. CHF), kept in price_points with source=supplier; USD on the site is derived from it.
-  const { data: spRow } = await supabaseAdmin
-    .from("price_points")
-    .select("amount, currency")
-    .eq("entity_type", "program")
-    .eq("entity_id", program.id)
-    .eq("tier", "base")
-    .eq("source", "supplier")
-    .maybeSingle()
+  // Everything below depends only on the program row, so it runs in parallel (it used to be ~9 round trips
+  // to Supabase one after another).
+  const [[pageHero], { data: reviewRows }, confirmedBooking, accommodations, galleryImages, { data: spRow }, allPrograms] = await Promise.all([
+    resolveHeroes([program as any]),
+    supabaseAdmin
+      .from("reviews")
+      .select("*, programs(name, slug)")
+      .eq("status", "published")
+      .in("visibility", ["both", "en"])
+      .not("rating", "is", null)
+      .order("created_at", { ascending: false }),
+    sp.booking === "paid" && sp.session_id ? confirmCheckoutSession(sp.session_id, program.id) : Promise.resolve(null),
+    (async (): Promise<AccommodationItem[]> => {
+      if (propertyIds.length === 0) return []
+      const { data: accData } = await supabaseAdmin
+        .from("accommodation_rates")
+        .select("id, property_id, room_type, capacity, has_pool, price_thb_per_night, description, sort_order, properties(id, name)")
+        .in("property_id", propertyIds)
+        .eq("active", true)
+        .order("property_id")
+        .order("sort_order")
+      return (accData ?? []) as unknown as AccommodationItem[]
+    })(),
+    // Gallery photos: prefer photos tied directly to this program, fall back to the primary property's gallery.
+    (async (): Promise<{ url: string; alt: string }[]> => {
+      const { data: programMedia } = await supabaseAdmin
+        .from("media_assets")
+        .select("public_url, alt_en, alt_ru, title_ru")
+        .eq("program_id", program.id)
+        .eq("active", true)
+        .eq("asset_type", "gallery")
+        .order("sort_order")
+      if (programMedia && programMedia.length > 0) return toGallery(programMedia as unknown as MediaRow[])
+      if (propertyIds.length === 0) return []
+      const { data: propMedia } = await supabaseAdmin
+        .from("media_assets")
+        .select("public_url, alt_en, alt_ru, title_ru")
+        .in("property_id", propertyIds)
+        .eq("active", true)
+        .eq("asset_type", "gallery")
+        .order("sort_order")
+      return toGallery((propMedia ?? []) as unknown as MediaRow[])
+    })(),
+    // Partner-quoted price (e.g. CHF), kept in price_points with source=supplier; USD on the site is derived from it.
+    supabaseAdmin
+      .from("price_points")
+      .select("amount, currency")
+      .eq("entity_type", "program")
+      .eq("entity_id", program.id)
+      .eq("tier", "base")
+      .eq("source", "supplier")
+      .maybeSingle(),
+    loadPrograms(),
+  ])
+  program.hero_image_url = pageHero.url
+
+  const programReviews = ((reviewRows ?? []) as any[]).filter((r) => {
+    const progs = Array.isArray(r.programs) ? r.programs : [r.programs]
+    return progs.some((p: any) => p?.slug === program.slug)
+  })
+
   const supplierPrice = spRow ? { amount: Number((spRow as any).amount), currency: String((spRow as any).currency) } : null
   const activeVariants = (program.program_variants ?? []).filter((v) => v.active)
   const lowestPrice = activeVariants.length > 0 ? Math.min(...activeVariants.map((v) => v.price_basic_usd)) : null
@@ -234,7 +234,6 @@ export default async function ProgramDetailPage({
       rating: Number(r.rating) || 5,
       date: r.created_at,
     }))
-  const allPrograms = await loadPrograms()
   const related = allPrograms.filter((p) => p.id !== program.id && (primaryProperty ? p.propertyIds.includes(primaryProperty.id) : p.cohort === program.cohort))
 
   return (

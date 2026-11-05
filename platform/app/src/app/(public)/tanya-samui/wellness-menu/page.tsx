@@ -1,5 +1,5 @@
 import Link from "@/lib/i18n-link"
-import { supabaseAdmin } from "@/lib/supabase-server"
+import { supabaseCatalog as supabaseAdmin } from "@/lib/supabase-catalog" // cached public catalog reads
 
 export const dynamic = "force-dynamic"
 

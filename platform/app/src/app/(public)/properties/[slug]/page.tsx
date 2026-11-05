@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation"
 import type { Metadata } from "next"
-import { supabaseAdmin } from "@/lib/supabase-server"
+import { supabaseCatalog as supabaseAdmin } from "@/lib/supabase-catalog" // cached public catalog reads
 import { dataLayerScript } from "../../_lib/track"
 import { countrySlug } from "../../_lib/countries"
 import { dayRange, enOnly, loadGallery, loadPrograms, loadProperties, loadReviews, loadRooms, money, shortLine, type CatalogProgram } from "../../_lib/catalog"

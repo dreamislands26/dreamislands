@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { supabaseAdmin } from "@/lib/supabase-server"
 import { getSessionUser } from "@/lib/auth"
+import { withCatalogRevalidate } from "@/lib/catalog-revalidate"
 
 type CreateAccommodationPayload = {
   property_id?: string
@@ -45,7 +46,7 @@ export async function GET(req: Request) {
   return NextResponse.json({ success: true, accommodations: data ?? [] })
 }
 
-export async function POST(req: Request) {
+async function postHandler(req: Request) {
   const me = await getSessionUser()
   if (!me || me.role !== "admin") return bad("forbidden", 403)
 
@@ -80,3 +81,6 @@ export async function POST(req: Request) {
   if (error || !data) return bad(error?.message ?? "insert failed")
   return NextResponse.json({ success: true, accommodation: data })
 }
+
+// Saved catalog changes drop the public site cache (lib/catalog-revalidate.ts).
+export const POST = withCatalogRevalidate(postHandler)

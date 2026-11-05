@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { supabaseAdmin } from "@/lib/supabase-server"
 import { getSessionUser } from "@/lib/auth"
+import { withCatalogRevalidate } from "@/lib/catalog-revalidate"
 
 type CreateItemPayload = {
   day_no?: number
@@ -31,7 +32,7 @@ export async function GET(
   return NextResponse.json({ success: true, items: data ?? [] })
 }
 
-export async function POST(
+async function postHandler(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
@@ -67,3 +68,6 @@ export async function POST(
   if (error || !data) return bad(error?.message ?? "insert failed")
   return NextResponse.json({ success: true, item: data })
 }
+
+// Saved catalog changes drop the public site cache (lib/catalog-revalidate.ts).
+export const POST = withCatalogRevalidate(postHandler)

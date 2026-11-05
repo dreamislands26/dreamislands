@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { supabaseAdmin } from "@/lib/supabase-server"
+import { supabaseCatalog as supabaseAdmin } from "@/lib/supabase-catalog" // cached public catalog reads
 import { loadReviews } from "../_lib/catalog"
 import { Stars } from "../ds/ui"
 import { JourneyPrompt, ReviewCard, cardStyles as cs } from "../ds/cards"

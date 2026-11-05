@@ -1,6 +1,6 @@
 import Image from "next/image"
 import Link from "@/lib/i18n-link"
-import { supabaseAdmin } from "@/lib/supabase-server"
+import { supabaseCatalog as supabaseAdmin } from "@/lib/supabase-catalog" // cached public catalog reads
 import Brand from "./Brand"
 import { Icon } from "./Icon"
 import { TRACKS } from "../_lib/programMapping"

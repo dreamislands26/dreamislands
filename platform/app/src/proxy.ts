@@ -35,6 +35,7 @@ const PUBLIC_PATHS = [
   "/medical",
   "/sitemap.xml",
   "/saved",
+  "/api/revalidate", // guarded by its own secret header (app/api/revalidate/route.ts)
 ]
 
 const PANEL_HOSTS = new Set(["panel.dreamislands.org"])
@@ -94,6 +95,7 @@ const PANEL_HOST_ALLOWED = [
   "/api/property-requests",
   "/api/upload",
   "/api/intake",
+  "/api/revalidate",
 ]
 
 function pathMatches(pathname: string, allowed: string[]) {
@@ -179,6 +181,15 @@ export async function proxy(request: NextRequest) {
       },
     }
   )
+
+  // Public pages only need the session cookie kept fresh. getClaims() refreshes an expired session exactly
+  // like getUser(), but verifies the JWT locally against the project's ES256 keys (cached in memory) instead
+  // of asking the Auth server in eu-west-1 on every request and prefetch. /login and every protected path
+  // keep the authoritative getUser() check, so a session revoked elsewhere is still caught there.
+  if (isPublic(pathname) && pathname !== "/login") {
+    await supabase.auth.getClaims()
+    return response
+  }
 
   const { data: { user } } = await supabase.auth.getUser()
 
