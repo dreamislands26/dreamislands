@@ -169,6 +169,8 @@
 .fieldLabel { font: 400 0.75rem/1rem var(--ds-font-body); color: var(--ds-on-surface-variant); letter-spacing: 0.1px; }
 .field:focus-within .fieldLabel { color: var(--ds-primary); }
 .fieldInput { font: 400 1rem/1.5rem var(--ds-font-body); color: var(--ds-on-surface); background: none; border: 0; outline: none; padding: 0; width: 100%; }
+/* The field shows focus with its underline; the site-wide :focus-visible ring would draw a square inside it */
+.fieldInput:focus-visible { outline: none; }
 .fieldInput::placeholder { color: var(--ds-on-surface-variant); opacity: 0.7; }
 .fieldError { box-shadow: inset 0 -0.125rem 0 var(--ds-error); border-radius: 0.75rem 0.75rem 0.25rem 0.25rem; }
 .fieldError .fieldLabel { color: var(--ds-error); }
