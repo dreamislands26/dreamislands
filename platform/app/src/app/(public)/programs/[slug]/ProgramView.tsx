@@ -9,6 +9,7 @@ import Gallery from "../../ds/Gallery"
 import SaveButton from "../../ds/SaveButton"
 import ShareButton from "../../ds/ShareButton"
 import BookingPanel from "./BookingPanel"
+import { Icon as Brand } from "../../_components/Icon"
 import MobilePhoto from "../../ds/MobilePhoto"
 import x from "../../ds/sections.module.css"
 import s from "./program.module.css"
@@ -65,10 +66,10 @@ function whatYoullDo(program: ProgramDetail) {
     const key = it.title.toLowerCase().replace(/\s*\(.*\)/, "")
     if (seen.has(key)) continue
     seen.add(key)
-    items.push({ title: it.title, text: shortLine(enOnly(it.description), 90) })
+    items.push({ title: it.title, text: enOnly(it.description) ?? "" })
     if (items.length === 4) break
   }
-  if (items.length === 0 && program.how_we_achieve) items.push({ title: "The method", text: shortLine(enOnly(program.how_we_achieve), 120) })
+  if (items.length === 0 && program.how_we_achieve) items.push({ title: "The method", text: enOnly(program.how_we_achieve) ?? "" })
   return items
 }
 
@@ -226,7 +227,7 @@ export default function ProgramView({
             <p className={s.facts}>
               <Facts items={[avg ? <span key="r" className={s.factRating}>★ {avg.toFixed(1)} ({reviews.length})</span> : "New", placeParts.length ? <span key="pl"><Flag of={primary?.country} /> {placeParts.join(", ")}</span> : null, days ? `${days} days` : null, cohort?.fullName]} />
             </p>
-            <ButtonLink href="#reserve" variant="tonal" size="l" className={s.checkDates}>Check dates</ButtonLink>
+            <ButtonLink href="#reserve" variant="tonal" size="l" trailingIcon="arrow_forward" className={s.checkDates}>Check dates</ButtonLink>
             <div className={s.highlights}>
               <h2 className={s.mobileOnlyTitle}>What to expect</h2>
               {highlights.map((h) => <ListItem key={h.h} icon={h.icon} headline={h.h} supporting={h.t} />)}
@@ -255,6 +256,10 @@ export default function ProgramView({
                 <div className={s.todoList}>
                   {todo.map((t) => <ListItem key={t.title} icon="self_improvement" headline={t.title} supporting={t.text || undefined} />)}
                 </div>
+                <div className={s.ctaRow}>
+                  <ButtonLink href="#reserve" variant="tonal" trailingIcon="arrow_forward">Check dates</ButtonLink>
+                  <ButtonLink href={waHref} variant="tonal" target="_blank" rel="noreferrer" className={s.waBtn}><Brand.wa width={18} height={18} aria-hidden />Message on WhatsApp</ButtonLink>
+                </div>
               </div>
             )}
 
@@ -262,36 +267,13 @@ export default function ProgramView({
               <div>
                 <h2 className={s.h2}>Where you stay</h2>
                 {accommodations.map((a) => (
-                  <ListItem key={a.id} icon={a.has_pool ? "pool" : "bed"} headline={enOnly(a.room_type) ?? a.room_type} supporting={<Facts items={[a.capacity ? `Up to ${a.capacity} ${a.capacity === 1 ? "guest" : "guests"}` : null, shortLine(enOnly(a.description), 48)]} />} />
+                  <ListItem key={a.id} icon={a.has_pool ? "pool" : "bed"} headline={<span className={s.oneLine}>{enOnly(a.room_type) ?? a.room_type}</span>} supporting={<span className={s.roomFacts}><Facts items={[a.capacity ? `Up to ${a.capacity} ${a.capacity === 1 ? "guest" : "guests"}` : null, enOnly(a.description)]} /></span>} trailing={<ButtonLink href="#reserve" variant="tonal" trailingIcon="arrow_forward" aria-label="Check dates" className={s.roomCta}><span className={s.roomCtaText}>Check dates</span></ButtonLink>} />
                 ))}
               </div>
             )}
 
-            {reviews.length > 0 ? (
-              <Ratings reviews={reviews} />
-            ) : (
-              <div>
-                <h2 className={s.h2}><span className={s.desktopInline}>Reviews</span><span className={s.mobileInline}>What guests say</span></h2>
-                <div className={s.newBox}>
-                  <span className={`ds-headline-m ${s.desktopInline}`} style={{ color: "var(--ds-primary)" }}>New</span>
-                  <div>
-                    <p className="ds-title-m" style={{ margin: "0 0 4px" }}>New on Dream Islands</p>
-                    <p className="ds-body-m ds-muted" style={{ margin: 0 }}>Reviews appear after the first guests come back, with how their Wellness Score changed.</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {place?.route && (
-              <div>
-                <h2 className={s.h2}>Getting there</h2>
-                <div className={s.desktopBlock}><Route stops={place.route.stops} /></div>
-                <p className="ds-body-m ds-muted" style={{ margin: "12px 0 0" }}>
-                  <span className={s.mobileInline}>{place.route.stops.map((st) => (st.leg ? `${st.name} → ${st.leg} → ` : st.name)).join("")}. </span>
-                  {place.route.note}
-                </p>
-              </div>
-            )}
+            {/* No reviews yet: no section (the stats already say "New") */}
+            {reviews.length > 0 && <Ratings reviews={reviews} />}
 
             {place?.hosts && (
               <div>
@@ -311,23 +293,10 @@ export default function ProgramView({
                 <div className={s.hostList}>
                   {place.hosts.map((h) => <ListItem key={h.name} icon={h.initials === "DI" ? "support_agent" : "temple_buddhist"} headline={h.name} supporting={`${h.role}. ${h.text}`} />)}
                 </div>
-                <div style={{ marginTop: 16 }}><ButtonLink href={waHref} variant="tonal" target="_blank" rel="noreferrer">Message on WhatsApp</ButtonLink></div>
+                <div style={{ marginTop: 16 }}><ButtonLink href={waHref} variant="tonal" target="_blank" rel="noreferrer" className={s.waBtn}><Brand.wa width={18} height={18} aria-hidden />Message on WhatsApp</ButtonLink></div>
               </div>
             )}
 
-            {(program.target_guest || primary?.country) && (
-              <div>
-                <h2 className={s.h2}>Things to know</h2>
-                <div className={s.known}>
-                  {program.target_guest && <div><h3>Who it&apos;s for</h3><p>{shortLine(enOnly(program.target_guest), 140)}</p></div>}
-                  {primary?.country && <div><h3>Visa and language</h3><p>See the <a href={`/destinations/${countrySlug(primary.country)}`}>{primary.country} guide</a>. Your coordinator checks the rules for your dates.</p></div>}
-                </div>
-                <div className={s.knownList}>
-                  {program.target_guest && <ListItem icon="person" headline="Who it's for" supporting={shortLine(enOnly(program.target_guest), 140)} />}
-                  {primary?.country && <ListItem icon="badge" headline="Visa and language" supporting={`See the ${primary.country} guide. Your coordinator checks the rules for your dates.`} />}
-                </div>
-              </div>
-            )}
           </div>
           <BookingPanel
             programId={program.id}
@@ -340,6 +309,30 @@ export default function ProgramView({
             waHref={waHref}
             supplierPrice={supplierPrice}
           />
+        </div>
+
+        {/* Below the booking: what to know, then how to get there, the last block before the related programmes */}
+        <div className={s.after}>
+            {(program.target_guest || primary?.country) && (
+            <div>
+              <h2 className={s.h2}>Things to know</h2>
+              <div className={s.known}>
+                {program.target_guest && <div className={s.knownCard}><Icon name="info" className={s.knownInfo} /><h3>Who it&apos;s for</h3><p>{shortLine(enOnly(program.target_guest), 140)}</p></div>}
+                {primary?.country && <div className={s.knownCard}><Icon name="info" className={s.knownInfo} /><h3>Visa and language</h3><p>See the <a href={`/destinations/${countrySlug(primary.country)}`}>{primary.country} guide</a>. Your coordinator checks the rules for your dates.</p></div>}
+              </div>
+              <div className={s.knownList}>
+                {program.target_guest && <ListItem icon="person" headline="Who it's for" supporting={shortLine(enOnly(program.target_guest), 140)} />}
+                {primary?.country && <ListItem icon="badge" headline="Visa and language" supporting={`See the ${primary.country} guide. Your coordinator checks the rules for your dates.`} />}
+              </div>
+            </div>
+          )}
+            {place?.route && (
+            <div>
+              <h2 className={s.h2}>Getting there</h2>
+              <Route stops={place.route.stops} />
+              {place.route.note && <p className="ds-body-m ds-muted" style={{ margin: "12px 0 0" }}>{place.route.note}</p>}
+            </div>
+          )}
         </div>
 
         {related.length > 0 && (
@@ -362,6 +355,8 @@ export default function ProgramView({
             <ButtonLink href="/start" variant="tonal" size="l">Take the Wellness Journey</ButtonLink>
           </div>
         </section>
+        {/* Room for the phone's fixed booking bar, at the very end of the page */}
+        <div className={s.barSpacer} aria-hidden />
       </div>
     </>
   )
