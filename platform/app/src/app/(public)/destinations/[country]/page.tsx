@@ -17,6 +17,7 @@ import { dataLayerScript } from "../../_lib/track"
 import { GOALS, dayRange, loadPrograms, loadProperties, money, shortLine, type CatalogProgram, type CatalogProperty } from "../../_lib/catalog"
 import { Badge, ButtonLink, Chip, Facts, Icon, ListItem, SectionHead, SeeAll, UvpPill } from "../../ds/ui"
 import { CountryCard, JourneyPrompt, Photo, PlaceCard, ProgramCard, cardStyles as cs } from "../../ds/cards"
+import Results from "../../ds/Results"
 import x from "../../ds/sections.module.css"
 import { TRACK_ICONS } from "../../_lib/routes"
 
@@ -216,7 +217,8 @@ export default async function DestinationCountryPage({ params, searchParams }: {
           <JourneyPrompt sub="Take your Wellness Journey: 2 minutes, your answer carries over." cta="Take the Wellness Journey" />
         </section>
 
-        {/* Rails per goal */}
+        {/* Rails per goal; a goal chip reloads them */}
+        <Results className={`${x.section} ${cs.rail}`} count={5}>
         {shownRails.map(({ g, list }) => {
           const places = Array.from(new Set(list.map((p) => p.location.split(",")[0]).filter(Boolean))).slice(0, 3)
           return (
@@ -233,6 +235,7 @@ export default async function DestinationCountryPage({ params, searchParams }: {
             </section>
           )
         })}
+        </Results>
 
         {/* Where to go */}
         {placeRows.length > 0 && (
