@@ -4,8 +4,8 @@
 /* The price chip sits on the point */
 .marker { position: relative; display: inline-flex; transform: translate(-50%, -50%); }
 .pin { position: relative; display: inline-flex; align-items: center; height: 1.75rem; padding: 0 0.625rem; border-radius: var(--ds-r-full); background: var(--ds-surface-container-lowest); color: var(--ds-on-surface); box-shadow: var(--ds-elev-2); font: 600 0.8125rem/1 var(--ds-font-body); white-space: nowrap; transition: background-color 0.2s, color 0.2s; }
-/* Selected pin (Figma 214:30302): dark */
-.on .pin { background: var(--ds-inverse-surface); color: var(--ds-inverse-on-surface); }
+/* Selected pin: the brand green */
+.on .pin { background: var(--ds-primary); color: var(--ds-on-primary); }
 
 /* Photos standing on the chip: one per property, a fan when there are several (the cheapest in front).
    Their own marker in a pane under the chips (CatalogMap), anchored at the same point: the bottom edge
@@ -28,15 +28,24 @@
 .folded .thumb:not(:first-child) { opacity: 0; transition: transform 0.4s var(--spring), opacity 0.2s; }
 .photoAt:hover .thumbs { --k: 1.3; }
 .on .thumbs { --k: 1.4; --grow: 1.15; }
-.on .thumb { border-color: var(--ds-inverse-surface); }
+.on .thumb { border-color: var(--ds-primary); }
 @keyframes pop { from { opacity: 0; transform: translateY(0.5rem) scale(0.4); } }
 @media (prefers-reduced-motion: reduce) { .thumb { animation: none; transition: none; } }
 
-/* Card carousel (Figma 214:30519): 348px cards centred, neighbours peek, 8px apart */
+/* Card carousel (Figma 214:30519): 348px cards centred, neighbours peek, 8px apart. The photo sits inside
+   the card, 8px in, its corners 16px (the card's 24 less the inset). The programmes of one place make one
+   long card: no gap, the corners and shadow on the group, 8px between the photos. */
 .cards { --card: min(21.75rem, calc(100vw - 2.625rem)); position: fixed; left: 0; right: 0; bottom: calc(0.75rem + env(safe-area-inset-bottom)); z-index: 60; display: flex; gap: 0.5rem; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding: 0.75rem calc((100vw - var(--card)) / 2) 2rem; margin-bottom: -2rem; overscroll-behavior-x: contain; touch-action: pan-x; transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1); animation: rise 0.28s cubic-bezier(0.2, 0, 0, 1); }
 .cards::-webkit-scrollbar { display: none; }
-.card { flex: none; width: var(--card); scroll-snap-align: center; scroll-snap-stop: always; border-radius: 1.5rem; overflow: hidden; background: var(--ds-surface-bright); box-shadow: var(--ds-elev-4); }
-.photo.photo { height: 11.875rem; border-radius: 0 !important; }
+.card { flex: none; width: var(--card); padding: 0.5rem 0.5rem 0; scroll-snap-align: center; scroll-snap-stop: always; border-radius: 1.5rem; overflow: hidden; background: var(--ds-surface-bright); box-shadow: var(--ds-elev-4); }
+.group { flex: none; display: flex; border-radius: 1.5rem; overflow: hidden; background: var(--ds-surface-bright); box-shadow: var(--ds-elev-4); }
+.group .card { border-radius: 0; box-shadow: none; }
+/* Inner edges of a long card: 4px each side, so the photos are 8px apart like the outer inset */
+.group .card + .card { padding-left: 0.25rem; }
+.group .card:has(+ .card) { padding-right: 0.25rem; }
+/* Which programme of the place this is (photo tag, top left) */
+.count { position: absolute; top: 0.75rem; left: 0.75rem; z-index: 3; height: 1.5rem; padding: 0 0.625rem; display: inline-flex; align-items: center; border-radius: var(--ds-r-full); background: var(--ds-surface-container-lowest); color: var(--ds-on-surface); font: 500 0.75rem/1 var(--ds-font-body); }
+.photo.photo { height: 11.875rem; border-radius: 1rem !important; }
 .grab { position: absolute; left: 0; right: 0; top: 0; height: 2.5rem; z-index: 2; touch-action: none; }
 .handle { position: absolute; top: 0.5rem; left: 50%; width: 2rem; height: 0.25rem; margin-left: -1rem; border-radius: 0.625rem; background: rgba(84, 102, 90, 0.2); }
 .actions { position: absolute; top: 0.75rem; right: 0.75rem; z-index: 3; display: flex; gap: 0.5rem; }
