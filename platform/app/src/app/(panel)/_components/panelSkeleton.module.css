@@ -2,7 +2,7 @@
 .screen { animation: appear 0.2s ease-out 0.15s both; }
 .screen :global(.ant-skeleton) { animation: pulse 1.6s ease-in-out infinite; }
 @keyframes appear { from { opacity: 0; } }
-@keyframes pulse { 50% { opacity: 0.5; } }
+@keyframes pulse { 50% { opacity: 0.65; } }
 @media (prefers-reduced-motion: reduce) {
   .screen, .screen :global(.ant-skeleton) { animation: none; }
 }
