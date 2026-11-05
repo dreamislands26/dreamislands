@@ -28,10 +28,10 @@ const PLACE_ZOOM = 8 // a tapped pin zooms in at least this far
 const REFINE_TIMEOUT_MS = 2500
 const GROUP_KM = 60 // places chained closer than this form one group (an island, a stretch of coast)
 
-/** Pin thumbnail source: our photos go through the image optimiser at 128px (a 40px thumb at 3x). */
+/** Pin thumbnail source: our photos go through the image optimiser at 256px (a 48px thumb at 3x is 144px; 256 is the next size the optimiser makes). */
 function thumbSrc(src: string) {
   try {
-    if (new URL(src).hostname === SUPABASE_HOST) return `/_next/image?url=${encodeURIComponent(src)}&w=128&q=75`
+    if (new URL(src).hostname === SUPABASE_HOST) return `/_next/image?url=${encodeURIComponent(src)}&w=256&q=75`
   } catch {}
   return src
 }
@@ -195,9 +195,9 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
           // its front photo; with no room for that either, the photos hide.
           const n = Number(x.thumbs.dataset.n)
           const cx = (x.chip.l + x.chip.r) / 2
-          const at = (half: number) => ({ l: cx - half, r: cx + half, t: x.chip.t - 40, b: x.chip.t + 6 })
-          const fan = at(22 + (n === 3 ? 18 : n === 2 ? 9 : 0))
-          const one = at(22)
+          const at = (half: number) => ({ l: cx - half, r: cx + half, t: x.chip.t - 42, b: x.chip.t + 6 })
+          const fan = at(26 + (n === 3 ? 22 : n === 2 ? 11 : 0))
+          const one = at(26)
           const keep = x.key === current
           const box = keep || !hits(fan, x.chip) ? fan : !hits(one, x.chip) ? one : null
           x.el.classList.toggle(m.folded, box === one && n > 1)
