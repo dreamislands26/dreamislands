@@ -151,19 +151,30 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
       map = L.map(el.current, { zoomControl: false, attributionControl: true, scrollWheelZoom: false, zoomSnap: 0.25 })
       map.attributionControl.setPrefix(false)
       L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, attribution: "© OpenStreetMap" }).addTo(map)
-      // Price chip with the property photos above it (thumbs: one, or a fan of up to three)
-      const pin = (label: string, photos: string[] = []) => {
-        const thumbs = photos.map((src, i) => `<img class="${m.thumb}" style="--i:${i}" src="${attr(thumbSrc(src))}" alt="" loading="lazy" decoding="async" draggable="false">`).join("")
-        const html = `<span class="${m.marker}">${photos.length ? `<span class="${m.thumbs}" data-n="${photos.length}">${thumbs}</span>` : ""}<span class="${m.pin}">${label}</span></span>`
-        return L.divIcon({ className: m.pinWrap, html, iconSize: undefined })
+      // A pin is two markers on the same point: the price chip, and the property photos standing on it
+      // (one, or a fan of up to three). The photos live in their own pane under the chips, so no photo,
+      // not even a neighbour's, ever covers a price.
+      const photoPane = map.createPane("pinPhotos")
+      photoPane.style.zIndex = "590" // markers are 600
+      const pin = (label: string) => L.divIcon({ className: m.pinWrap, html: `<span class="${m.marker}"><span class="${m.pin}">${label}</span></span>`, iconSize: undefined })
+      const photoIcon = (photos: string[]) => {
+        const imgs = photos.map((src, i) => `<img class="${m.thumb}" style="--i:${i}" src="${attr(thumbSrc(src))}" alt="" loading="lazy" decoding="async" draggable="false">`).join("")
+        return L.divIcon({ className: m.pinWrap, html: `<span class="${m.photoAt}"><span class="${m.thumbs}" data-n="${photos.length}">${imgs}</span></span>`, iconSize: undefined })
       }
-      const markers = new Map<string, import("leaflet").Marker>()
-      type Shown = { mk: import("leaflet").Marker; min: number; key?: string }
+      type Mk = import("leaflet").Marker
+      type Shown = { mk: Mk; ph?: Mk; min: number; key?: string }
+      const markers = new Map<string, Shown>()
       const placeList: Shown[] = []
       const countryList: Shown[] = []
       let current: string | null = null
       // The selected pin is marked by a class, not a new icon, so its photos animate instead of reloading
-      const mark = (key: string, on: boolean) => markers.get(key)?.getElement()?.classList.toggle(m.on, on)
+      const mark = (key: string, on: boolean) => {
+        const x = markers.get(key)
+        for (const mk of [x?.mk, x?.ph]) {
+          mk?.getElement()?.classList.toggle(m.on, on)
+          mk?.setZIndexOffset(on ? 1000 : 0)
+        }
+      }
       // Photos only where they fit: a pin whose photos would cover another pin's price shows just its
       // price. The selected pin keeps its photos, then the cheapest pins go first.
       const declutter = () => {
@@ -172,13 +183,14 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
         const shown = (map.getZoom() >= DETAIL_ZOOM ? placeList : countryList).flatMap((x) => {
           const el = x.mk.getElement()
           const chip = el?.querySelector(`.${m.pin}`)?.getBoundingClientRect()
-          return el && chip ? [{ ...x, el, chip: { l: chip.left, r: chip.right, t: chip.top, b: chip.bottom }, thumbs: el.querySelector<HTMLElement>(`.${m.thumbs}`) }] : []
+          const ph = x.ph?.getElement()
+          return el && chip ? [{ ...x, el: ph, chip: { l: chip.left, r: chip.right, t: chip.top, b: chip.bottom }, thumbs: ph?.querySelector<HTMLElement>(`.${m.thumbs}`) }] : []
         })
         const taken: Box[] = shown.map((x) => x.chip)
         const hits = (a: Box, own: Box) => taken.some((t) => t !== own && a.l < t.r && a.r > t.l && a.t < t.b && a.b > t.t)
         const order = [...shown].sort((a, b) => Number(b.key === current) - Number(a.key === current) || a.min - b.min)
         for (const x of order) {
-          if (!x.thumbs) continue
+          if (!x.thumbs || !x.el) continue
           // Where the photos stand: centred over the chip, wider for a fan. A fan with no room folds into
           // its front photo; with no room for that either, the photos hide.
           const n = Number(x.thumbs.dataset.n)
@@ -195,13 +207,12 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
       }
       const select = (key: string | null, fromCarousel = false) => {
         if (key === current) return
-        if (current) { mark(current, false); markers.get(current)?.setZIndexOffset(0) }
+        if (current) mark(current, false)
         current = key
         declutter()
         const p = key ? points.find((x) => x.key === key) : undefined
         if (p && map) {
           mark(p.key, true)
-          markers.get(p.key)?.setZIndexOffset(1000)
           // A pin tapped from far away zooms in to the place; the carousel keeps the zoom. The pin
           // stays in view above the cards.
           const z = fromCarousel ? map.getZoom() : Math.max(map.getZoom(), PLACE_ZOOM)
@@ -216,25 +227,31 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
         window.dispatchEvent(new CustomEvent(MAP_SELECT, { detail: key }))
       }
       selectRef.current = select
-      const places = L.layerGroup(points.map((p) => {
-        const mk = L.marker(p.at, { icon: pin(p.label, pinPhotos(p.programs)), keyboard: false })
-          .on("click", (e) => { L.DomEvent.stopPropagation(e); select(p.key) })
-          // Leaflet rebuilds the element whenever the layer comes back (zooming past DETAIL_ZOOM)
-          .on("add", () => { if (current === p.key) mark(p.key, true) })
-        markers.set(p.key, mk)
-        placeList.push({ mk, min: p.min, key: p.key })
-        return mk
+      // The chip and, when there are photos, the photos; a tap on either picks the pin
+      const pair = (at: [number, number], label: string, photos: string[], onTap: () => void, onAdd?: () => void) => {
+        const tap = (e: import("leaflet").LeafletMouseEvent) => { L.DomEvent.stopPropagation(e); onTap() }
+        const mk = L.marker(at, { icon: pin(label), keyboard: false }).on("click", tap)
+        const ph = photos.length ? L.marker(at, { icon: photoIcon(photos), keyboard: false, pane: "pinPhotos" }).on("click", tap) : undefined
+        // Leaflet rebuilds the elements whenever the layer comes back (zooming past DETAIL_ZOOM)
+        if (onAdd) for (const x of [mk, ph]) x?.on("add", onAdd)
+        return { mk, ph }
+      }
+      const places = L.layerGroup(points.flatMap((p) => {
+        const { mk, ph } = pair(p.at, p.label, pinPhotos(p.programs), () => select(p.key), () => { if (current === p.key) mark(p.key, true) })
+        const x = { mk, ph, min: p.min, key: p.key }
+        markers.set(p.key, x)
+        placeList.push(x)
+        return ph ? [ph, mk] : [mk]
       }))
       const byCountry = new Map<string, MapPoint[]>()
       for (const p of points) byCountry.set(p.country, [...(byCountry.get(p.country) ?? []), p])
-      const countries = L.layerGroup([...byCountry.values()].map((ps) => {
+      const countries = L.layerGroup([...byCountry.values()].flatMap((ps) => {
         const at: [number, number] = [ps.reduce((a, p) => a + p.at[0], 0) / ps.length, ps.reduce((a, p) => a + p.at[1], 0) / ps.length]
         // The country pin shows its cheapest place: tapping it zooms in and opens that place's card
         const best = ps.reduce((a, b) => (b.min < a.min ? b : a))
-        const mk = L.marker(at, { icon: pin(usd(best.min), pinPhotos(ps.flatMap((p) => p.programs))), keyboard: false })
-          .on("click", (e) => { L.DomEvent.stopPropagation(e); select(best.key) })
-        countryList.push({ mk, min: best.min })
-        return mk
+        const { mk, ph } = pair(at, usd(best.min), pinPhotos(ps.flatMap((p) => p.programs)), () => select(best.key))
+        countryList.push({ mk, ph, min: best.min })
+        return ph ? [ph, mk] : [mk]
       }))
       const sync = () => {
         if (!map) return
