@@ -231,6 +231,16 @@ export function Faq({ items }: { items: { q: string; a: ReactNode }[] }) {
   )
 }
 
+// The way a leg is travelled, from its words ("high-speed rail", "transfer", "speedboat")
+const LEG_ICONS: [RegExp, string][] = [
+  [/rail|train/i, "train"],
+  [/fl(?:y|ight)|plane|air/i, "flight"],
+  [/ferry|boat|catamaran|cruise/i, "directions_boat"],
+  [/bus|coach/i, "directions_bus"],
+  [/walk|hike|trek/i, "directions_walk"],
+  [/transfer|car|drive|taxi|road|van/i, "directions_car"],
+]
+
 export function Route({ stops }: { stops: { name: string; leg?: string }[] }) {
   return (
     <div className={s.route}>
@@ -239,6 +249,7 @@ export function Route({ stops }: { stops: { name: string; leg?: string }[] }) {
           <span className={cx(s.stop, i === stops.length - 1 && s.stopLast)}>{st.name}</span>
           {st.leg && (
             <span className={s.leg}>
+              {LEG_ICONS.find(([re]) => re.test(st.leg!)) && <Icon name={LEG_ICONS.find(([re]) => re.test(st.leg!))![1]} className={s.legMode} />}
               {st.leg}
               <Icon name="arrow_forward" />
             </span>

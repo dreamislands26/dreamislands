@@ -82,6 +82,19 @@ export default function BookingPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [programId])
 
+  // On a phone the panel is hidden (the bottom bar books): the page's other "Check dates" links
+  // (#reserve) open the dialog instead of jumping to nothing
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      const a = (e.target as Element | null)?.closest?.('a[href="#reserve"]')
+      if (!a || !window.matchMedia("(max-width: 767px)").matches) return
+      e.preventDefault()
+      openDialog()
+    }
+    document.addEventListener("click", onClick)
+    return () => document.removeEventListener("click", onClick)
+  }, [openDialog])
+
   const closeFailed = () => {
     setFailed(false)
     router.replace(window.location.pathname, { scroll: false })
@@ -133,7 +146,6 @@ export default function BookingPanel({
       </aside>
 
       {/* CF3 mobile: bottom action bar */}
-      <div className={s.barSpacer} aria-hidden />
       <div className={s.bar}>
         <div className={s.barPrice}>
           <span className={s.barTop}>
