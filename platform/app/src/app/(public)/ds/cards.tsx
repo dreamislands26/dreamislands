@@ -7,7 +7,7 @@ import SaveButton from "./SaveButton"
 import s from "./cards.module.css"
 import Flag from "./Flag"
 
-const SUPABASE_HOST = "xbzrtofanbrahasxbisf.supabase.co"
+export const SUPABASE_HOST = "xbzrtofanbrahasxbisf.supabase.co"
 
 /** Photo with a calm art fallback. Optimised through next/image when the host allows it. */
 export function Photo({ src, alt, className, sizes = "(max-width: 768px) 90vw, 400px", priority, children, style }: { src: string | null | undefined; alt: string; className?: string; sizes?: string; priority?: boolean; children?: ReactNode; style?: React.CSSProperties }) {
