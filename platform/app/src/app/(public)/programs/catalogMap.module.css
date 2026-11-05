@@ -4,8 +4,9 @@
 /* The price chip sits on the point */
 .marker { position: relative; display: inline-flex; transform: translate(-50%, -50%); }
 .pin { position: relative; display: inline-flex; align-items: center; height: 1.75rem; padding: 0 0.625rem; border-radius: var(--ds-r-full); background: var(--ds-surface-container-lowest); color: var(--ds-on-surface); box-shadow: var(--ds-elev-2); font: 600 0.8125rem/1 var(--ds-font-body); white-space: nowrap; transition: background-color 0.2s, color 0.2s; }
-/* Selected pin: the brand green */
-.on .pin { background: var(--ds-primary); color: var(--ds-on-primary); }
+/* Selected pin: neutral near-black (the DS dark surfaces carry a green tint the pin should not have) */
+.pinWrap { --pin-on: #1c1c1e; }
+.on .pin { background: var(--pin-on); color: #fff; }
 
 /* Photos standing on the chip: one per property, a fan when there are several (the cheapest in front).
    Their own marker in a pane under the chips (CatalogMap), anchored at the same point: the bottom edge
@@ -28,7 +29,7 @@
 .folded .thumb:not(:first-child) { opacity: 0; transition: transform 0.4s var(--spring), opacity 0.2s; }
 .photoAt:hover .thumbs { --k: 1.3; }
 .on .thumbs { --k: 1.4; --grow: 1.15; }
-.on .thumb { border-color: var(--ds-primary); }
+.on .thumb { border-color: var(--pin-on); }
 @keyframes pop { from { opacity: 0; transform: translateY(0.5rem) scale(0.4); } }
 @media (prefers-reduced-motion: reduce) { .thumb { animation: none; transition: none; } }
 
