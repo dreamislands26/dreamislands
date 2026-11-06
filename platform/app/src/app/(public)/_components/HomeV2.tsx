@@ -179,7 +179,7 @@ export default async function HomeV2({ programs, tanya, tanyaPhotos, chinaImage,
                   <div className={h.stat}><strong>2009</strong><span>{t("opened")}</span></div>
                   {tanyaMin > 0 && Number.isFinite(tanyaMin) && <div className={h.stat}><strong>{money(tanyaMin)}</strong><span>{t("from, per person")}</span></div>}
                 </div>
-                <div className={h.flagCta}><ButtonLink href="/tanya-samui" variant="tonal" trailingIcon="arrow_forward">{t("Explore Tanya Samui")}</ButtonLink></div>
+                <div className={h.flagCta}><ButtonLink href="/tanya-samui" variant="filled" trailingIcon="arrow_forward">{t("Explore Tanya Samui")}</ButtonLink></div>
               </div>
             </div>
           </section>

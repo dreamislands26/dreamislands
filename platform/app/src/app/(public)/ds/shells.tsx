@@ -215,7 +215,6 @@ export function CountryShell({ country }: { country: string }) {
           </section>
           {[0, 1].map((i) => (
             <section key={i} className={x.section}>
-              <p className={x.overline}><Skeleton className={s.overline} /></p>
               <SectionHead title={<Skeleton className={s.h2} />} />
               <CardsSkeleton className={cs.rail} count={5} />
             </section>

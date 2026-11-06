@@ -220,12 +220,8 @@ export default async function DestinationCountryPage({ params, searchParams }: {
         {/* Rails per goal; a goal chip reloads them */}
         <Results className={`${x.section} ${cs.rail}`} count={5}>
         {shownRails.map(({ g, list }) => {
-          const places = Array.from(new Set(list.map((p) => p.location.split(",")[0]).filter(Boolean))).slice(0, 3)
           return (
             <section key={g.key} className={x.section}>
-              <p className={x.overline}>
-                <Facts items={[list[0].trackFull, `${list.length} ${list.length === 1 ? "programme" : "programmes"}`, places.join(", ")]} />
-              </p>
               <SectionHead title={g.title} action={<SeeAll href={`/programs?track=${g.track}&country=${country}`} count={list.length} />} />
               <div className={cs.rail}>
                 {list.slice(0, 8).map((p, i) => (
@@ -296,7 +292,7 @@ export default async function DestinationCountryPage({ params, searchParams }: {
                   {flagship.s.dMin > 0 && <div className={x.stat}><strong>{flagship.s.dMin === flagship.s.dMax ? flagship.s.dMin : `${flagship.s.dMin}–${flagship.s.dMax}`}</strong><span>days</span></div>}
                   {flagship.s.min > 0 && <div className={x.stat}><strong>{money(flagship.s.min)}</strong><span>from, per person</span></div>}
                 </div>
-                <ButtonLink href={"/properties/" + flagship.p.slug} variant="tonal" trailingIcon="arrow_forward">Explore {flagship.p.name.split(" ")[0]}</ButtonLink>
+                <ButtonLink href={"/properties/" + flagship.p.slug} variant="filled" trailingIcon="arrow_forward" className={x.flagCta}>Explore {flagship.p.name.split(" ")[0]}</ButtonLink>
               </div>
             </div>
           </section>
