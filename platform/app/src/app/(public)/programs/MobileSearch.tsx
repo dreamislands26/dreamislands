@@ -5,7 +5,7 @@
 import { startNavigation } from "@/lib/nav-pending"
 import Link from "@/lib/i18n-link"
 import { useRouter } from "@/lib/i18n-nav"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { BottomSheet } from "../ds/overlay"
 import PriceRange from "../ds/PriceRange"
 import { Button, Chip, Icon, IconButton } from "../ds/ui"
@@ -33,6 +33,10 @@ export default function MobileSearch({ programs, outcomes, countries, bounds, st
   chips: { key: string; label: string; href: string; selected: boolean; icon: string }[]
   trackCohort?: number
 }) {
+  const chipRow = useRef<HTMLDivElement>(null)
+  const picked = chips.filter((c) => c.selected).map((c) => c.key).join(",")
+  // The row starts at its beginning whenever the picked set changes
+  useEffect(() => { chipRow.current?.scrollTo({ left: 0 }) }, [picked])
   const router = useRouter()
   const go = (href: string, opts: { scroll: boolean }) => { startNavigation(href); router.replace(href, opts) }
   const back = useSafeBack("/")
@@ -96,8 +100,9 @@ export default function MobileSearch({ programs, outcomes, countries, bounds, st
           {active && <span className={m.tuneDot} aria-hidden />}
         </span>
       </div>
-      <div className={m.chips}>
-        {chips.map((c) => <Chip key={c.key} icon={c.icon || undefined} selected={c.selected} href={c.href} replace>{c.label}</Chip>)}
+      {/* Picked filters lead the row, so a goal chosen on the home page is in view (Oleg 07.11.2026) */}
+      <div className={m.chips} ref={chipRow}>
+        {[...chips.filter((c) => c.selected), ...chips.filter((c) => !c.selected)].map((c) => <Chip key={c.key} icon={c.icon || undefined} selected={c.selected} href={c.href} replace>{c.label}</Chip>)}
       </div>
       </div>
 
