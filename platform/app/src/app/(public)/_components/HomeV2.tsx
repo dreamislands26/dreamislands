@@ -160,7 +160,7 @@ export default async function HomeV2({ programs, tanya, tanyaPhotos, chinaImage,
         {/* Flagship */}
         {tanya && (
           <section className={x.sectionLoose}>
-            <div className={h.flagship}>
+            <div className={h.flagship} data-card>
               {tanyaPhotos.length >= 3 ? (
                 <div className={h.mosaic}>
                   <Photo src={tanyaPhotos[0]} alt="Tanya Samui" sizes="(max-width: 900px) 100vw, 600px" />

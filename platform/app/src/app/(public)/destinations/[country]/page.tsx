@@ -277,7 +277,7 @@ export default async function DestinationCountryPage({ params, searchParams }: {
         {/* Flagship place */}
         {flagship && (
           <section className={x.sectionLoose}>
-            <div className={x.flagship}>
+            <div className={x.flagship} data-card>
               {collage.length >= 3 ? (
                 <div className={x.collage}>
                   <Photo src={collage[0]} alt={flagship.p.name} sizes="(max-width: 900px) 100vw, 600px" />

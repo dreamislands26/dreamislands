@@ -417,6 +417,7 @@ export default async function AboutPage() {
 
         <div
           className="card about-tanya"
+          data-card
           style={{
             padding: 20,
             marginBottom: 32,

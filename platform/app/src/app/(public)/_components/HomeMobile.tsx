@@ -194,7 +194,7 @@ export default function HomeMobile({ programs, outcomes, properties, reviews }: 
       {/* China: green card with a looping video on top (Figma 197:26223) */}
       {cn.programs > 0 && (
         <section className={m.cn}>
-          <div className={m.cnCard}>
+          <div className={m.cnCard} data-card>
             <HeroVideo src="/video/china-zhangjiajie-mobile.mp4" poster="/video/china-zhangjiajie-mobile.jpg" media="(max-width: 767px)" className={m.cnVideo} />
             <div className={m.cnShade} />
             <div className={m.cnGreen} />
@@ -225,7 +225,7 @@ export default function HomeMobile({ programs, outcomes, properties, reviews }: 
               ))}
             </div>
             <div className={m.cnActions}>
-              <Link href={`/destinations/${countrySlug("China")}`} className={m.cnExplore}>Explore <Icon name="arrow_forward" size={20} /></Link>
+              <Link href={`/destinations/${countrySlug("China")}`} className={m.cnExplore} data-card-primary>Explore <Icon name="arrow_forward" size={20} /></Link>
               <a href={WA} className={m.cnContact} target="_blank" rel="noreferrer">Contact Specialist</a>
             </div>
           </div>
