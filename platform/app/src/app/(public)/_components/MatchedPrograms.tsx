@@ -4,6 +4,7 @@ import Link from "@/lib/i18n-link"
 import { useState, type ReactNode } from "react"
 import { COHORT_LABELS } from "../_lib/programMapping"
 import { Icon } from "./Icon"
+import { BottomSheet } from "../ds/overlay"
 import ProgramImage from "./ProgramImage"
 
 export type MatchedProperty = {
@@ -145,61 +146,10 @@ export default function MatchedPrograms({
           </div>
         </div>
 
-      {reserveTarget && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          onClick={closeReserve}
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 60,
-            background: "rgba(20,32,27,.45)",
-            backdropFilter: "blur(4px)",
-            display: "flex",
-            alignItems: "flex-end",
-            justifyContent: "center",
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: "100%",
-              maxWidth: 520,
-              maxHeight: "92dvh",
-              overflowY: "auto",
-              background: "var(--bg)",
-              borderTopLeftRadius: "var(--r-lg)",
-              borderTopRightRadius: "var(--r-lg)",
-              padding: "24px 22px 32px",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: 16,
-              }}
-            >
-              <div className="eyebrow">Reserve dates</div>
-              <button
-                type="button"
-                onClick={closeReserve}
-                aria-label="Close"
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: "50%",
-                  background: "var(--surface-2)",
-                  display: "grid",
-                  placeItems: "center",
-                  color: "var(--ink)",
-                }}
-              >
-                <Icon.close width={16} height={16} />
-              </button>
-            </div>
+      {/* DS BottomSheet, the site's one sheet head (Oleg 07.11.2026) */}
+      <BottomSheet open={!!reserveTarget} onClose={closeReserve} title="Reserve dates">
+        {reserveTarget && (
+        <div style={{ padding: "0 0.75rem" }}>
             <h3 className="display" style={{ margin: "0 0 12px", fontSize: 26, color: "var(--ink)" }}>
               {reserveTarget.name}
             </h3>
@@ -233,9 +183,9 @@ export default function MatchedPrograms({
               </div>
               <button type="button" className="btn btn-ghost btn-block" onClick={closeReserve}>Cancel</button>
             </form>
-          </div>
         </div>
-      )}
+        )}
+      </BottomSheet>
 
       <style>{`
         @media (min-width: 700px) {

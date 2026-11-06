@@ -42,5 +42,6 @@
   :global(body):has(.mobile) :global(footer) { display: none; }
   /* A selected map pin hides the tab bar while its card is open */
   :global(html[data-map-card]) :global([data-tabbar]) { transform: translateY(130%); }
-  :global([data-tabbar]) { transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1); }
+  /* Keep the tab bar's own spring on padding (collapse on scroll): this rule loads site-wide once the map was visited */
+  :global([data-tabbar]) { transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), padding var(--ds-spring-dur) var(--ds-spring); }
 }

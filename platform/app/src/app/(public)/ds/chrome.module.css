@@ -104,6 +104,9 @@
   /* Minimised, the tabs and the search circle close in toward the centre together (same gap) */
   .tabbarMin { padding-left: 2.25rem; padding-right: 2.25rem; }
   .tabbarSpacer { height: 6.625rem; }
+  /* A page with its own bottom bar (programme, place: price + action) shows no tab bar under it (Oleg 07.11.2026).
+     The spacer stays: it keeps the end of the footer clear of that bar. */
+  :global(.ds-root:has([data-own-bar])) .tabbar { display: none; }
   /* Over the footer the bar fades into the footer colour, and the room under it is footer too */
   .tabbarOnFooter { --tabbar-bg: var(--ds-surface-container-lowest); }
   .tabbarOnFooter .tabsCap { background: var(--ds-surface); } /* the pill keeps its edge on white, like the footer plaque */
