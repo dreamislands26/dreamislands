@@ -142,7 +142,7 @@ export default function MobileSearch({ programs, outcomes, countries, bounds, st
           <section className={m.group}>
             <h3 className="ds-headline-s">Start date</h3>
             <input type="date" value={date} min={new Date().toISOString().slice(0, 10)} onChange={(e) => setDate(e.target.value)} suppressHydrationWarning
-              style={{ width: "100%", height: "3rem", padding: "0 0.875rem", borderRadius: "0.75rem", border: "1px solid var(--ds-outline-variant)", background: "var(--ds-surface)", color: "var(--ds-on-surface)" }} />
+              style={{ display: "block", width: "100%", minWidth: 0, maxWidth: "100%", height: "3rem", padding: "0 0.875rem", borderRadius: "0.75rem", border: "1px solid var(--ds-outline-variant)", background: "var(--ds-surface)", color: "var(--ds-on-surface)" }} />
             {date && (
               <div className={m.wrap} style={{ marginTop: "0.75rem" }}>
                 {[["exact", "Exact date"], ["3", "± 3 days"], ["month", "Anytime that month"]].map(([k, l]) => (
