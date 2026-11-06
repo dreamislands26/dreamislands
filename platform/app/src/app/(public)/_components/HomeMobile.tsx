@@ -153,11 +153,11 @@ export default function HomeMobile({ programs, outcomes, properties, reviews }: 
         </div>
       </section>
 
-      {/* Personal Experience: profile and matched programs (Figma 197:26111, 197:26097) */}
-      <section className={m.section} style={{ gap: "1.25rem" }}>
-        <h2 className="ds-headline-m">Personal Experience</h2>
+      {/* Personal experience: profile and matched programs (Figma 197:26111, 197:26097). The old section title is now the card's kicker (Oleg 07.11.2026) */}
+      <section className={m.section}>
         <div className={m.promise}>
           <div className={m.promiseText}>
+            <p className={m.promiseKicker}>Improve your personal experience</p>
             <h3 className="ds-headline-l">Wellness Profile</h3>
             <p className={m.promiseBody}>Access your wellness statistics in the app. Connect health trackers, take additional surveys.</p>
           </div>
@@ -181,12 +181,13 @@ export default function HomeMobile({ programs, outcomes, properties, reviews }: 
       </section>
 
       {/* Programs: rails follow the first three chips */}
-      <section className={m.intro} style={{ paddingTop: "3rem" }}>
+      {/* The heading belongs to the rails: well clear of the cards above, close to the first rail (Oleg 07.11.2026) */}
+      <section className={m.intro} style={{ paddingTop: "4rem" }}>
         <h2 className="ds-headline-m">Programmes built<br />around real outcomes</h2>
       </section>
-      {rails.map((r) => (
-        <section key={r.label} className={m.section} style={{ paddingTop: "2.25rem" }}>
-          <Head title={r.label} sub={SUB} href={r.href} />
+      {rails.map((r, i) => (
+        <section key={r.label} className={m.section} style={{ paddingTop: i === 0 ? "1.25rem" : "2.25rem" }}>
+          <Head title={r.label} href={r.href} />
           <Rail list={r.list} href={r.href} />
         </section>
       ))}
@@ -264,12 +265,12 @@ export default function HomeMobile({ programs, outcomes, properties, reviews }: 
               </article>
             ))}
           </PullRail>
-          <Link href="/reviews" className={m.textBtn}>Read All Stories</Link>
+          <Link href="/reviews" className={`${m.promiseTonal} ${m.wideBtn}`}>Read All Stories</Link>
         </section>
       )}
 
       {/* Not sure which one fits (Figma 214:30685) */}
-      <section className={m.section} style={{ padding: "3rem 1.5rem 0" }}>
+      <section className={m.section} style={{ paddingTop: "3rem" }}>
         <div className={`${m.promise} ${m.promiseTight}`} style={{ paddingBottom: "2rem" }}>
           <Icon name="spa" className={m.promiseIcon} />
           <h2 className="ds-headline-s">Not sure which one fits? Get matched in 2 minutes.</h2>

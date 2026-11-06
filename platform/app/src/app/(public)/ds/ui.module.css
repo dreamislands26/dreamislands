@@ -33,6 +33,9 @@
 .l { height: 3rem; padding: 0 1.5rem; font: 500 1rem/1.25rem var(--ds-font-body); }
 .text.m, .text.l { padding: 0 0.75rem; }
 .block { width: 100%; }
+/* Phones: every filled/tonal button on a page is the large one, 3rem, like the home page (Oleg 07.11.2026).
+   Text buttons (See All) and the header keep their own size. */
+@media (max-width: 767px) { :global(.ds-main) .m:not(.text) { height: 3rem; font: 500 1rem/1.25rem var(--ds-font-body); } }
 
 .filled { background: var(--ds-primary); color: var(--ds-on-primary); }
 .tonal { background: var(--ds-secondary-container); color: var(--ds-on-secondary-container); }

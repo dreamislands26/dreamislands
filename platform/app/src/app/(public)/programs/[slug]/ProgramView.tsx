@@ -269,7 +269,7 @@ export default function ProgramView({
               <div>
                 <h2 className={s.h2}>Where you stay</h2>
                 {accommodations.map((a) => (
-                  <ListItem key={a.id} icon={a.has_pool ? "pool" : "bed"} headline={<span className={s.oneLine}>{enOnly(a.room_type) ?? a.room_type}</span>} supporting={<span className={s.roomFacts}><Facts items={[a.capacity ? `Up to ${a.capacity} ${a.capacity === 1 ? "guest" : "guests"}` : null, enOnly(a.description)]} /></span>} trailing={<ButtonLink href="#reserve" replace variant="tonal" trailingIcon="arrow_forward" aria-label="Check dates" className={s.roomCta}><span className={s.roomCtaText}>Check dates</span></ButtonLink>} />
+                  <ListItem key={a.id} card icon={a.has_pool ? "pool" : "bed"} headline={<span className={s.oneLine}>{enOnly(a.room_type) ?? a.room_type}</span>} supporting={<span className={s.roomFacts}><Facts items={[a.capacity ? `Up to ${a.capacity} ${a.capacity === 1 ? "guest" : "guests"}` : null, enOnly(a.description)]} /></span>} trailing={<ButtonLink href="#reserve" replace variant="tonal" trailingIcon="arrow_forward" aria-label="Check dates" className={s.roomCta}><span className={s.roomCtaText}>Check dates</span></ButtonLink>} />
                 ))}
               </div>
             )}
@@ -340,7 +340,7 @@ export default function ProgramView({
         {related.length > 0 && (
           <section className={x.sectionLoose}>
             <p className={x.overline}>{primary ? `Same ${primary.island?.toLowerCase().includes("mountain") ? "mountain" : "place"}, other lengths` : "You may also like"}</p>
-            <SectionHead title={primary ? `More at ${(primary.island ?? primary.name).split(" ")[0]}` : "Similar programmes"} action={<SeeAll href={primary ? `/properties/${primary.slug}` : "/programs"} count={related.length} />} />
+            <SectionHead titleClass={s.h2} className={s.relatedHead} title={primary ? `More at ${(primary.island ?? primary.name).split(" ")[0].replace(/[,;:.]+$/, "")}` : "Similar programmes"} action={<SeeAll href={primary ? `/properties/${primary.slug}` : "/programs"} count={related.length} />} />
             <div className={cs.rail}>
               {related.slice(0, 8).map((p) => <ProgramCard key={p.id} program={p} />)}
             </div>

@@ -54,6 +54,7 @@
 /* Buttons: DS pills, hug */
 .ds-root .btn { height: 2.5rem; padding: 0 1.5rem; border-radius: var(--ds-r-full); font: 500 0.875rem/1.125rem var(--ds-font-body); letter-spacing: 0; box-shadow: none; border: 0; }
 .ds-root .btn-lg { height: 3rem; padding: 0 1.5rem; font-size: 1rem; }
+@media (max-width: 767px) { .ds-root .ds-main .btn { height: 3rem; font-size: 1rem; } } /* phones: one button height, as on DS pages */
 .ds-root .btn-primary { background: var(--ds-primary); color: var(--ds-on-primary); box-shadow: none; }
 .ds-root .btn-primary:hover { background: color-mix(in srgb, var(--ds-primary) 92%, white); }
 .ds-root .btn-ghost { background: var(--ds-secondary-container); color: var(--ds-on-secondary-container); border: 0; }

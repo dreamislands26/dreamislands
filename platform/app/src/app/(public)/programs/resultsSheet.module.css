@@ -3,9 +3,9 @@
 /* Full: the sheet meets the search bar edge to edge, no corners and no shadow */
 .sheet[data-snap="full"] { border-radius: 0; box-shadow: none; }
 /* The head sits in the list (out of its side padding) and scrolls with it in the full sheet */
-.head { position: relative; flex: none; margin: 0 -1.5rem; padding: 1.5rem 1.5rem 1rem; touch-action: none; cursor: grab; }
+.head { position: relative; flex: none; margin: 0 calc(-1 * var(--ds-gutter)); padding: 1.5rem var(--ds-gutter) 1rem; touch-action: none; cursor: grab; }
 .sheet[data-snap="full"] .head { touch-action: auto; }
 .handle { position: absolute; top: 0.5rem; left: 50%; width: 2rem; height: 0.25rem; margin-left: -1rem; border-radius: 0.125rem; background: var(--ds-outline-variant); }
-.list { position: relative; flex: 1; min-height: 0; overflow: hidden; overscroll-behavior: contain; padding: 0 1.5rem calc(2rem + env(safe-area-inset-bottom)); }
+.list { position: relative; flex: 1; min-height: 0; overflow: hidden; overscroll-behavior: contain; padding: 0 var(--ds-gutter) calc(2rem + env(safe-area-inset-bottom)); }
 .sheet[data-snap="full"] .list { overflow-y: auto; }
 .sheet[data-away] { transform: translateY(100dvh) !important; }
