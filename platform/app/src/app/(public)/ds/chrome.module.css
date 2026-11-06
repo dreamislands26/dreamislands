@@ -148,7 +148,9 @@
 .mtopActions { display: flex; align-items: center; gap: 0.25rem; }
 .mtopCta { height: 2.25rem !important; padding: 0 0.875rem !important; font-size: 0.8125rem !important; white-space: nowrap; }
 .burger { width: 2.5rem; height: 2.5rem; flex: none; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: var(--ds-on-surface); cursor: pointer; }
-.burger:hover { background: color-mix(in srgb, var(--ds-on-surface) 8%, transparent); }
+/* Hover only where there is a pointer: on iPhone a tap at the same spot (the survey's close button) left a sticky
+   :hover that wiped the photo variant's background (Oleg 07.11.2026) */
+@media (hover: hover) { .burger:not(.burgerPhoto):hover { background: color-mix(in srgb, var(--ds-on-surface) 8%, transparent); } }
 .burgerPhoto { background: rgba(255, 255, 255, 0.8); color: rgba(0, 0, 0, 0.74); width: 2.625rem; height: 2.625rem; }
 .loginPhoto { height: 2.625rem; padding: 0 1rem; background: rgba(255, 255, 255, 0.8); color: rgba(0, 0, 0, 0.74); }
 .sheetScrim { position: fixed; inset: 0; z-index: 90; background: rgba(0, 0, 0, 0.3); animation: menuFade 0.2s ease; }
