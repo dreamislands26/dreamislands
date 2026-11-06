@@ -97,7 +97,7 @@
 .monthSelect :global(.ds-icon) { color: var(--ds-on-surface-variant); }
 .marksRow { display: flex; justify-content: center; }
 /* Choose a departure (BottomSheet, laid out like Filters) */
-.dep { display: flex; flex-direction: column; gap: 1.25rem; padding: 0 0.75rem; }
+.dep { display: flex; flex-direction: column; gap: 1rem; padding: 0 0.75rem; }
 .depGroup { display: flex; flex-direction: column; gap: 0.5rem; min-width: 0; }
 .depGroup h3, .depRow h3 { margin: 0; }
 .depRow { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }

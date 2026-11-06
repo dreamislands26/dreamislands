@@ -52,11 +52,14 @@ export function BottomSheet({ open, onClose, title, footer, tall, wide, back, ch
     document.addEventListener("keydown", onKey)
     // Keyboard users land inside the sheet (it shows no ring itself, see overlay.module.css)
     sheet.current?.focus()
-    // Footer shadow only while there is more content below
+    // Footer shadow only while there is more content below, and not on open: it shows once the body has
+    // been scrolled (Oleg 07.11.2026, the shadow on a just-opened sheet read as a glitch)
     const b = body.current, sh = sheet.current
-    const sync = () => { if (b && sh) sh.dataset.more = b.scrollTop + b.clientHeight < b.scrollHeight - 2 ? "1" : "" }
+    let scrolled = false
+    const sync = () => { if (b && sh) sh.dataset.more = scrolled && b.scrollTop + b.clientHeight < b.scrollHeight - 2 ? "1" : "" }
+    const onScroll = () => { scrolled = true; sync() }
     sync()
-    b?.addEventListener("scroll", sync, { passive: true })
+    b?.addEventListener("scroll", onScroll, { passive: true })
     const ro = typeof ResizeObserver !== "undefined" && b ? new ResizeObserver(sync) : null
     if (ro && b) { ro.observe(b); if (b.firstElementChild) ro.observe(b.firstElementChild) }
     // Swipe down to close (phones): from the head always, from the body only at its top so it still scrolls
@@ -91,7 +94,7 @@ export function BottomSheet({ open, onClose, title, footer, tall, wide, back, ch
     return () => {
       document.body.style.overflow = prev
       document.removeEventListener("keydown", onKey)
-      b?.removeEventListener("scroll", sync)
+      b?.removeEventListener("scroll", onScroll)
       ro?.disconnect()
       sh?.removeEventListener("touchstart", onStart)
       sh?.removeEventListener("touchmove", onMove)

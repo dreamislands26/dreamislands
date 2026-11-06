@@ -100,9 +100,9 @@ export default function MobileSearch({ programs, outcomes, countries, bounds, st
           {active && <span className={m.tuneDot} aria-hidden />}
         </span>
       </div>
-      {/* Picked filters lead the row, so a goal chosen on the home page is in view (Oleg 07.11.2026) */}
+      {/* "All" always first, then the picked filters, so a goal chosen on the home page is in view (Oleg 07.11.2026) */}
       <div className={m.chips} ref={chipRow}>
-        {[...chips.filter((c) => c.selected), ...chips.filter((c) => !c.selected)].map((c) => <Chip key={c.key} icon={c.icon || undefined} selected={c.selected} href={c.href} replace>{c.label}</Chip>)}
+        {[...chips.slice(0, 1), ...chips.slice(1).filter((c) => c.selected), ...chips.slice(1).filter((c) => !c.selected)].map((c) => <Chip key={c.key} icon={c.icon || undefined} selected={c.selected} href={c.href} replace>{c.label}</Chip>)}
       </div>
       </div>
 
