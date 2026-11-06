@@ -357,8 +357,8 @@ export default function ProgramView({
             <ButtonLink href="/start" variant="tonal" size="l">Take the Wellness Journey</ButtonLink>
           </div>
         </section>
-        {/* Room for the phone's fixed booking bar, at the very end of the page */}
-        <div className={s.barSpacer} aria-hidden />
+        {/* Phones: the booking bar settles here as a card at the end of the page (BookingPanel) */}
+        <div className={s.barDock} data-bar-dock />
       </div>
       </div>
     </>

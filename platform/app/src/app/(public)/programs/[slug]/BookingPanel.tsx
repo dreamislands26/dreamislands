@@ -6,7 +6,8 @@
 //  - CF5 analogue: "Your details" step, then Stripe Checkout (production flow)
 //  - CF7: request sent; CF8: payment didn't go through (?booking=cancelled)
 // Payloads to /api/bookings/public are unchanged from production.
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import { useSearchParams } from "next/navigation"
 import { useRouter } from "@/lib/i18n-nav"
 import { getAttribution, getGaClientId, getSessionId, track } from "../../_lib/track"
@@ -69,6 +70,20 @@ export default function BookingPanel({
   const slot = slots.find((x) => x.start === start) ?? slots[0]
   const [pax, setPax] = useState(1)
   const [open, setOpen] = useState(false)
+  // Phones: at the end of the page the fixed bar turns into a card before the footer (Oleg 07.11.2026).
+  // The card lives in ProgramView's [data-bar-dock]; once its top reaches the bar's top the bar steps away.
+  const barRef = useRef<HTMLDivElement>(null)
+  const [dock, setDock] = useState<HTMLElement | null>(null)
+  const [docked, setDocked] = useState(false)
+  useEffect(() => {
+    const el = document.querySelector<HTMLElement>("[data-bar-dock]")
+    setDock(el)
+    if (!el) return
+    const h = barRef.current?.offsetHeight ?? 100
+    const io = new IntersectionObserver(([e]) => setDocked(e.isIntersecting || e.boundingClientRect.top < 0), { rootMargin: `0px 0px -${h}px 0px` })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
   const [failed, setFailed] = useState(params.get("booking") === "cancelled")
   const price = v?.price_basic_usd ?? 0
   const fmtSup = (n: number) => `${supplierPrice!.currency} ${Math.round(n).toLocaleString("en-US")}`
@@ -102,6 +117,19 @@ export default function BookingPanel({
 
   const cta = (withDates: boolean) => (priced ? `Reserve${withDates && slot ? ` ${slot.title}` : ""}` : `Request${withDates && slot ? ` ${slot.title}` : " dates"}`)
 
+  const barBody = (
+    <>
+      <div className={s.barPrice}>
+        <span className={s.barTop}>
+          <strong>{sup ? `from ${sup}` : price > 0 ? usd(price) : "On request"}</strong>
+          <span className="ds-sep" />
+          <span>{days} days</span>
+        </span>
+        <span className={s.barSub}><Facts items={[slot?.title, priced ? `${usd(deposit)} deposit` : "no payment now"]} /></span>
+      </div>
+      <Button variant="filled" size="l" onClick={openDialog}>{priced ? "Reserve" : "Request"}</Button>
+    </>
+  )
   return (
     <>
       {/* CF3 desktop: pill + Reserve card · Departures */}
@@ -145,18 +173,11 @@ export default function BookingPanel({
         </div>
       </aside>
 
-      {/* CF3 mobile: bottom action bar */}
-      <div className={s.bar} data-own-bar>
-        <div className={s.barPrice}>
-          <span className={s.barTop}>
-            <strong>{sup ? `from ${sup}` : price > 0 ? usd(price) : "On request"}</strong>
-            <span className="ds-sep" />
-            <span>{days} days</span>
-          </span>
-          <span className={s.barSub}><Facts items={[slot?.title, priced ? `${usd(deposit)} deposit` : "no payment now"]} /></span>
-        </div>
-        <Button variant="filled" size="l" onClick={openDialog}>{priced ? "Reserve" : "Request"}</Button>
+      {/* CF3 mobile: bottom action bar; at the end of the page it becomes the card in [data-bar-dock] */}
+      <div ref={barRef} className={cx(s.bar, docked && s.barDocked)} data-own-bar="program" aria-hidden={docked || undefined}>
+        {barBody}
       </div>
+      {dock && createPortal(<div className={s.barCard}>{barBody}</div>, dock)}
 
       <BookingDialog
         open={open}

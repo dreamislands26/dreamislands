@@ -128,7 +128,7 @@
 .trip { border-radius: var(--ds-r-xl-plus); background: var(--ds-surface-container-high); padding: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; }
 
 /* Mobile-only pieces hidden on desktop */
-.bar, .barSpacer { display: none; }
+.bar, .barSpacer, .barDock { display: none; }
 
 @media (max-width: 1023px) {
   .body { grid-template-columns: 1fr; gap: 2.5rem; }
@@ -177,6 +177,10 @@
   /* Bottom action bar (CF3 mobile) */
   /* No spacer here: the tab bar spacer after the footer already keeps the end of the page clear of this bar */
   .bar { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; position: fixed; left: 0; right: 0; bottom: 0; z-index: 56; padding: 1rem var(--ds-gutter) calc(1.75rem + env(safe-area-inset-bottom)); border-radius: 2.25rem 2.25rem 0 0; background: var(--ds-surface-container-high); }
+  .bar { transition: transform 0.28s cubic-bezier(0.2, 0, 0, 1), opacity 0.2s ease; }
+  .barDocked { transform: translateY(100%); opacity: 0; pointer-events: none; }
+  .barDock { display: block; margin-top: -2rem; padding-bottom: 2rem; } /* 1rem under the last card (its section ends with 3rem) */
+  .barCard { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 1rem 1rem 1rem 1.25rem; border-radius: var(--ds-r-xl-plus); background: var(--ds-surface-container-high); }
   .barPrice { display: flex; flex-direction: column; min-width: 0; }
   .barTop { display: flex; align-items: baseline; font: 400 0.875rem/1.25rem var(--ds-font-body); color: var(--ds-on-surface-variant); }
   .barTop strong { font: 600 1.125rem/1.5rem var(--ds-font-body); color: var(--ds-on-surface); }
