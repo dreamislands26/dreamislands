@@ -265,6 +265,9 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 }
 
 html:has(.ds-root), body:has(.ds-root) { background: var(--ds-surface); color: var(--ds-on-surface); }
+/* Phones: no rubber-band past the ends of the page. Pulling past the footer showed a band of page colour under
+   the white footer (iOS Safari, Oleg 07.11.2026). Sheets and rails already contain their own overscroll. */
+@media (max-width: 767px) { html:has(.ds-root), body:has(.ds-root) { overscroll-behavior-y: none; } }
 
 /* Cookie banner: a popup, so it gets elevation */
 .ds-consent {
