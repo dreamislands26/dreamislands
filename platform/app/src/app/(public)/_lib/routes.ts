@@ -10,7 +10,7 @@ export type Route = { key: string; label: string; icon: string; goal?: string; t
 export const GOAL_ICONS: Record<string, string> = {
   "restore-sleep": "bedtime",
   "boost-energy": "bolt",
-  "metabolic-health": "monitor_weight",
+  "metabolic-health": "dit_apple",
   "mental-clarity": "psychology",
   "stress-anxiety": "self_improvement",
   "rebuild-your-body": "fitness_center",

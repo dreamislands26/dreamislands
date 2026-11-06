@@ -24,6 +24,9 @@ export const ICON_NAMES = [
   "view_agenda", "visibility", "weekend", "weight", "width",
 ]
 
+/** Glyphs Material Symbols lacks, drawn as SVG on its 24 grid (ds/ui.tsx CUSTOM_ICONS). Not in the font. */
+export const CUSTOM_ICON_NAMES = ["dit_apple"]
+
 const AXES = "opsz,wght,FILL,GRAD@20..48,300,0..1,0"
 
 /** Stylesheet URL. Google wants the names sorted and comma-separated. */
