@@ -187,6 +187,9 @@
 
 /* Material Symbols Rounded, Light (300). The glyph box is square so round
    containers never stretch into ovals. */
+/* Whole-card taps (ds/CardClick.tsx): the card itself reads as pressable. */
+[data-card] { cursor: pointer; }
+
 .ds-icon {
   font-family: var(--ds-font-icon);
   font-weight: 300;

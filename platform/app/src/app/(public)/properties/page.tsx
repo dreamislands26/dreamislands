@@ -138,7 +138,7 @@ export default async function PropertiesPage() {
 
             <div style={{ display: "grid", gap: 20 }}>
               {group.items.map((prop) => (
-                <div key={prop.id} className="card" style={{ overflow: "hidden" }}>
+                <div key={prop.id} className="card" style={{ overflow: "hidden" }} data-card>
                   {prop.image_url && (
                     <div style={{ position: "relative", width: "100%", aspectRatio: "16 / 7" }}>
                       <Image

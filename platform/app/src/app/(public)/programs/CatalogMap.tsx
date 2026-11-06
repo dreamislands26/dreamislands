@@ -458,9 +458,9 @@ function PlaceCards({ cards, selected, jump, onPlace, onClose }: { cards: Card[]
       {groups.map((g) => (
         <div key={g[0].key} className={m.group}>
         {g.map((p, i) => (
-        <article key={p.id} className={m.card} data-preview-title={p.name} data-preview-place={p.place.join(", ")} data-preview-price={p.price}>
+        <article key={p.id} className={m.card} data-card data-preview-title={p.name} data-preview-place={p.place.join(", ")} data-preview-price={p.price}>
           <Photo src={p.image} alt={p.name} className={m.photo} sizes="100vw">
-            <div className={m.grab} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
+            <div className={m.grab} data-card-skip onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
               <span className={m.handle} aria-hidden />
             </div>
             {g.length > 1 ? <span className={m.count}>{i + 1} of {g.length}</span> : null}
