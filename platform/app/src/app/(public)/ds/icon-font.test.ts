@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync, statSync } from "node:fs"
 import path from "node:path"
 import { describe, expect, it } from "vitest"
-import { ICON_FONT_HREF, ICON_NAMES } from "./icon-font"
+import { CUSTOM_ICON_NAMES, ICON_FONT_HREF, ICON_NAMES } from "./icon-font"
 
 // The icon font is a subset (ds/icon-font.ts). A name used in code but missing from ICON_NAMES would show
 // as plain text instead of an icon, so this scans the public site for icon names written as literals.
@@ -42,7 +42,7 @@ function usedNames(): Set<string> {
 
 describe("icon font subset", () => {
   it("contains every icon name the public site uses", () => {
-    const listed = new Set(ICON_NAMES)
+    const listed = new Set([...ICON_NAMES, ...CUSTOM_ICON_NAMES])
     const missing = [...usedNames()].filter((n) => !listed.has(n)).sort()
     expect(missing).toEqual([])
   })

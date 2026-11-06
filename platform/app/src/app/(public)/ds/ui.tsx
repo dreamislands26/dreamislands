@@ -5,7 +5,19 @@ import s from "./ui.module.css"
 const cx = (...c: (string | false | null | undefined)[]) => c.filter(Boolean).join(" ")
 
 /** Material Symbols Rounded glyph (Light 300). */
+/** Glyphs Material Symbols lacks, drawn on its 24 grid to match Rounded Light (names in icon-font.ts). */
+const CUSTOM_ICONS: Record<string, ReactNode> = {
+  dit_apple: (
+    <>
+      <path d="M12 7.6C10.2 6.4 7.6 6.6 6 8.2C4.4 9.8 4.2 12.6 4.9 15C5.7 17.8 7.6 20.5 9.7 20.5C10.8 20.5 11.3 20.2 12 20.2C12.7 20.2 13.2 20.5 14.3 20.5C16.4 20.5 18.3 17.8 19.1 15C19.8 12.6 19.6 9.8 18 8.2C16.4 6.6 13.8 6.4 12 7.6Z" />
+      <path d="M12 7.6C12 5.9 11.5 4.6 10.6 3.7" />
+      <path d="M12.7 5.9C13 4.1 14.5 3 16.7 3.1C16.5 5 14.9 6.1 12.7 5.9Z" />
+    </>
+  ),
+}
+
 export function Icon({ name, size, fill, className, label }: { name: string; size?: number; fill?: boolean; className?: string; label?: string }) {
+  const custom = CUSTOM_ICONS[name]
   return (
     <span
       className={cx("ds-icon", className)}
@@ -15,7 +27,9 @@ export function Icon({ name, size, fill, className, label }: { name: string; siz
       aria-label={label}
       role={label ? "img" : undefined}
     >
-      {name}
+      {custom ? (
+        <svg viewBox="0.6 1.6 22.8 22.8" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round">{custom}</svg>
+      ) : name}
     </span>
   )
 }

@@ -62,10 +62,10 @@
 /* Track tiles: two rows that scroll together */
 .tiles { display: grid; grid-template-rows: repeat(2, 10.25rem); grid-auto-flow: column; grid-auto-columns: 15rem; gap: 0.5rem; overflow-x: auto; scrollbar-width: none; margin-right: -0.75rem; padding-right: 0.75rem; }
 .tiles::-webkit-scrollbar { display: none; }
-.tile { position: relative; width: 15rem; height: 10.25rem; flex: none; border-radius: 1.25rem; background: #c9e7d6; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; text-decoration: none; color: var(--ds-on-surface); overflow: hidden; }
+.tile { position: relative; width: 15rem; height: 10.25rem; flex: none; border-radius: 1.25rem; background: oklch(91% 0.04 var(--tile-h, 160)); padding: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; text-decoration: none; color: var(--ds-on-surface); overflow: hidden; }
 .tileTitle { width: 9.5625rem; font: 700 1.125rem/1.2 var(--ds-font-display); }
 .tileHook { width: 8.125rem; font: 400 0.875rem/1.25rem var(--ds-font-body); color: var(--ds-on-surface-variant); }
-.tileIcon { position: absolute; top: 0.6875rem; right: 0.625rem; font-size: 4.3125rem !important; font-weight: 300; color: var(--ds-primary); }
+.tileIcon { position: absolute; top: 0.6rem; right: 0.6rem; font-size: 4.6rem; color: oklch(52% 0.09 var(--tile-h, 160)); }
 .tileGo { position: absolute; right: 1.1875rem; bottom: 1rem; height: 2.125rem; padding: 0.5rem 1rem; border-radius: var(--ds-r-full); background: var(--ds-surface); color: var(--ds-on-surface); display: inline-flex; align-items: center; }
 .tileGo svg { width: 0.875rem; height: 0.9375rem; }
 

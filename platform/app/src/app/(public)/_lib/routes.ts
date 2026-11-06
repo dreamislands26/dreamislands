@@ -10,7 +10,7 @@ export type Route = { key: string; label: string; icon: string; goal?: string; t
 export const GOAL_ICONS: Record<string, string> = {
   "restore-sleep": "bedtime",
   "boost-energy": "bolt",
-  "metabolic-health": "monitor_weight",
+  "metabolic-health": "dit_apple",
   "mental-clarity": "psychology",
   "stress-anxiety": "self_improvement",
   "rebuild-your-body": "fitness_center",
@@ -19,6 +19,18 @@ export const GOAL_ICONS: Record<string, string> = {
 // Kept in programMapping (no server imports) so client components can use it too
 export { TRACK_ICONS }
 export const goalIcon = (slug: string) => GOAL_ICONS[slug] ?? "spa"
+/** Home goal tiles: one hue per goal (OKLCH), same lightness and chroma for all, so they read as one palette.
+ *  Mint (160) is the brand tile colour; the rest are spread round the wheel so neighbours differ. */
+export const GOAL_HUES: Record<string, number> = {
+  "rebuild-your-body": 25, // coral
+  "metabolic-health": 60, // peach
+  "boost-energy": 95, // sand
+  "healthy-ageing": 130, // sage
+  "stress-anxiety": 160, // mint
+  "mental-clarity": 225, // sky
+  "restore-sleep": 285, // lavender
+}
+export const goalHue = (slug: string) => GOAL_HUES[slug] ?? 160
 
 /** Home order: design trio first, then the remaining live goals. */
 export function homeRoutes(outcomes: Outcome[], programs: CatalogProgram[]): Route[] {
