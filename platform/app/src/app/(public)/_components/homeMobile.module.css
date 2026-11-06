@@ -89,6 +89,7 @@
 .promiseTight { gap: 1rem; }
 .promiseIcon.promiseIcon { font-size: 2rem; color: var(--ds-primary); font-variation-settings: "wght" 300; }
 .promiseText { display: flex; flex-direction: column; gap: 0.5rem; }
+.promiseKicker { margin: 0; font: 500 1rem/1.25rem var(--ds-font-body); color: var(--ds-primary); }
 .promiseAccent { color: #26c568; }
 .promiseBody { font: 400 1rem/1.5rem var(--ds-font-body); color: rgba(28, 38, 42, 0.9); }
 .promiseActions { display: flex; flex-direction: column; gap: 0.75rem; }

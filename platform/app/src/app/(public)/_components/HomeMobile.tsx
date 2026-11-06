@@ -153,11 +153,11 @@ export default function HomeMobile({ programs, outcomes, properties, reviews }: 
         </div>
       </section>
 
-      {/* Personal Experience: profile and matched programs (Figma 197:26111, 197:26097) */}
-      <section className={m.section} style={{ gap: "1.25rem" }}>
-        <h2 className="ds-headline-m">Personal Experience</h2>
+      {/* Personal experience: profile and matched programs (Figma 197:26111, 197:26097). The old section title is now the card's kicker (Oleg 07.11.2026) */}
+      <section className={m.section}>
         <div className={m.promise}>
           <div className={m.promiseText}>
+            <p className={m.promiseKicker}>Improve your personal experience</p>
             <h3 className="ds-headline-l">Wellness Profile</h3>
             <p className={m.promiseBody}>Access your wellness statistics in the app. Connect health trackers, take additional surveys.</p>
           </div>
