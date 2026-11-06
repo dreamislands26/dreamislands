@@ -177,8 +177,14 @@
   /* Bottom action bar (CF3 mobile) */
   /* No spacer here: the tab bar spacer after the footer already keeps the end of the page clear of this bar */
   .bar { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; position: fixed; left: 0; right: 0; bottom: 0; z-index: 56; padding: 1rem var(--ds-gutter) calc(1.75rem + env(safe-area-inset-bottom)); border-radius: 2.25rem 2.25rem 0 0; background: var(--ds-surface-container-high); }
-  .bar { transition: transform 0.28s cubic-bezier(0.2, 0, 0, 1), opacity 0.2s ease; }
-  .barDocked { transform: translateY(100%); opacity: 0; pointer-events: none; }
+  /* Morph into the end card (--p 0..1 from BookingPanel): side insets, all corners round, card padding */
+  .bar {
+    left: calc(var(--ds-gutter) * var(--p, 0)); right: calc(var(--ds-gutter) * var(--p, 0));
+    border-radius: 2.25rem 2.25rem calc(var(--ds-r-xl-plus) * var(--p, 0)) calc(var(--ds-r-xl-plus) * var(--p, 0));
+    padding: 1rem calc(var(--ds-gutter) + (1rem - var(--ds-gutter)) * var(--p, 0)) calc((1.75rem + env(safe-area-inset-bottom)) * (1 - var(--p, 0)) + 1rem * var(--p, 0)) calc(var(--ds-gutter) + (1.25rem - var(--ds-gutter)) * var(--p, 0));
+  }
+  .barDocked { visibility: hidden; pointer-events: none; }
+  .barCardWaiting { visibility: hidden; }
   .barDock { display: block; margin-top: -2rem; padding-bottom: 2rem; } /* 1rem under the last card (its section ends with 3rem) */
   .barCard { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 1rem 1rem 1rem 1.25rem; border-radius: var(--ds-r-xl-plus); background: var(--ds-surface-container-high); }
   .barPrice { display: flex; flex-direction: column; min-width: 0; }

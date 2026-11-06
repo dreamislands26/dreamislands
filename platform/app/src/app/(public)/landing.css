@@ -763,5 +763,3 @@ h1, h2 { font-family: var(--font-display); font-weight: 400; letter-spacing: -.0
 /* Pages with their own price bar (programme, place): the same 16px above that bar */
 @media (max-width: 767px) { .ds-root:has([data-own-bar]) .fab-support { bottom: calc(6.65rem + env(safe-area-inset-bottom)); } }
 @media (max-width: 767px) { .ds-root:has([data-own-bar="action"]) .fab-support { bottom: calc(7.05rem + env(safe-area-inset-bottom)); } } /* the place bar is a little taller */
-/* Programme bar docked into the page (end of page): the button returns to the screen edge */
-@media (max-width: 767px) { .fab-support { transition: transform 0.2s ease, bottom 0.28s cubic-bezier(0.2, 0, 0, 1); } .ds-root:has([data-own-bar="program"][aria-hidden]) .fab-support { bottom: calc(1rem + env(safe-area-inset-bottom)); } }

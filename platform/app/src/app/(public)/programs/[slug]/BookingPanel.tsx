@@ -70,8 +70,9 @@ export default function BookingPanel({
   const slot = slots.find((x) => x.start === start) ?? slots[0]
   const [pax, setPax] = useState(1)
   const [open, setOpen] = useState(false)
-  // Phones: at the end of the page the fixed bar turns into a card before the footer (Oleg 07.11.2026).
-  // The card lives in ProgramView's [data-bar-dock]; once its top reaches the bar's top the bar steps away.
+  // Phones: at the end of the page the fixed bar morphs into the card before the footer (Oleg 07.11.2026).
+  // While the card ([data-bar-dock] in ProgramView) rises into view, --p goes 0..1 and the bar takes the card's
+  // shape (insets, corners, padding); when the card is fully on screen the bar sits exactly on it and hands over.
   const barRef = useRef<HTMLDivElement>(null)
   const [dock, setDock] = useState<HTMLElement | null>(null)
   const [docked, setDocked] = useState(false)
@@ -79,11 +80,22 @@ export default function BookingPanel({
     const el = document.querySelector<HTMLElement>("[data-bar-dock]")
     setDock(el)
     if (!el) return
-    const h = barRef.current?.offsetHeight ?? 100
-    const io = new IntersectionObserver(([e]) => setDocked(e.isIntersecting || e.boundingClientRect.top < 0), { rootMargin: `0px 0px -${h}px 0px` })
-    io.observe(el)
-    return () => io.disconnect()
-  }, [])
+    let raf = 0
+    const update = () => {
+      raf = 0
+      const bar = barRef.current, card = el.firstElementChild as HTMLElement | null
+      if (!bar || !card) return
+      const r = card.getBoundingClientRect(), vh = window.innerHeight
+      const p = Math.min(1, Math.max(0, (vh - r.top) / r.height))
+      bar.style.setProperty("--p", String(p))
+      setDocked(r.bottom <= vh)
+    }
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update) }
+    update()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    window.addEventListener("resize", onScroll)
+    return () => { window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); if (raf) cancelAnimationFrame(raf) }
+  }, [dock])
   const [failed, setFailed] = useState(params.get("booking") === "cancelled")
   const price = v?.price_basic_usd ?? 0
   const fmtSup = (n: number) => `${supplierPrice!.currency} ${Math.round(n).toLocaleString("en-US")}`
@@ -177,7 +189,7 @@ export default function BookingPanel({
       <div ref={barRef} className={cx(s.bar, docked && s.barDocked)} data-own-bar="program" aria-hidden={docked || undefined}>
         {barBody}
       </div>
-      {dock && createPortal(<div className={s.barCard}>{barBody}</div>, dock)}
+      {dock && createPortal(<div className={cx(s.barCard, !docked && s.barCardWaiting)}>{barBody}</div>, dock)}
 
       <BookingDialog
         open={open}
