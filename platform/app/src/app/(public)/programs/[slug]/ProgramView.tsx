@@ -200,6 +200,8 @@ export default function ProgramView({
   return (
     <>
       {/* Mobile photo with buttons over it */}
+      {/* Clips the content sheet while it unfolds past the screen edges (ds-unfold) */}
+      <div className="ds-unfold">
       <MobilePhoto images={images} title={program.name} fallback={primary ? `/properties/${primary.slug}` : "/programs"} save={saveItem} />
 
       <div className={`ds-container-narrow ${s.page}`}>
@@ -357,6 +359,7 @@ export default function ProgramView({
         </section>
         {/* Room for the phone's fixed booking bar, at the very end of the page */}
         <div className={s.barSpacer} aria-hidden />
+      </div>
       </div>
     </>
   )

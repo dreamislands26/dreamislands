@@ -165,6 +165,8 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
       ))}
       <script dangerouslySetInnerHTML={{ __html: dataLayerScript("view_property", { property_id: property.id, property_name: property.name, country: property.country, destination_country: property.country }) }} />
 
+      {/* Clips the content sheet while it unfolds past the screen edges (ds-unfold) */}
+      <div className="ds-unfold">
       <MobilePhoto images={images} title={name} fallback={property.country ? `/destinations/${countrySlug(property.country)}` : "/destinations"} save={{ kind: "place", id: property.id, title: name, href: `/properties/${property.slug}`, image: property.image_url ?? null, meta: [property.island, property.country].filter(Boolean).join(", ") }} />
 
       <div className={`ds-container-narrow ${p.page}`}>
@@ -396,6 +398,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
             </div>
           </div>
         </section>
+      </div>
       </div>
       {programs.length > 0 && (
         <BottomActionBar price={minPrice ? `from ${money(minPrice)}` : `${programs.length} programmes`} sub={<Facts items={[`${programs.length} ${programs.length === 1 ? "programme" : "programmes"}`, dayRange(dMin, dMax)]} />}>

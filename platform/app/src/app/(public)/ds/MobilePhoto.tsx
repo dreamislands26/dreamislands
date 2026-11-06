@@ -1,6 +1,6 @@
 "use client"
-// CF3/CF2 mobile: full-bleed photo with back / share / save over it and a "1 / N" counter.
-import { useState } from "react"
+// CF3/CF2 mobile: full-bleed photo under the site header, back / share / save over it and a "1 / N" counter.
+import { useEffect, useRef, useState } from "react"
 import { useSafeBack } from "./navHistory"
 import { Photo } from "./cards"
 import { Dialog } from "./overlay"
@@ -14,6 +14,29 @@ export default function MobilePhoto({ images, title, fallback, save }: { images:
   const [i, setI] = useState(0)
   const list = useSaved()
   const saved = save ? isSaved(list, save.kind, save.id) : false
+  const box = useRef<HTMLDivElement>(null)
+
+  // How far the page's content sheet has risen over the photo towards the header, 0..1, as --photo-p on
+  // the root: the sheet's corners unfold with it (program.module.css, place.module.css), like the home hero.
+  useEffect(() => {
+    const photo = box.current
+    if (!photo) return
+    const root = document.documentElement
+    const update = () => {
+      // The sheet overlaps the photo by 1.75rem and meets the header after scrolling the rest of it
+      const overlap = 1.75 * parseFloat(getComputedStyle(root).fontSize)
+      const range = photo.offsetHeight - overlap
+      root.style.setProperty("--photo-p", range > 0 ? String(Math.min(1, Math.max(0, window.scrollY / range))) : "0")
+    }
+    update()
+    window.addEventListener("scroll", update, { passive: true })
+    window.addEventListener("resize", update)
+    return () => {
+      window.removeEventListener("scroll", update)
+      window.removeEventListener("resize", update)
+      root.style.removeProperty("--photo-p")
+    }
+  }, [])
 
   async function share() {
     try {
@@ -25,7 +48,7 @@ export default function MobilePhoto({ images, title, fallback, save }: { images:
   }
 
   return (
-    <div className={s.mPhoto}>
+    <div ref={box} className={s.mPhoto}>
       <div
         className={s.mPhotoTrack}
         onScroll={(e) => {
