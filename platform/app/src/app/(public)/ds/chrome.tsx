@@ -204,7 +204,7 @@ export function TopAppBar() {
 const FOCUS = /^\/start(\/|$)/
 
 /** Routes that draw their own mobile top bar (photo-first detail pages). */
-const OWN_MOBILE_BAR = [/^\/programs$/, /^\/programs\/[^/]+$/, /^\/properties\/[^/]+$/, /^\/destinations\/[^/]+\/medical$/, /^\/start/]
+const OWN_MOBILE_BAR = [/^\/programs$/, /^\/properties\/clinique-la-prairie-phuket$/, /^\/destinations\/[^/]+\/medical$/, /^\/start/]
 
 export function MobileTopBar() {
   const pathname = useShownPath(usePathname())

@@ -187,6 +187,10 @@
 
 /* Material Symbols Rounded, Light (300). The glyph box is square so round
    containers never stretch into ovals. */
+/* Detail pages on a phone: the content sheet widens past the screen edges as it unfolds under the header
+   (ds/MobilePhoto); clip it here, html/body overflow does not stop sideways panning on iOS. */
+@media (max-width: 767px) { .ds-unfold { overflow-x: clip; } }
+
 /* Whole-card taps (ds/CardClick.tsx): the card itself reads as pressable. */
 [data-card] { cursor: pointer; }
 

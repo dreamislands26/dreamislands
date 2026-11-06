@@ -41,7 +41,10 @@
 /* CF2 mobile (91:1280): photo above, sheet with centred title and stats */
 @media (max-width: 767px) {
   .desktopOnly, .crumb, .titleActions, .facts, .highlights, .cta, .intro { display: none !important; }
-  .page.page { position: relative; margin-top: -1.75rem; padding: 1.5rem 1.5rem 0; border-radius: 2.25rem 2.25rem 0 0; background: var(--ds-surface); }
+  /* The sheet over the photo unfolds as it rises under the header, as the home hero does (Oleg 06.11.2026):
+     --photo-p (0..1, ds/MobilePhoto) grows the corner radius from 36 to 148px while the sheet widens past
+     both screen edges by radius x p, so the arc flattens and slides out of view. */
+  .page.page { --sheet-r: calc(2.25rem + 7rem * var(--photo-p, 0)); --sheet-out: calc(var(--sheet-r) * var(--photo-p, 0)); position: relative; width: auto; margin-top: -1.75rem; margin-left: calc(-1 * var(--sheet-out)); margin-right: calc(-1 * var(--sheet-out)); padding: 1.5rem calc(1.5rem + var(--sheet-out)) 0; border-radius: var(--sheet-r) var(--sheet-r) 0 0; background: var(--ds-surface); }
   .top { display: block; padding-top: 0; }
   .summary { gap: 2rem; }
   .titleRow { justify-content: center; text-align: center; }
