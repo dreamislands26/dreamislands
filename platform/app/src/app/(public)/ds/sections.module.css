@@ -76,6 +76,7 @@
 .stat span { font: 400 0.75rem/1rem var(--ds-font-body); color: var(--ds-on-surface-variant); }
 @media (max-width: 900px) {
   .flagship { grid-template-columns: 1fr; gap: 1.5rem; }
+  .flagCta { width: 100%; }
 }
 
 /* Two-column list */

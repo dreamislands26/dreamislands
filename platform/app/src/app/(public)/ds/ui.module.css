@@ -148,7 +148,8 @@
 .seeAllCount { color: var(--ds-secondary); opacity: 0.8; }
 
 /* Section head: title left, See all right */
-.sectionHead { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; }
+.sectionHead { display: flex; align-items: flex-end; align-items: last baseline; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; }
+.sectionHead > .seeAll { margin-right: -0.75rem; } /* the pill padding, so the text lines up with the content edge */
 .sectionHead h2 { margin: 0; }
 .sectionSub { margin: 0.375rem 0 0; color: var(--ds-on-surface-variant); }
 
