@@ -35,6 +35,7 @@ const PUBLIC_PATHS = [
   "/medical",
   "/sitemap.xml",
   "/saved",
+  "/support",
   "/api/revalidate", // guarded by its own secret header (app/api/revalidate/route.ts)
 ]
 
@@ -72,6 +73,7 @@ const PUBLIC_HOST_ALLOWED = [
   "/medical",
   "/sitemap.xml",
   "/saved",
+  "/support",
 ]
 
 const PANEL_HOST_ALLOWED = [

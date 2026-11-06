@@ -229,11 +229,12 @@ export function Stars({ value = 5 }: { value?: number }) {
 
 export { cx }
 
-export function Faq({ items }: { items: { q: string; a: ReactNode }[] }) {
+/** Questions that unfold. `openId` opens the item with that `id` (support centre: a tapped question card). */
+export function Faq({ items, openId }: { items: { q: string; a: ReactNode; id?: string }[]; openId?: string }) {
   return (
     <div className={s.faq}>
       {items.map((it) => (
-        <details key={it.q} className={s.faqItem}>
+        <details key={it.q} id={it.id ? `faq-${it.id}` : undefined} open={!!it.id && it.id === openId} className={s.faqItem}>
           <summary>
             {it.q}
             <Icon name="expand_more" />

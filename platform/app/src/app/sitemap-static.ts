@@ -5,6 +5,7 @@ export const STATIC_ROUTES: Array<{ path: string; changefreq: "weekly" | "monthl
   { path: "/programs", changefreq: "weekly", priority: 0.9 },
   { path: "/properties", changefreq: "weekly", priority: 0.9 },
   { path: "/reviews", changefreq: "monthly", priority: 0.7 },
+  { path: "/support", changefreq: "monthly", priority: 0.5 },
   { path: "/about", changefreq: "monthly", priority: 0.6 },
   { path: "/partners", changefreq: "monthly", priority: 0.6 },
   { path: "/for-properties", changefreq: "monthly", priority: 0.8 },

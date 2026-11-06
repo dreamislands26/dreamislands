@@ -60,8 +60,9 @@ export const overlayStyles = s
 
 /** Bottom sheet (Figma "Bottom sheet", fixed DS pattern): top corners 36, handle, centred title, close
  *  12px from the edges, scrolling body, sticky footer whose shadow shows only while content runs under
- *  it. Swipe down on the head, tap the scrim or press Escape to close. */
-export function BottomSheet({ open, onClose, title, footer, children }: { open: boolean; onClose: () => void; title: ReactNode; footer?: ReactNode; children: ReactNode }) {
+ *  it. Swipe down on the head, tap the scrim or press Escape to close. `tall` keeps it at full height
+ *  whatever the content (support chat). */
+export function BottomSheet({ open, onClose, title, footer, tall, children }: { open: boolean; onClose: () => void; title: ReactNode; footer?: ReactNode; tall?: boolean; children: ReactNode }) {
   const sheet = useRef<HTMLDivElement>(null)
   const body = useRef<HTMLDivElement>(null)
   const mounted = useSyncExternalStore(noopSubscribe, () => true, () => false)
@@ -104,7 +105,7 @@ export function BottomSheet({ open, onClose, title, footer, children }: { open: 
   if (!open || !mounted) return null
   return createPortal(
     <div className={s.sheetScrim} onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div ref={sheet} role="dialog" aria-modal="true" aria-label={typeof title === "string" ? title : undefined} className={s.bs}>
+      <div ref={sheet} role="dialog" aria-modal="true" aria-label={typeof title === "string" ? title : undefined} className={cx(s.bs, tall && s.bsTall)}>
         <div className={s.bsHead} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
           <span className={s.bsHandle} aria-hidden />
           <h2 className={cx("ds-headline-s", s.bsTitle)}>{title}</h2>

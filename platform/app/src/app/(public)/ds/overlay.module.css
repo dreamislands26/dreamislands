@@ -98,10 +98,12 @@
 .bsClose { position: absolute !important; top: 0.75rem; right: 0.75rem; }
 /* Vertical only: overflow-y alone makes x `auto` too, and iOS then lets the whole sheet body slide sideways
    under a diagonal swipe. Horizontal chip rows inside scroll on their own. */
+.bsTall { height: calc(100dvh - 6.5rem); }
 .bsBody { flex: 1; min-height: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; overscroll-behavior-x: none; padding: 0 0.75rem 1.5rem; }
 .bsFoot { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 3rem; padding: 0.75rem 1.5rem calc(0.75rem + env(safe-area-inset-bottom)) 0.75rem; background: var(--ds-surface); transition: box-shadow 0.2s ease; }
 .bs[data-more="1"] .bsFoot { box-shadow: 0 -1rem 1rem -1rem rgba(23, 40, 30, 0.2), 0 -0.25rem 1rem rgba(23, 40, 30, 0.08); }
 @media (min-width: 768px) {
   .sheetScrim { align-items: center; justify-content: center; padding: 1.5rem; }
-  .bs { max-width: 35rem; max-height: calc(100dvh - 3rem); border-radius: var(--ds-r-xl-plus); animation: rise 0.22s cubic-bezier(0.2, 0, 0, 1); }
+  .bsTall { height: min(46rem, calc(100dvh - 3rem)); }
+  .bs { overflow: hidden; max-width: 35rem; max-height: calc(100dvh - 3rem); border-radius: var(--ds-r-xl-plus); animation: rise 0.22s cubic-bezier(0.2, 0, 0, 1); }
 }

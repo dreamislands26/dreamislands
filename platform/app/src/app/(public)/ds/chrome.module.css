@@ -166,6 +166,12 @@
 }
 
 /* Footer social links */
+/* Footer plaque → /support */
+.supportCard { display: flex; align-items: center; gap: 0.75rem; max-width: 22.5rem; margin-top: 0.5rem; padding: 0.75rem 1rem 0.75rem 0.75rem; border-radius: var(--ds-r-xl); background: var(--ds-surface); color: var(--ds-on-surface); text-decoration: none; }
+.supportCard:hover { background: var(--ds-surface-dim); }
+.supportCard > :global(.ds-icon) { color: var(--ds-on-surface-variant); }
+.supportIcon { width: 2.75rem; height: 2.75rem; flex: none; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--ds-primary-container); color: var(--ds-on-primary-container); }
+.supportText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.125rem; }
 .footerSocial { display: flex; gap: 0.5rem; margin-top: 0.25rem; }
 .footerSocialLink { width: 2.5rem; height: 2.5rem; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: var(--ds-on-surface-variant); text-decoration: none; }
 .footerSocialLink:hover { color: var(--ds-on-surface); background: color-mix(in srgb, var(--ds-on-surface) 8%, transparent); }

@@ -325,6 +325,14 @@ export function Footer() {
               {t("The wellness intelligence and travel platform for Asia. Baseline first. Match intelligently. Measure what changed.")}
             </p>
             <SocialLinks />
+            <Link href="/support" className={s.supportCard}>
+              <span className={s.supportIcon}><Icon name="support_agent" /></span>
+              <span className={s.supportText}>
+                <span className="ds-title-m">{t("Support centre")}</span>
+                <span className="ds-body-s ds-muted">{t("FAQ and chat with a coordinator")}</span>
+              </span>
+              <Icon name="arrow_forward" />
+            </Link>
           </div>
           <div className={s.footerCol}>
             <h3>{t("Explore")}</h3>
