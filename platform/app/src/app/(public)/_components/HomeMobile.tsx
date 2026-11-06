@@ -1,5 +1,5 @@
 // S1 · Главная · Mobile (Figma 150:24912, revision 18.10.2026). Own layout, not a squeezed desktop.
-import { goalIcon, homeRoutes, routeHref, routeMatch } from "../_lib/routes"
+import { goalHue, goalIcon, homeRoutes, routeHref, routeMatch } from "../_lib/routes"
 import Link from "@/lib/i18n-link"
 import { COUNTRIES, countrySlug } from "../_lib/countries"
 import { outcomeLabel, type CatalogProgram, type CatalogProperty, type GuestReview, type Outcome } from "../_lib/catalog"
@@ -142,7 +142,7 @@ export default function HomeMobile({ programs, outcomes, properties, reviews }: 
         <h2 className="ds-headline-m">What do you want to change?</h2>
         <div className={m.tiles}>
           {goals.map((g) => (
-            <Link key={g.slug} href={`/programs?goal=${g.slug}`} className={m.tile}>
+            <Link key={g.slug} href={`/programs?goal=${g.slug}`} className={m.tile} style={{ "--tile-h": goalHue(g.slug) } as React.CSSProperties}>
               <span className={m.tileTitle}>{outcomeLabel(g)}</span>
               <span className={m.tileHook}>{g.hook}</span>
               <Icon name={goalIcon(g.slug)} className={m.tileIcon} />
