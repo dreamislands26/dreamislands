@@ -340,7 +340,7 @@ export default function ProgramView({
         {related.length > 0 && (
           <section className={x.sectionLoose}>
             <p className={x.overline}>{primary ? `Same ${primary.island?.toLowerCase().includes("mountain") ? "mountain" : "place"}, other lengths` : "You may also like"}</p>
-            <SectionHead titleClass={s.h2} className={s.relatedHead} title={primary ? `More at ${(primary.island ?? primary.name).split(" ")[0].replace(/[,;:.]+$/, "")}` : "Similar programmes"} action={<SeeAll href={primary ? `/properties/${primary.slug}` : "/programs"} count={related.length} />} />
+            <SectionHead titleClass={s.h2} className={s.relatedHead} title={primary ? `More at ${(primary.island ?? primary.name).split(",")[0].trim()}` : "Similar programmes"} action={<SeeAll href={primary ? `/properties/${primary.slug}` : "/programs"} count={related.length} />} />
             <div className={cs.rail}>
               {related.slice(0, 8).map((p) => <ProgramCard key={p.id} program={p} />)}
             </div>

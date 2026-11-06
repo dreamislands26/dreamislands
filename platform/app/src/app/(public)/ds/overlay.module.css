@@ -107,3 +107,7 @@
   .bsTall { height: min(46rem, calc(100dvh - 3rem)); }
   .bs { overflow: hidden; max-width: 35rem; max-height: calc(100dvh - 3rem); border-radius: var(--ds-r-xl-plus); animation: rise 0.22s cubic-bezier(0.2, 0, 0, 1); }
 }
+
+/* The dialog takes focus on open only so keyboard users land inside it; it never shows a ring itself
+   (Safari drew a blue outline round the sheet after a tap, Oleg 07.11.2026). Controls inside keep theirs. */
+.dialog:focus, .bs:focus { outline: none; }

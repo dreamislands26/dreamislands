@@ -17,9 +17,43 @@ export function Dialog({ open, onClose, title, wide, children, labelledBy = "ds-
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose()
     document.addEventListener("keydown", onKey)
     ref.current?.focus()
+    // Phones: swipe the sheet down to close (Oleg 07.11.2026). From the handle or head it always drags;
+    // from the body only once the content is scrolled to the top, so scrolling inside still works.
+    const el = ref.current
+    let startY: number | null = null, dy = 0, dragging = false
+    const onStart = (e: TouchEvent) => {
+      if (!el || window.innerWidth >= 768) return
+      startY = e.touches[0].clientY; dy = 0
+      dragging = !!(e.target as Element).closest(`.${s.handle}, .${s.head}`) || el.scrollTop <= 0
+    }
+    const onMove = (e: TouchEvent) => {
+      if (!el || startY === null || !dragging) return
+      const d = e.touches[0].clientY - startY
+      if (d <= 0) { if (dy > 0) { dy = 0; el.style.transform = "" } return }
+      if (e.cancelable) e.preventDefault()
+      dy = d
+      el.style.transition = "none"
+      el.style.transform = `translateY(${d}px)`
+    }
+    const onEnd = () => {
+      if (!el || startY === null) return
+      startY = null
+      el.style.transition = "transform 0.2s cubic-bezier(0.2, 0, 0, 1)"
+      if (dy > 90) { el.style.transform = "translateY(100%)"; window.setTimeout(onClose, 180) }
+      else el.style.transform = ""
+      dy = 0
+    }
+    el?.addEventListener("touchstart", onStart, { passive: true })
+    el?.addEventListener("touchmove", onMove, { passive: false })
+    el?.addEventListener("touchend", onEnd)
+    el?.addEventListener("touchcancel", onEnd)
     return () => {
       document.body.style.overflow = prev
       document.removeEventListener("keydown", onKey)
+      el?.removeEventListener("touchstart", onStart)
+      el?.removeEventListener("touchmove", onMove)
+      el?.removeEventListener("touchend", onEnd)
+      el?.removeEventListener("touchcancel", onEnd)
     }
   }, [open, onClose, mounted])
   if (!open || !mounted) return null
