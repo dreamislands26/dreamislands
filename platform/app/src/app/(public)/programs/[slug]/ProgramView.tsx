@@ -227,7 +227,7 @@ export default function ProgramView({
             <p className={s.facts}>
               <Facts items={[avg ? <span key="r" className={s.factRating}>★ {avg.toFixed(1)} ({reviews.length})</span> : "New", placeParts.length ? <span key="pl"><Flag of={primary?.country} /> {placeParts.join(", ")}</span> : null, days ? `${days} days` : null, cohort?.fullName]} />
             </p>
-            <ButtonLink href="#reserve" variant="tonal" size="l" trailingIcon="arrow_forward" className={s.checkDates}>Check dates</ButtonLink>
+            <ButtonLink href="#reserve" replace variant="tonal" size="l" trailingIcon="arrow_forward" className={s.checkDates}>Check dates</ButtonLink>
             <div className={s.highlights}>
               <h2 className={s.mobileOnlyTitle}>What to expect</h2>
               {highlights.map((h) => <ListItem key={h.h} icon={h.icon} headline={h.h} supporting={h.t} />)}
@@ -257,7 +257,7 @@ export default function ProgramView({
                   {todo.map((t) => <ListItem key={t.title} icon="self_improvement" headline={t.title} supporting={t.text || undefined} />)}
                 </div>
                 <div className={s.ctaRow}>
-                  <ButtonLink href="#reserve" variant="tonal" trailingIcon="arrow_forward">Check dates</ButtonLink>
+                  <ButtonLink href="#reserve" replace variant="tonal" trailingIcon="arrow_forward">Check dates</ButtonLink>
                   <ButtonLink href={waHref} variant="tonal" target="_blank" rel="noreferrer" className={s.waBtn}><Brand.wa width={18} height={18} aria-hidden />Message on WhatsApp</ButtonLink>
                 </div>
               </div>
@@ -267,7 +267,7 @@ export default function ProgramView({
               <div>
                 <h2 className={s.h2}>Where you stay</h2>
                 {accommodations.map((a) => (
-                  <ListItem key={a.id} icon={a.has_pool ? "pool" : "bed"} headline={<span className={s.oneLine}>{enOnly(a.room_type) ?? a.room_type}</span>} supporting={<span className={s.roomFacts}><Facts items={[a.capacity ? `Up to ${a.capacity} ${a.capacity === 1 ? "guest" : "guests"}` : null, enOnly(a.description)]} /></span>} trailing={<ButtonLink href="#reserve" variant="tonal" trailingIcon="arrow_forward" aria-label="Check dates" className={s.roomCta}><span className={s.roomCtaText}>Check dates</span></ButtonLink>} />
+                  <ListItem key={a.id} icon={a.has_pool ? "pool" : "bed"} headline={<span className={s.oneLine}>{enOnly(a.room_type) ?? a.room_type}</span>} supporting={<span className={s.roomFacts}><Facts items={[a.capacity ? `Up to ${a.capacity} ${a.capacity === 1 ? "guest" : "guests"}` : null, enOnly(a.description)]} /></span>} trailing={<ButtonLink href="#reserve" replace variant="tonal" trailingIcon="arrow_forward" aria-label="Check dates" className={s.roomCta}><span className={s.roomCtaText}>Check dates</span></ButtonLink>} />
                 ))}
               </div>
             )}
