@@ -760,3 +760,6 @@ h1, h2 { font-family: var(--font-display); font-weight: 400; letter-spacing: -.0
 @media (min-width: 900px) { .fab-support { bottom: 92px; right: 24px; } }
 /* Phones: sit above the tab bar, 16px clear of it (same as the side gap) */
 @media (max-width: 767px) { .fab-support { bottom: calc(5.55rem + env(safe-area-inset-bottom)); } }
+/* Pages with their own price bar (programme, place): the same 16px above that bar */
+@media (max-width: 767px) { .ds-root:has([data-own-bar]) .fab-support { bottom: calc(6.65rem + env(safe-area-inset-bottom)); } }
+@media (max-width: 767px) { .ds-root:has([data-own-bar="action"]) .fab-support { bottom: calc(7.05rem + env(safe-area-inset-bottom)); } } /* the place bar is a little taller */

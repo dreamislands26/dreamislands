@@ -101,7 +101,11 @@
 .depGroup { display: flex; flex-direction: column; gap: 0.5rem; min-width: 0; }
 .depGroup h3, .depRow h3 { margin: 0; }
 .depRow { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
-.depRow .monthSelect { gap: 0.25rem; }
+/* Month picker: a 3rem tap target, text still on the content edge (Oleg 07.11.2026) */
+.depRow .monthSelect { gap: 0.25rem; height: 3rem; padding: 0 0.5rem 0 0.75rem; margin-right: -0.5rem; border-radius: var(--ds-r-full); cursor: pointer; }
+.depRow .monthSelect select { inset: 0; height: 100%; -webkit-appearance: none; appearance: none; }
+.depRow .monthSelect:active { background: color-mix(in srgb, var(--ds-on-surface) 8%, transparent); }
+.depRow .monthSelect :global(.ds-icon) { color: var(--ds-on-surface); }
 .depGo { flex: 1; }
 /* Rows are white on the sheet, like the chips in Filters; the picked one stays green */
 .dep [role="radio"][aria-checked="false"] { background: var(--ds-surface-container-lowest); }

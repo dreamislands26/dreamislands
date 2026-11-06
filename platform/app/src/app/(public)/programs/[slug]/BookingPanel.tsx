@@ -416,7 +416,7 @@ function BookingDialog(props: {
                   {months.map((k) => <option key={k} value={k}>{monthLabel(k)}</option>)}
                 </select>
                 <span className="ds-title-s">{monthLabel(months.includes(month) ? month : months[0])}</span>
-                <Icon name="expand_more" size={16} />
+                <Icon name="expand_more" size={24} />
               </label>
             ) : null}
           </div>

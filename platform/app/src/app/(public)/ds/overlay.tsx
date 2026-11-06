@@ -21,7 +21,7 @@ export function BottomActionBar({ price, sub, children }: { price: ReactNode; su
   return (
     <>
       <div className={s.actionBarSpacer} aria-hidden />
-      <div className={s.actionBar} data-own-bar>
+      <div className={s.actionBar} data-own-bar="action">
         <div className={s.actionPrice}>
           <strong>{price}</strong>
           {sub && <span>{sub}</span>}
