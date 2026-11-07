@@ -90,9 +90,9 @@
 .note { font: 400 0.75rem/1rem var(--ds-font-body); color: var(--ds-on-surface-variant); letter-spacing: 0.1px; margin: 0; }
 .error { font: 400 0.875rem/1.25rem var(--ds-font-body); color: var(--ds-error); margin: 0; }
 
-/* Bottom sheet (Figma "Bottom sheet") */
+/* Bottom sheet (Figma "Bottom sheet"). Up to 2.5rem under the top of the screen, over the site header, so more fits (Oleg 07.11.2026) */
 .sheetScrim { position: fixed; inset: 0; z-index: 95; background: rgba(0, 0, 0, 0.3); display: flex; align-items: flex-end; animation: fade 0.18s ease; }
-.bs { position: relative; width: 100%; max-height: calc(100dvh - 6.5rem); display: flex; flex-direction: column; border-radius: var(--ds-r-xl-plus) var(--ds-r-xl-plus) 0 0; background: var(--ds-surface); color: var(--ds-on-surface); box-shadow: var(--ds-elev-3); animation: sheet 0.28s cubic-bezier(0.2, 0, 0, 1); transition: transform 0.2s ease; }
+.bs { position: relative; width: 100%; max-height: calc(100dvh - 2.5rem - env(safe-area-inset-top)); display: flex; flex-direction: column; border-radius: var(--ds-r-xl-plus) var(--ds-r-xl-plus) 0 0; background: var(--ds-surface); color: var(--ds-on-surface); box-shadow: var(--ds-elev-3); animation: sheet 0.28s cubic-bezier(0.2, 0, 0, 1); transition: transform 0.2s ease; }
 .bsHead { position: relative; flex: none; padding: 1.5rem 3.5rem 1.5rem; text-align: center; touch-action: none; }
 .bsHandle { position: absolute; top: 0.5rem; left: 50%; width: 2rem; height: 0.25rem; margin-left: -1rem; border-radius: 0.125rem; background: var(--ds-outline-variant); }
 .bsTitle { margin: 0; }
@@ -102,7 +102,7 @@
 .stack { display: flex; flex-direction: column; gap: 1rem; padding: 0 0.75rem; }
 /* Vertical only: overflow-y alone makes x `auto` too, and iOS then lets the whole sheet body slide sideways
    under a diagonal swipe. Horizontal chip rows inside scroll on their own. */
-.bsTall { height: calc(100dvh - 6.5rem); }
+.bsTall { height: calc(100dvh - 2.5rem - env(safe-area-inset-top)); }
 .bsBody { flex: 1; min-height: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; overscroll-behavior-x: none; padding: 0 0.75rem 1.5rem; }
 .bsFoot { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 3rem; padding: 0.75rem 1.5rem calc(0.75rem + env(safe-area-inset-bottom)) 0.75rem; background: var(--ds-surface); transition: box-shadow 0.2s ease; }
 .bs[data-more="1"] .bsFoot { box-shadow: 0 -1rem 1rem -1rem rgba(23, 40, 30, 0.2), 0 -0.25rem 1rem rgba(23, 40, 30, 0.08); }
