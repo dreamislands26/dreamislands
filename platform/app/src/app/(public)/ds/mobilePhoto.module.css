@@ -20,7 +20,9 @@
   .mPhoto { transition: height 0.35s cubic-bezier(0.2, 0, 0, 1); }
   :global(html[data-photo-full]) .mPhoto { height: calc(100dvh - 3.5rem - env(safe-area-inset-top) + 1.75rem); }
   :global(html[data-photo-full]) { overflow: hidden; }
-  :global(html[data-photo-full]) .mDots { bottom: calc(1.75rem + 6.25rem + env(safe-area-inset-bottom)); }
+  /* Dots: fixed like the floating bar, so they keep 1rem above it whatever the browser's viewport units say
+     (the bar is 5rem tall, 0.75rem above the bottom) */
+  :global(html[data-photo-full]) .mDots { position: fixed; bottom: calc(var(--ds-gutter) + 5rem + 1rem + env(safe-area-inset-bottom)); }
   :global(html[data-photo-full] .fab-support) { display: none; }
   :global(html[data-photo-full] [data-own-bar="action"]) {
     left: var(--ds-gutter); right: var(--ds-gutter); bottom: calc(var(--ds-gutter) + env(safe-area-inset-bottom));
