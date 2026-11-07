@@ -30,3 +30,21 @@ export function monthLabel(key: string) {
   const [y, m] = key.split("-").map(Number)
   return fmt(new Date(Date.UTC(y, m - 1, 1)), { month: "long", year: "numeric" })
 }
+
+// Arrival is free (Oleg 07.11.2026): any day from a week ahead, up to about half a year out
+export const LEAD_DAYS = 7
+export const AHEAD_DAYS = 182
+const addDays = (d: Date, n: number) => new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + n))
+export function arrivalWindow(from = new Date()) {
+  const first = addDays(from, LEAD_DAYS)
+  return { earliest: iso(first), latest: iso(addDays(first, AHEAD_DAYS)) }
+}
+
+/** The stay from `start` for `days` days (both ends counted), in the same shape as a weekly slot */
+export function stayFor(start: string, days: number): Slot {
+  const s = new Date(`${start}T00:00:00Z`)
+  const e = addDays(s, Math.max(days, 1) - 1)
+  const sameMonth = s.getUTCMonth() === e.getUTCMonth()
+  const title = `${fmt(s, { month: "short", day: "numeric" })} to ${sameMonth ? fmt(e, { day: "numeric" }) : fmt(e, { month: "short", day: "numeric" })}`
+  return { start, end: iso(e), title, weekdays: `${fmt(s, { weekday: "short" })} to ${fmt(e, { weekday: "short" })}`, monthKey: start.slice(0, 7), dayLabel: fmt(s, { weekday: "short", month: "short", day: "numeric" }) }
+}

@@ -14,7 +14,7 @@ import { getAttribution, getGaClientId, getSessionId, track } from "../../_lib/t
 import { Badge, Button, Chip, Facts, Icon, IconButton, Radio, TextField, cx } from "../../ds/ui"
 import { BottomSheet, Dialog, overlayStyles as o } from "../../ds/overlay"
 import { PaymentMarks } from "../../ds/payment"
-import { slotsFor, type Slot } from "./departures"
+import { arrivalWindow, stayFor, type Slot } from "./departures"
 import RangeCalendar from "../../ds/RangeCalendar"
 import s from "./program.module.css"
 
@@ -70,9 +70,12 @@ export default function BookingPanel({
   const [variantId, setVariantId] = useState(variants[0]?.id ?? "")
   const v = variants.find((x) => x.id === variantId) ?? variants[0]
   const days = v?.duration_days ?? 1
-  const slots = useMemo(() => slotsFor(days), [days])
-  const [start, setStart] = useState<string>(slots[0]?.start ?? "")
-  const slot = slots.find((x) => x.start === start) ?? slots[0]
+  // Arrival is free (calendar in the sheet); by default the first possible day and the shortest length
+  const window_ = useMemo(() => arrivalWindow(), [])
+  const [start, setStart] = useState<string>(window_.earliest)
+  const slot = useMemo(() => stayFor(start, days), [start, days])
+  // The reserve card (desktop) offers the next three weekly arrivals from the picked one's weekday
+  const slots = useMemo(() => [0, 7, 14].map((n) => { const d = new Date(`${window_.earliest}T00:00:00Z`); d.setUTCDate(d.getUTCDate() + n); return stayFor(d.toISOString().slice(0, 10), days) }), [window_, days])
   const [pax, setPax] = useState(1)
   const [open, setOpen] = useState(false)
   // Phones: at the end of the page the fixed bar morphs into the card before the footer (Oleg 07.11.2026).
@@ -210,9 +213,9 @@ export default function BookingPanel({
         variants={variants}
         variantId={variantId}
         onVariant={setVariantId}
-        slots={slots}
+        window={window_}
         slot={slot}
-        onSlot={setStart}
+        onStay={(a, n) => { setStart(a); const hit = variants.find((x) => x.duration_days === n); if (hit) setVariantId(hit.id) }}
         pax={pax}
         setPax={setPax}
         priceUsd={price}
@@ -288,6 +291,12 @@ function RoomPicker({ rooms, room, onRoom }: { rooms: PanelRoom[]; room: PanelRo
   )
 }
 
+/** "6, 8 or 11" */
+function listLengths(ns: number[]) {
+  const u = [...new Set(ns)].sort((a, b) => a - b)
+  return u.length < 2 ? String(u[0] ?? "") : `${u.slice(0, -1).join(", ")} or ${u[u.length - 1]}`
+}
+
 function Stepper({ pax, setPax }: { pax: number; setPax: React.Dispatch<React.SetStateAction<number>> }) {
   return (
     <div className={o.stepper}>
@@ -309,9 +318,9 @@ function BookingDialog(props: {
   variants: PanelVariant[]
   variantId: string
   onVariant: (id: string) => void
-  slots: Slot[]
+  window: { earliest: string; latest: string }
   slot?: Slot
-  onSlot: (start: string) => void
+  onStay: (arrival: string, days: number) => void
   pax: number
   setPax: React.Dispatch<React.SetStateAction<number>>
   priceUsd: number
@@ -321,7 +330,7 @@ function BookingDialog(props: {
   roomId: string
   onRoom: (id: string) => void
 }) {
-  const { open, onClose, mobile, programId, programName, placeLine, priced, variants, variantId, onVariant, slots, slot, onSlot, pax, setPax, priceUsd, meta, waHref, rooms, roomId, onRoom } = props
+  const { open, onClose, mobile, programId, programName, placeLine, priced, variants, variantId, window: win, slot, onStay, pax, setPax, priceUsd, meta, waHref, rooms, roomId, onRoom } = props
   const room = rooms.find((r) => r.id === roomId) ?? rooms[0]
   const [step, setStep] = useState<"choose" | "details" | "sent">("choose")
   const [thbVariants, setThbVariants] = useState<ThbVariant[]>([])
@@ -482,23 +491,23 @@ function BookingDialog(props: {
             <RoomPicker rooms={rooms} room={room} onRoom={onRoom} />
           </section>
         )}
-        {variants.length > 1 && (
-          <section className={s.depGroup}>
-            <h3 className="ds-headline-s">Length</h3>
-            <div className={s.lengths} role="radiogroup" aria-label="Programme length">
-              {variants.map((x) => (
-                <Chip key={x.id} size="s" selected={x.id === variantId} onClick={() => onVariant(x.id)}>{x.duration_days} days</Chip>
-              ))}
-            </div>
-          </section>
-        )}
         <section className={s.depRow}>
           <h3 className="ds-headline-s">Guests</h3>
           <Stepper pax={pax} setPax={setPax} />
         </section>
         <section className={s.depGroup}>
           {/* A calendar of the trips one can take; the picked stay is highlighted; the month sits on the title row (Oleg 07.11.2026) */}
-          <RangeCalendar ranges={slots} selected={slot} onPick={onSlot} heading={<h3 className="ds-headline-s">Dates</h3>} />
+          {/* Arrival then departure; the lengths replace the old Length chips, the tag tells the length (Oleg 07.11.2026) */}
+          <RangeCalendar
+            earliest={win.earliest}
+            latest={win.latest}
+            arrival={slot?.start ?? win.earliest}
+            days={days}
+            lengths={variants.map((x) => x.duration_days)}
+            onPick={onStay}
+            heading={<h3 className="ds-headline-s">Dates</h3>}
+            tag={(picking) => <span>{picking ? `Pick a departure: ${listLengths(variants.map((x) => x.duration_days))} days` : `${days} days`}</span>}
+          />
           {slot && (
             <div className={s.calPick}>
               <span className="ds-title-m">{slot.title}</span>

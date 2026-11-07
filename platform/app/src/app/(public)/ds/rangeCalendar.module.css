@@ -5,6 +5,12 @@
 .nav { display: flex; align-items: center; margin-right: -0.5rem; }
 .head:not(:has(> :not(.nav))) .nav { flex: 1; justify-content: space-between; margin: 0 -0.5rem; } /* no heading: arrows at both ends */
 .month { min-width: 8.5rem; text-align: center; white-space: nowrap; }
+/* The tag under the title (the stay's length, or what to pick next) */
+.tagRow { display: flex; margin-top: -0.25rem; }
+.tagRow > * { height: 1.75rem; padding: 0 0.75rem; display: inline-flex; align-items: center; border-radius: var(--ds-r-full); background: var(--ds-secondary-container); color: var(--ds-on-secondary-container); font: 500 0.8125rem/1rem var(--ds-font-body); }
+/* Days one can arrive on: green; before the first arrival or past the last: faded */
+.day[data-free]:not([data-out]) { color: var(--ds-primary); }
+.day:disabled:not([data-out]) { opacity: 0.35; }
 .grid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 0.25rem; }
 .wd { height: 2rem; display: flex; align-items: center; justify-content: center; font: 500 0.75rem/1rem var(--ds-font-body); color: var(--ds-on-surface-variant); }
 .day { position: relative; height: 2.5rem; padding: 0; border: 0; background: none; display: flex; align-items: center; justify-content: center; font: 500 0.9375rem/1 var(--ds-font-body); color: var(--ds-on-surface); cursor: pointer; }
@@ -23,8 +29,8 @@
 .day[data-out] { opacity: 1; pointer-events: none; color: var(--ds-on-surface); }
 .day[data-out]::before { opacity: 0.3; }
 .day[data-out] > span { opacity: 0.18; }
-/* The first and last day of every trip one can take: a see-through green ring instead of a dot (Oleg 07.11.2026) */
-.day[data-range-start]:not([data-edge]) > span, .day[data-range-end]:not([data-edge]) > span { box-shadow: inset 0 0 0 1.5px rgba(96, 187, 137, 0.28); }
+/* The first and last day of every trip one can take: a solid green ring (Oleg 07.11.2026) */
+.day[data-range-start]:not([data-edge]) > span, .day[data-range-end]:not([data-edge]) > span { box-shadow: inset 0 0 0 1.5px var(--ds-primary); }
 /* Bands run cell to cell and round off where a trip starts or ends and where a week row starts or ends.
    Pale for every trip one can take, mint for the picked stay (other trips' ends inside it do not cut it). */
 .day[data-avail]::before { content: ""; position: absolute; inset: 0.125rem 0; background: var(--ds-surface-container-high); }
