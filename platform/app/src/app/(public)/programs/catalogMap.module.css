@@ -9,7 +9,7 @@
 .on .pin { background: var(--pin-on); color: #fff; }
 /* China programmes: a near-white warm rim and a gold glow around it, the rim lighter than the glow as with
    real light (Oleg 07.11.2026) */
-.gold { --gold: #fff4d1; --gold-glow: 0 0 0.375rem 0.0625rem rgba(255, 206, 64, 0.85), 0 0 1.125rem 0.25rem rgba(255, 196, 40, 0.5); }
+.gold { --gold: #fff4d1; --gold-glow: 0 0 0.3125rem 0 rgba(255, 206, 64, 0.6), 0 0 0.875rem 0.125rem rgba(255, 196, 40, 0.3); }
 .gold .pin { box-shadow: 0 0 0 0.125rem var(--gold), var(--gold-glow), var(--ds-elev-2); }
 .gold .thumb { border-color: var(--gold); box-shadow: var(--gold-glow), var(--ds-elev-2); }
 .on .gold .thumb { border-color: var(--gold); }
