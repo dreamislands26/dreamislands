@@ -15,7 +15,7 @@ import { createPortal } from "react-dom"
 import "leaflet/dist/leaflet.css"
 import { Photo, SUPABASE_HOST } from "../ds/cards"
 import { isSaved, toggleSaved, useSaved, type SavedItem } from "../ds/saved"
-import { Facts, Icon } from "../ds/ui"
+import { ButtonLink, Facts, Icon } from "../ds/ui"
 import { MAP_DRAG, MAP_SELECT, MAP_SHEET, type MapSheetDetail } from "./ResultsSheet"
 import m from "./catalogMap.module.css"
 import Flag from "../ds/Flag"
@@ -483,14 +483,18 @@ function PlaceCards({ cards, selected, jump, onPlace, onClose }: { cards: Card[]
               <button type="button" className={m.mini} aria-label="Close" onClick={onClose}><Icon name="close" /></button>
             </div>
           </Photo>
-          <Link href={p.href} className={m.text}>
-            <span className={m.titleRow}>
-              <span className={m.title}>{p.name}</span>
-              {p.rating ? <span className={m.rating}><span className={m.star} aria-hidden>★</span>{p.rating.toFixed(1)}</span> : null}
-            </span>
-            <span className={m.line}>{p.flag ? <Flag of={p.flag} /> : null}<Facts items={p.place} /></span>
-            <span className={m.line}>{p.price}{p.duration ? <><i className={m.dot} aria-hidden />{p.duration}</> : null}</span>
-          </Link>
+          {/* The text opens the programme too; the button says so (Oleg 07.11.2026) */}
+          <div className={m.body}>
+            <Link href={p.href} className={m.text}>
+              <span className={m.titleRow}>
+                <span className={m.title}>{p.name}</span>
+                {p.rating ? <span className={m.rating}><span className={m.star} aria-hidden>★</span>{p.rating.toFixed(1)}</span> : null}
+              </span>
+              <span className={m.line}>{p.flag ? <Flag of={p.flag} /> : null}<Facts items={p.place} /></span>
+              <span className={m.line}>{p.price}{p.duration ? <><i className={m.dot} aria-hidden />{p.duration}</> : null}</span>
+            </Link>
+            <ButtonLink href={p.href} size="l" className={m.open} tabIndex={-1}>Open</ButtonLink>
+          </div>
         </article>
         ))}
         </div>
