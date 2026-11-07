@@ -57,7 +57,15 @@ export function BottomSheet({ open, onClose, title, footer, tall, wide, back, ch
     const b = body.current, sh = sheet.current
     let scrolled = false
     const sync = () => { if (b && sh) sh.dataset.more = scrolled && b.scrollTop + b.clientHeight < b.scrollHeight - 2 ? "1" : "" }
-    const onScroll = () => { scrolled = true; sync() }
+    // Phones: scrolling the body down takes the sheet full screen over the header, corners gone; back at
+    // the top it returns under the header (Oleg 07.11.2026)
+    const onScroll = () => {
+      scrolled = true
+      sync()
+      if (!sh || !b || window.innerWidth >= 768) return
+      if (b.scrollTop > 8) sh.dataset.full = "1"
+      else if (b.scrollTop <= 0) delete sh.dataset.full
+    }
     sync()
     b?.addEventListener("scroll", onScroll, { passive: true })
     const ro = typeof ResizeObserver !== "undefined" && b ? new ResizeObserver(sync) : null
