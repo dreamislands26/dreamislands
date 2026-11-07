@@ -45,7 +45,8 @@ function Head({ title, sub, href, seeAll }: { title: string; sub?: string; href?
   return (
     <div className={m.head}>
       <div className={m.headText}>
-        <h2 className="ds-headline-s">{title}</h2>
+        {/* The title opens the list too, like its arrow (Oleg 07.11.2026) */}
+        <h2 className="ds-headline-s">{href ? <Link href={href} className={m.headLink}>{title}</Link> : title}</h2>
         {sub && <p className="ds-overline ds-muted">{sub}</p>}
       </div>
       {href && (seeAll
