@@ -55,6 +55,11 @@ export default function RangeCalendar({ ranges, selected, onPick, heading }: { r
           const avail = !!trip
           const edge = selected && (k === selected.start ? "start" : k === selected.end ? "end" : null)
           const col = (lead + i) % 7
+          // Another trip runs on past the picked stay's arrival or departure: that half of the day stays pale
+          const shift = (n: number) => iso(new Date(Date.UTC(y, m - 1, i + 1 + n)))
+          const runs = (a: string, b: string) => ranges.some((r) => r.start <= a && b <= r.end && !(selected && selected.start <= a && b <= selected.end))
+          const paleBefore = edge === "start" && runs(shift(-1), k)
+          const paleAfter = edge === "end" && runs(k, shift(1))
           return (
             <button
               key={k}
@@ -65,6 +70,8 @@ export default function RangeCalendar({ ranges, selected, onPick, heading }: { r
               data-range-start={starts.has(k) ? "" : undefined}
               data-range-end={ends.has(k) ? "" : undefined}
               data-edge={edge ?? undefined}
+              data-pale-before={paleBefore ? "" : undefined}
+              data-pale-after={paleAfter ? "" : undefined}
               data-row-start={col === 0 || i === 0 ? "" : undefined}
               data-row-end={col === 6 || i === count - 1 ? "" : undefined}
               data-start={starts.has(k) ? "" : undefined}
