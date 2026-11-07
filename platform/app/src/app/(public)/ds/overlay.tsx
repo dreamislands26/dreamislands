@@ -57,49 +57,61 @@ export function BottomSheet({ open, onClose, title, footer, tall, wide, back, ch
     const b = body.current, sh = sheet.current
     let scrolled = false
     const sync = () => { if (b && sh) sh.dataset.more = scrolled && b.scrollTop + b.clientHeight < b.scrollHeight - 2 ? "1" : "" }
-    // Phones: scrolling the body takes the sheet full screen over the header with the site's unfold (as the
-    // programme sheet over its photo): over the header's height of scroll, --fp goes 0..1, the sheet rises
-    // over the header, its corners grow and it widens past both edges until the arc is gone (Oleg 07.11.2026)
-    const header = () => document.querySelector("[class*=mtop]")?.getBoundingClientRect().bottom || 56
-    let raf = 0
-    const unfold = () => {
-      raf = 0
-      if (!sh || !b) return
-      const p = window.innerWidth >= 768 ? 0 : Math.min(1, Math.max(0, b.scrollTop / header()))
-      sh.style.setProperty("--fp", p.toFixed(3))
-    }
-    const onScroll = () => {
-      scrolled = true
-      sync()
-      if (!raf) raf = requestAnimationFrame(unfold)
-    }
+    const onScroll = () => { scrolled = true; sync() }
     sync()
     b?.addEventListener("scroll", onScroll, { passive: true })
     const ro = typeof ResizeObserver !== "undefined" && b ? new ResizeObserver(sync) : null
     if (ro && b) { ro.observe(b); if (b.firstElementChild) ro.observe(b.firstElementChild) }
-    // Swipe down to close (phones): from the head always, from the body only at its top so it still scrolls
-    let startY: number | null = null, dy = 0, dragging = false
+    // Phones: two resting points, switched by a swipe (Oleg 07.11.2026). Under the header (open) and full
+    // screen over it, reached with the site's unfold (--fp 0..1, as the programme sheet over its photo: the
+    // sheet rises over the header, its corners grow and it widens past both edges until the arc is gone).
+    // Swipe up unfolds (when the content does not fit); full, a swipe down from the head or from the top of
+    // the content folds it back; folded, a swipe down closes. Scrolling the content never changes the point.
+    const header = () => document.querySelector("[class*=mtop]")?.getBoundingClientRect().bottom || 56
+    const EASE = "cubic-bezier(0.2, 0, 0, 1)"
+    let full = false
+    const setFp = (p: number) => sh?.style.setProperty("--fp", p.toFixed(3))
+    let startY: number | null = null, startX = 0, dy = 0, mode: "unfold" | "fold" | "close" | "none" | null = null
+    let inHead = false, atTop = true, canUnfold = false, H = 56
     const onStart = (e: TouchEvent) => {
       if (!sh || window.innerWidth >= 768) return
-      startY = e.touches[0].clientY; dy = 0
-      const inHead = !!(e.target as Element).closest(`.${s.bsHead}`)
-      dragging = inHead || !b || b.scrollTop <= 0
+      startY = e.touches[0].clientY; startX = e.touches[0].clientX; dy = 0; mode = null
+      inHead = !!(e.target as Element).closest(`.${s.bsHead}`)
+      atTop = !b || b.scrollTop <= 0
+      canUnfold = !!b && (b.scrollHeight > b.clientHeight + 2 || sh.classList.contains(s.bsTall))
+      H = header()
     }
     const onMove = (e: TouchEvent) => {
-      if (!sh || startY === null || !dragging) return
-      const d = e.touches[0].clientY - startY
-      if (d <= 0) { if (dy > 0) { dy = 0; sh.style.transform = "" } return }
+      if (!sh || startY === null || mode === "none") return
+      const d = e.touches[0].clientY - startY, dx = e.touches[0].clientX - startX
+      if (mode === null) {
+        if (Math.max(Math.abs(d), Math.abs(dx)) < 6) return
+        if (Math.abs(dx) > Math.abs(d)) { mode = "none"; return }
+        if (d < 0) mode = !full && canUnfold ? "unfold" : "none"
+        else mode = inHead || atTop ? (full ? "fold" : "close") : "none"
+        if (mode === "none") return
+        sh.style.transition = "none"
+      }
       if (e.cancelable) e.preventDefault()
       dy = d
-      sh.style.transition = "none"
-      sh.style.transform = `translateY(${d}px)`
+      if (mode === "unfold") setFp(Math.min(1, Math.max(0, -d / H)))
+      else if (mode === "fold") setFp(Math.min(1, Math.max(0, 1 - d / H)))
+      else if (mode === "close") sh.style.transform = d > 0 ? `translateY(${d}px)` : ""
     }
     const onEnd = () => {
       if (!sh || startY === null) return
       startY = null
-      sh.style.transition = "transform 0.2s cubic-bezier(0.2, 0, 0, 1)"
-      if (dy > 90) { sh.style.transform = "translateY(100%)"; window.setTimeout(onClose, 180) }
-      else sh.style.transform = ""
+      const m = mode
+      mode = null
+      if (!m || m === "none") return
+      sh.style.transition = `transform 0.2s ${EASE}, --fp 0.3s ${EASE}`
+      // Folding stops at the open point; closing takes a swipe of its own
+      const closing = m === "close" && dy > 90
+      if (closing) { sh.style.transform = "translateY(100%)"; window.setTimeout(onClose, 180); return }
+      sh.style.transform = ""
+      if (m === "unfold") full = -dy > H * 0.3
+      if (m === "fold") full = dy < H * 0.3
+      setFp(full ? 1 : 0)
       dy = 0
     }
     sh?.addEventListener("touchstart", onStart, { passive: true })
@@ -110,7 +122,6 @@ export function BottomSheet({ open, onClose, title, footer, tall, wide, back, ch
       document.body.style.overflow = prev
       document.removeEventListener("keydown", onKey)
       b?.removeEventListener("scroll", onScroll)
-      cancelAnimationFrame(raf)
       ro?.disconnect()
       sh?.removeEventListener("touchstart", onStart)
       sh?.removeEventListener("touchmove", onMove)

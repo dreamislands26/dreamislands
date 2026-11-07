@@ -107,9 +107,11 @@
 /* Vertical only: overflow-y alone makes x `auto` too, and iOS then lets the whole sheet body slide sideways
    under a diagonal swipe. Horizontal chip rows inside scroll on their own. */
 .bsTall { height: calc(100dvh - 3.5rem - env(safe-area-inset-top)); }
-/* Scrolled (overlay.tsx sets --fp 0..1): the sheet rises over the header to full screen with the site's
+/* --fp animates between the sheet's resting points (overlay.tsx), so it is a registered number */
+@property --fp { syntax: "<number>"; inherits: true; initial-value: 0; }
+/* Swiped up (overlay.tsx sets --fp 0..1): the sheet rises over the header to full screen with the site's
    unfold: corners grow from 36 to 148px while the sheet widens past both edges by radius x fp, so the arc
-   flattens and leaves the screen; the head clears the status bar. Follows the scroll, no transition. */
+   flattens and leaves the screen; the head clears the status bar. Follows the finger, then settles. */
 @media (max-width: 767px) {
   .bs {
     --fp: 0; --r: calc(2.25rem + 7rem * var(--fp)); --out: calc(var(--r) * var(--fp));
