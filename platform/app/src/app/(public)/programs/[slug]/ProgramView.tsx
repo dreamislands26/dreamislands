@@ -84,6 +84,17 @@ const ACTIVITY_ICONS: [RegExp, string][] = [
 const activityIcon = (t: { title: string; text: string }) =>
   ACTIVITY_ICONS.find(([re]) => re.test(t.title))?.[1] ?? ACTIVITY_ICONS.find(([re]) => re.test(t.text))?.[1] ?? "spa"
 
+/** A room's icon from its kind, not its pool (Oleg 07.11.2026): villa, several bedrooms, one guest, twin or
+ *  shared, else a double */
+function roomIcon(a: { room_type: string | null; description?: string | null; capacity?: number | null }) {
+  const t = `${a.room_type ?? ""} ${a.description ?? ""}`.toLowerCase()
+  if (/villa/.test(t)) return "villa"
+  if (/\b([2-9]|two|three|four) bedrooms?\b|apartment|suite with|house|residence/.test(t)) return "house"
+  if (a.capacity === 1 || /\bsingle\b|\bsolo\b/.test(t)) return "single_bed"
+  if (/twin|shared|dorm/.test(t)) return "bed"
+  return "king_bed"
+}
+
 /** Four "What you'll do" items: distinct activities from the schedule (no meals), else the method text. */
 function whatYoullDo(program: ProgramDetail) {
   const seen = new Set<string>()
@@ -303,7 +314,7 @@ export default function ProgramView({
               <div>
                 <h2 className={s.h2}>Where you stay</h2>
                 {accommodations.map((a) => (
-                  <ListItem key={a.id} card icon={a.has_pool ? "pool" : "bed"} headline={<span className={s.oneLine}>{enOnly(a.room_type) ?? a.room_type}</span>} supporting={<span className={s.roomFacts}><Facts items={[a.capacity ? `Up to ${a.capacity} ${a.capacity === 1 ? "guest" : "guests"}` : null, enOnly(a.description)]} /></span>} trailing={<ButtonLink href="#reserve" replace variant="tonal" trailingIcon="arrow_forward" aria-label="Check dates" className={s.roomCta}><span className={s.roomCtaText}>Check dates</span></ButtonLink>} />
+                  <ListItem key={a.id} card icon={roomIcon(a)} headline={<span className={s.oneLine}>{enOnly(a.room_type) ?? a.room_type}</span>} supporting={<span className={s.roomFacts}><Facts items={[a.capacity ? `Up to ${a.capacity} ${a.capacity === 1 ? "guest" : "guests"}` : null, enOnly(a.description)]} /></span>} trailing={<ButtonLink href="#reserve" replace variant="tonal" trailingIcon="arrow_forward" aria-label="Check dates" className={s.roomCta}><span className={s.roomCtaText}>Check dates</span></ButtonLink>} />
                 ))}
               </div>
             )}
