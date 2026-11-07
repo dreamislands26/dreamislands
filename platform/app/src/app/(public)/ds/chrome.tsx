@@ -166,6 +166,7 @@ export function MobileMenu({ variant }: { variant?: "photo" }) {
               </span>
               <Icon name="arrow_forward" />
             </Link>
+            <div className={s.sheetLangs}><LocaleSwitcher variant="pills" onPick={close} /></div>
           </nav>
         </div>
       )}
