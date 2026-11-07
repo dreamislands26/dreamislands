@@ -29,6 +29,9 @@ type PublicBookingPayload = {
   // Availability/pricing-request fallback contract (ReserveModal.tsx, no
   // priced variant available — variant_id absent, guest_name present)
   source_page?: string
+  // The room picked in the booking sheet (name, as shown). No bookings column for it yet: it reaches the
+  // team in the notification e-mail (Oleg 07.11.2026)
+  room?: string
   // Medical case intake (ReserveModal case mode): no checkout, no program required
   request_type?: string
   case_summary?: string
@@ -353,6 +356,7 @@ async function handleDepositCheckout(req: Request, body: PublicBookingPayload) {
     arrival,
     departure,
     pax,
+    room: cleanRoom(body.room),
   })
 
   return NextResponse.json(
@@ -409,6 +413,7 @@ async function handleAvailabilityRequest(req: Request, body: PublicBookingPayloa
     property_name: body.property_name ?? null,
     destination_country: body.destination_country ?? null,
     source_page: body.source_page ?? null,
+    room: cleanRoom(body.room),
     guest_contact: { email: guestEmail, whatsapp: guestWhatsapp },
     attribution: {
       market_country: body.market_country ?? null,
@@ -466,6 +471,7 @@ async function handleAvailabilityRequest(req: Request, body: PublicBookingPayloa
     arrival: arrival || null,
     pax,
     sourcePage: body.source_page ?? null,
+    room: cleanRoom(body.room),
   })
 
   return NextResponse.json({ success: true, booking: { id: booking.id } }, { headers: cors })
@@ -607,6 +613,11 @@ async function handleMedicalCase(req: Request, body: PublicBookingPayload) {
   return NextResponse.json({ success: true, booking: { id: booking.id } }, { headers: cors })
 }
 
+/** The guest's room choice as free text: trimmed and capped, never trusted as markup (the e-mail escapes it) */
+function cleanRoom(v: unknown): string | null {
+  return typeof v === "string" && v.trim() ? v.trim().slice(0, 120) : null
+}
+
 async function notifyInquiry(args: {
   req: Request
   userId: string
@@ -615,6 +626,7 @@ async function notifyInquiry(args: {
   arrival: string
   departure: string
   pax: number
+  room?: string | null
 }) {
   try {
     const origin = new URL(args.req.url).origin
@@ -648,6 +660,7 @@ async function notifyInquiry(args: {
       arrival: args.arrival,
       departure: args.departure,
       pax: args.pax,
+      room: args.room ?? null,
       adminBookingUrl: `${origin}/admin/bookings`,
     })
     await sendEmail({ to: recipients, ...mail, tag: "booking_inquiry" })
@@ -666,6 +679,7 @@ async function notifyAvailabilityRequest(args: {
   arrival: string | null
   pax: number
   sourcePage: string | null
+  room?: string | null
 }) {
   try {
     const origin = new URL(args.req.url).origin
@@ -681,6 +695,7 @@ async function notifyAvailabilityRequest(args: {
       arrival: args.arrival,
       pax: args.pax,
       sourcePage: args.sourcePage,
+      room: args.room ?? null,
       adminBookingUrl: `${origin}/admin/bookings`,
     })
     await sendEmail({ to: recipients, ...mail, tag: "availability_request" })

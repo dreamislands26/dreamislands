@@ -70,7 +70,10 @@ export default async function ProgramsPage({ searchParams }: { searchParams: Pro
         name: p.name,
       })),
   }
-  const track = GOALS.find((g) => g.track === sp.track)
+  // Several category chips can be on at once (Oleg 07.11.2026): track and goal are comma lists, and a
+  // program shows when it matches any picked chip
+  const tracks = (sp.track ?? "").split(",").map((x) => GOALS.find((g) => g.track === x.trim())).filter((g) => !!g)
+  const track = tracks[0]
   const country = COUNTRIES.find((k) => k === sp.country)
   const length = LENGTHS.find((l) => l.key === sp.length)
   const price = PRICES.find((l) => l.key === sp.price)
@@ -85,15 +88,18 @@ export default async function ProgramsPage({ searchParams }: { searchParams: Pro
 
   const list = wellness.filter(
     (p) =>
-      (!track || p.cohort === track.cohort) &&
+      ((!tracks.length && !goals.length) || tracks.some((t) => p.cohort === t.cohort) || goals.some((g) => p.outcomes.includes(g))) &&
       (!country || p.country === country) &&
       (!length || length.test(p.minDays)) &&
       (!price || price.test(p.minPrice)) &&
       (!pmin || p.minPrice >= pmin) &&
       (!pmax || p.minPrice <= pmax) &&
-      (!goals.length || goals.some((g) => p.outcomes.includes(g))) &&
       (!q || `${p.name} ${p.location} ${p.trackFull} ${p.tags.join(" ")}`.toLowerCase().includes(q)),
-  ).sort((a, b) => (goals.length > 1 ? goals.filter((g) => b.outcomes.includes(g)).length - goals.filter((g) => a.outcomes.includes(g)).length : 0))
+  ).sort((a, b) => {
+    if (tracks.length + goals.length < 2) return 0
+    const hits = (p: (typeof wellness)[number]) => tracks.filter((t) => p.cohort === t.cohort).length + goals.filter((g) => p.outcomes.includes(g)).length
+    return hits(b) - hits(a)
+  })
   const countries = new Set(wellness.map((p) => p.country).filter(Boolean)).size
   const filtered = !!(track || country || length || price || goal || q || pmin || pmax)
   const shown = COUNTRIES.filter((k) => wellness.some((p) => p.country === k))
@@ -118,7 +124,7 @@ export default async function ProgramsPage({ searchParams }: { searchParams: Pro
     }
   }
   const points: MapPoint[] = [...pins.values()]
-  const mState = { q: sp.q, track: sp.track, goal: goals.length ? goals.join(",") : undefined, length: length?.key, country, pmin, pmax, from: sp.from, when: sp.when, date: sp.date, flex: sp.flex }
+  const mState = { q: sp.q, track: tracks.length ? tracks.map((t) => t.track).join(",") : undefined, goal: goals.length ? goals.join(",") : undefined, length: length?.key, country, pmin, pmax, from: sp.from, when: sp.when, date: sp.date, flex: sp.flex }
   // Same categories as the home chips (shared routes), with the broader tracks mixed in mid-row
   const routes = searchRoutes(homeRoutes(outcomes, wellness), TRACK_ORDER.map((n) => GOALS.find((g) => g.cohort === n)!).map((g) => ({
     label: wellness.find((p) => p.cohort === g.cohort)?.trackFull ?? g.chip, track: g.track, cohort: g.cohort,
@@ -126,8 +132,9 @@ export default async function ProgramsPage({ searchParams }: { searchParams: Pro
   const mChips = [
     { key: "all", label: "All", href: searchHref({ ...mState, track: undefined, goal: undefined }), selected: !track && !goal, icon: "" },
     ...routes.map((r) => {
-      const on = r.goal ? goal?.slug === r.goal : track?.track === r.track
-      return { key: r.key, label: r.label, selected: on, icon: r.icon, href: searchHref({ ...mState, goal: on ? undefined : r.goal, track: on ? undefined : r.track }) }
+      const flip = (list: string[], x?: string) => { const next = !x ? list : list.includes(x) ? list.filter((y) => y !== x) : [...list, x]; return next.length ? next.join(",") : undefined }
+      const on = r.goal ? goals.includes(r.goal) : tracks.some((t) => t.track === r.track)
+      return { key: r.key, label: r.label, selected: on, icon: r.icon, href: searchHref({ ...mState, goal: flip(goals, r.goal), track: flip(tracks.map((t) => t.track), r.goal ? undefined : r.track) }) }
     }),
   ]
 
@@ -146,7 +153,7 @@ export default async function ProgramsPage({ searchParams }: { searchParams: Pro
         bounds={bounds}
         state={mState}
         chips={mChips}
-        trackCohort={track?.cohort}
+        trackCohorts={tracks.map((t) => t.cohort)}
       />
       <div className={c.map}><CatalogMap points={points} token={mapToken()} /></div>
       <ResultsSheet head={<ResultsHead count={list.length} q={sp.q} clearHref={filtered ? "/programs" : undefined} />}>
@@ -197,7 +204,7 @@ export default async function ProgramsPage({ searchParams }: { searchParams: Pro
         <div className={c.row}>
           <Chip selected={!track} href={href(sp, { track: undefined })}>All tracks</Chip>
           {TRACK_ORDER.map((n) => GOALS.find((g) => g.cohort === n)!).map((g) => (
-            <Chip key={g.key} icon={TRACK_ICONS[g.track] ?? true} selected={track?.key === g.key} href={href(sp, { track: track?.key === g.key ? undefined : g.track })}>
+            <Chip key={g.key} icon={TRACK_ICONS[g.track] ?? true} selected={tracks.some((t) => t.key === g.key)} href={href(sp, { track: track?.key === g.key ? undefined : g.track })}>
               {wellness.find((p) => p.cohort === g.cohort)?.trackFull ?? g.chip}
             </Chip>
           ))}

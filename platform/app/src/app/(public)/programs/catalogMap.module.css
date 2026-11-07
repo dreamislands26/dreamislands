@@ -7,6 +7,12 @@
 /* Selected pin: neutral near-black (the DS dark surfaces carry a green tint the pin should not have) */
 .pinWrap { --pin-on: #1c1c1e; }
 .on .pin { background: var(--pin-on); color: #fff; }
+/* China programmes: a near-white warm rim and a gold glow around it, the rim lighter than the glow as with
+   real light (Oleg 07.11.2026) */
+.gold { --gold: #fff4d1; --gold-glow: 0 0 0.3125rem 0 rgba(255, 206, 64, 0.6), 0 0 0.875rem 0.125rem rgba(255, 196, 40, 0.3); }
+.gold .pin { box-shadow: 0 0 0 0.125rem var(--gold), var(--gold-glow), var(--ds-elev-2); }
+.gold .thumb { border-color: var(--gold); box-shadow: var(--gold-glow), var(--ds-elev-2); }
+.on .gold .thumb { border-color: var(--gold); }
 
 /* Photos standing on the chip: one per property, a fan when there are several (the cheapest in front).
    Their own marker in a pane under the chips (CatalogMap), anchored at the same point: the bottom edge
@@ -57,7 +63,13 @@
 .mini :global(.ds-icon) { font-size: 1.375rem; }
 .mini .heart { font-size: 1.0625rem; }
 .mini .heartOn { font-size: 1.0625rem; color: #ff4462; }
-.text { display: flex; flex-direction: column; gap: 0.125rem; padding: 0.75rem 1.5rem; color: inherit; text-decoration: none; }
+/* The arrow sits in the bottom right corner, as far from the bottom as the photo is from the side (8px) */
+.body { display: flex; align-items: flex-end; gap: 0.75rem; padding: 0 0 0.5rem 1.5rem; }
+.text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.125rem; padding: 0.75rem 0 0.25rem; color: inherit; text-decoration: none; }
+.open { flex: none; width: 2.5rem; height: 2.5rem; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--ds-primary); color: var(--ds-on-primary); text-decoration: none; }
+.open :global(.ds-icon) { font-size: 1.25rem; }
+/* Inside a long card the inner edge is 4px: keep the arrow 8px from the card's side there too */
+.group .card:has(+ .card) .open { margin-right: 0.25rem; }
 .titleRow { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
 .title { font: 500 1rem/1.25rem var(--ds-font-body); color: var(--ds-on-surface); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .rating { flex: none; display: inline-flex; align-items: center; gap: 0.125rem; font: 400 0.75rem/1rem var(--ds-font-body); color: var(--ds-on-surface-variant); }

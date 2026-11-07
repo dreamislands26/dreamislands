@@ -25,7 +25,7 @@ export const ICON_NAMES = [
 ]
 
 /** Glyphs Material Symbols lacks, drawn as SVG on its 24 grid (ds/ui.tsx CUSTOM_ICONS). Not in the font. */
-export const CUSTOM_ICON_NAMES = ["dit_apple"]
+export const CUSTOM_ICON_NAMES = ["dit_apple", "dit_bed_single", "dit_bed_twin", "dit_bed_double", "dit_rooms", "dit_villa", "dit_house_japanese", "dit_house_singapore"]
 
 const AXES = "opsz,wght,FILL,GRAD@20..48,300,0..1,0"
 

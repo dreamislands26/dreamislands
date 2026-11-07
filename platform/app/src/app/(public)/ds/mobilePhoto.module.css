@@ -6,10 +6,33 @@
   .mPhoto { display: block; position: sticky; top: calc(3.5rem + env(safe-area-inset-top)); z-index: 0; height: 22.5rem; margin: 0; }
   .mPhotoTrack { display: flex; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
   .mPhotoTrack::-webkit-scrollbar { display: none; }
-  .mPhotoSlide { flex: 0 0 100%; height: 100%; scroll-snap-align: start; padding: 0; border: 0; display: block; }
+  /* snap-stop: a fast flick still moves one photo, never a batch (Oleg 07.11.2026) */
+  .mPhotoSlide { flex: 0 0 100%; height: 100%; scroll-snap-align: start; scroll-snap-stop: always; padding: 0; border: 0; display: block; }
   .mPhotoSlide > div { height: 100%; border-radius: 0 !important; }
   .mPhotoBar { position: absolute; left: 0; right: 0; top: 0.75rem; display: flex; justify-content: space-between; padding: 0 1rem; } /* under the site header (Oleg 06.11.2026) */
   .mPhotoActions { display: flex; gap: 0.5rem; }
-  .mCounter { position: absolute; right: 1.25rem; bottom: 3rem; height: 1.5rem; padding: 0.25rem 0.625rem; border-radius: var(--ds-r-full); background: rgba(0, 0, 0, 0.6); color: #fff; font: 500 0.75rem/1rem var(--ds-font-body); }
+  /* Page dots at the bottom centre, clear of the sheet that overlaps the photo by 1.75rem */
+  .mDots { position: absolute; left: 50%; bottom: 2.75rem; transform: translateX(-50%); transition: bottom 0.35s cubic-bezier(0.2, 0, 0, 1); }
+
+  /* Full-screen photo (MobilePhoto): the photo grows to the bottom of the screen plus the 1.75rem the sheet
+     overlaps it, so the sheet leaves the screen entirely; the page stops scrolling. The programme bar always floats; the
+     place's action bar floats here */
+  .mPhoto { transition: height 0.35s cubic-bezier(0.2, 0, 0, 1); }
+  :global(html[data-photo-full]) .mPhoto { height: calc(100dvh - 3.5rem - env(safe-area-inset-top) + 1.75rem); }
+  :global(html[data-photo-full]) { overflow: hidden; }
+  /* Dots: fixed like the floating bar, so they keep 1rem above it whatever the browser's viewport units say
+     (the bar is 5rem tall, 0.75rem above the bottom) */
+  :global(html[data-photo-full]) .mDots { position: fixed; bottom: calc(var(--ds-gutter) + 5rem + 1rem + env(safe-area-inset-bottom)); }
+  :global(html[data-photo-full] .fab-support) { display: none; }
+  /* Over the full photo the bar is slightly see-through with a soft blur of the photo behind (Oleg 07.11.2026) */
+  :global(html[data-photo-full] [data-own-bar]) {
+    background: color-mix(in srgb, var(--ds-surface-container-high) 76%, transparent);
+    -webkit-backdrop-filter: blur(14px) saturate(1.3); backdrop-filter: blur(14px) saturate(1.3);
+  }
+  :global(html[data-photo-full] [data-own-bar="action"]) {
+    left: var(--ds-gutter); right: var(--ds-gutter); bottom: calc(var(--ds-gutter) + env(safe-area-inset-bottom));
+    padding: 0.75rem 0.75rem 0.75rem 1.25rem; border-radius: var(--ds-r-xl-plus); box-shadow: var(--ds-elev-3);
+  }
+  :global([data-own-bar="action"]) { transition: left 0.35s cubic-bezier(0.2, 0, 0, 1), right 0.35s cubic-bezier(0.2, 0, 0, 1), bottom 0.35s cubic-bezier(0.2, 0, 0, 1), padding 0.35s cubic-bezier(0.2, 0, 0, 1), border-radius 0.35s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.35s; }
 
 }

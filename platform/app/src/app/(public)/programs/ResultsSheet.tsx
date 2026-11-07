@@ -11,6 +11,10 @@ type Snap = "collapsed" | "half" | "full"
 const ORDER: Snap[] = ["full", "half", "collapsed"]
 export const MAP_DRAG = "catalog-map-drag"
 export const MAP_SELECT = "catalog-map-select"
+/** Where the sheet rests (px from the top; null when full and the map is covered) and whether the user
+ *  moved it, so the map can keep its middle in the middle of the part that shows */
+export const MAP_SHEET = "catalog-map-sheet"
+export type MapSheetDetail = { top: number | null; byUser: boolean }
 
 export default function ResultsSheet({ head, children }: { head: ReactNode; children: ReactNode }) {
   const sheet = useRef<HTMLDivElement>(null)
@@ -18,6 +22,7 @@ export default function ResultsSheet({ head, children }: { head: ReactNode; chil
   const [snap, setSnap] = useState<Snap>("half")
   const [pos, setPos] = useState<Record<Snap, number> | null>(null)
   const [away, setAway] = useState(false)
+  const byUser = useRef(false)
 
   // Resting points in px from the top of the viewport. The bottom is where position: fixed; bottom: 0
   // sits, not window.innerHeight: on iOS the browser bars come and go, and innerHeight measured with
@@ -111,6 +116,7 @@ export default function ResultsSheet({ head, children }: { head: ReactNode; chil
       // A long pull can pass the middle point
       if (Math.abs(dy) > 260) next = dy > 0 ? "collapsed" : "full"
       set(pos[next])
+      byUser.current = true
       setSnap(next)
     }
     el.addEventListener("touchstart", start, { passive: true })
@@ -128,6 +134,13 @@ export default function ResultsSheet({ head, children }: { head: ReactNode; chil
   useEffect(() => {
     if (snap !== "full") list.current?.scrollTo({ top: 0 })
   }, [snap])
+
+  useEffect(() => {
+    if (!pos) return
+    const detail: MapSheetDetail = { top: snap === "full" ? null : pos[snap], byUser: byUser.current }
+    byUser.current = false
+    window.dispatchEvent(new CustomEvent(MAP_SHEET, { detail }))
+  }, [pos, snap])
 
   const y = pos?.[snap]
   return (

@@ -1,0 +1,50 @@
+/* RangeCalendar: 7 columns, 40px rows. Trips one can take are pale bands, the selected stay a mint band with
+   dark round ends; trip start days carry a small dot; days no trip covers are green. */
+.cal { display: flex; flex-direction: column; gap: 0.5rem; }
+.head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.nav { display: flex; align-items: center; margin-right: -0.5rem; }
+.head:not(:has(> :not(.nav))) .nav { flex: 1; justify-content: space-between; margin: 0 -0.5rem; } /* no heading: arrows at both ends */
+.month { min-width: 8.5rem; text-align: center; white-space: nowrap; }
+.grid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 0.25rem; }
+.wd { height: 2rem; display: flex; align-items: center; justify-content: center; font: 500 0.75rem/1rem var(--ds-font-body); color: var(--ds-on-surface-variant); }
+.day { position: relative; height: 2.5rem; padding: 0; border: 0; background: none; display: flex; align-items: center; justify-content: center; font: 500 0.9375rem/1 var(--ds-font-body); color: var(--ds-on-surface); cursor: pointer; }
+.day > span { position: relative; z-index: 1; width: 2.25rem; height: 2.25rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s, color 0.2s; }
+/* This month's days with no trip: solid green, no transparency (Oleg 07.11.2026) */
+.day:disabled { color: var(--ds-primary); cursor: default; }
+/* Days of the months around: faded with their bands, the numbers fainter still (Oleg 07.11.2026); not tappable.
+   No notch backgrounds there: they would not fade with the band. */
+.day[data-out][data-pale-after], .day[data-out][data-pale-before] { background: none; }
+/* The picked stay's ends in the months around: no dark circle, the band just runs on faded */
+.day[data-out][data-edge] > span { background: none; color: inherit; }
+.day[data-out][data-edge="start"]::before { left: 0; }
+.day[data-out][data-edge="end"]::before { right: 0; }
+.day[data-out][data-edge="start"][data-row-start]::before { left: calc(50% - 1.125rem); border-top-left-radius: 1.125rem; border-bottom-left-radius: 1.125rem; }
+.day[data-out][data-edge="end"][data-row-end]::before { right: calc(50% - 1.125rem); border-top-right-radius: 1.125rem; border-bottom-right-radius: 1.125rem; }
+.day[data-out] { opacity: 1; pointer-events: none; color: var(--ds-on-surface); }
+.day[data-out]::before { opacity: 0.3; }
+.day[data-out] > span { opacity: 0.18; }
+/* The first and last day of every trip one can take: a see-through green ring instead of a dot (Oleg 07.11.2026) */
+.day[data-range-start]:not([data-edge]) > span, .day[data-range-end]:not([data-edge]) > span { box-shadow: inset 0 0 0 1.5px rgba(96, 187, 137, 0.28); }
+/* Bands run cell to cell and round off where a trip starts or ends and where a week row starts or ends.
+   Pale for every trip one can take, mint for the picked stay (other trips' ends inside it do not cut it). */
+.day[data-avail]::before { content: ""; position: absolute; inset: 0.125rem 0; background: var(--ds-surface-container-high); }
+.day[data-in]::before { background: var(--ds-secondary-container); }
+/* Round ends are the size of a day circle (2.25rem), centred on the day, so a band ends exactly round it */
+.day[data-avail][data-row-start]::before, .day[data-avail]:not([data-in])[data-cap-left]::before { left: calc(50% - 1.125rem); border-top-left-radius: 1.125rem; border-bottom-left-radius: 1.125rem; }
+.day[data-avail][data-row-end]::before, .day[data-avail]:not([data-in])[data-cap-right]::before { right: calc(50% - 1.125rem); border-top-right-radius: 1.125rem; border-bottom-right-radius: 1.125rem; }
+/* The picked stay's arrival and departure: the band starts and stops under the middle of the dark circle */
+.day[data-avail][data-edge="start"]::before { left: 50%; border-top-left-radius: 0; border-bottom-left-radius: 0; }
+.day[data-avail][data-edge="end"]::before { right: 50%; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+/* Another trip runs on from the picked stay's arrival or departure: its pale band starts on that half of the
+   day with a round notch round the dark circle (the circle's radius plus a 4px gap) */
+/* A junction day (one trip ends, the next starts): the earlier band runs into its circle */
+.day[data-avail][data-junction]:not([data-in])::before { left: 0; right: calc(50% - 1.125rem); border-radius: 0 1.125rem 1.125rem 0; }
+.day[data-avail][data-junction][data-row-start]:not([data-in])::before { left: calc(50% - 1.125rem); border-top-left-radius: 1.125rem; border-bottom-left-radius: 1.125rem; }
+.day[data-pale-after] { background: radial-gradient(circle at 0 50%, transparent 1.375rem, var(--ds-surface-container-high) calc(1.375rem + 0.5px)) right center / 50% 2.25rem no-repeat; }
+.day[data-pale-before] { background: radial-gradient(circle at 100% 50%, transparent 1.375rem, var(--ds-surface-container-high) calc(1.375rem + 0.5px)) left center / 50% 2.25rem no-repeat; }
+/* Days in the trips one can take and in the picked stay: green too (Oleg 07.11.2026) */
+.day[data-avail]:not([data-out]) { color: var(--ds-primary); }
+/* In the picked stay a deeper, more saturated green, to read on the mint band */
+.day[data-in]:not([data-out]) { color: oklch(57% 0.14 152); }
+.day[data-edge] > span { background: var(--ds-on-secondary-container); color: #fff; }
+@media (hover: hover) { .day:not(:disabled):not([data-in]):hover > span { background: var(--ds-surface-container-high); } }

@@ -58,7 +58,8 @@
   cursor: pointer;
 }
 .iconBtn::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: currentColor; opacity: 0; z-index: -1; transition: opacity 0.15s; }
-.iconBtn:hover::after { opacity: var(--ds-state-hover); }
+/* Hover only with a pointer: iOS keeps :hover on a tapped button (Oleg 07.11.2026) */
+@media (hover: hover) { .iconBtn:hover::after { opacity: var(--ds-state-hover); } }
 .iconBtn .icon { font-size: 1.5rem; }
 .ibTonal { background: var(--ds-secondary-container); color: var(--ds-on-secondary-container); }
 .ibFilled { background: var(--ds-primary); color: var(--ds-on-primary); }
@@ -81,7 +82,8 @@
   flex: none;
   text-decoration: none;
 }
-.chip:hover { background: var(--ds-surface-container-highest); }
+/* Hover only where there is a pointer: on iOS a tapped chip keeps :hover, which painted a selected chip grey */
+@media (hover: hover) { .chip:not(.chipSelected):hover { background: var(--ds-surface-container-highest); } }
 .chipDot { width: 1.3125rem; height: 1.3125rem; border-radius: 50%; background: var(--ds-secondary-container); color: var(--ds-on-secondary-container); flex: none; display: inline-flex; align-items: center; justify-content: center; }
 .chipDot :global(.ds-icon) { font-size: 0.875rem; }
 .chipS { height: 2.3125rem; padding: 0 0.75rem 0 0.625rem; } /* compact, used in filter sheets */
@@ -190,6 +192,7 @@
 .listItem { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 0; color: inherit; text-decoration: none; }
 .leading { width: 3rem; height: 3rem; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center; background: var(--ds-surface-container-high); color: var(--ds-primary); }
 .leading .icon { font-size: 1.5rem; }
+.leadingTint { background: oklch(91% 0.04 var(--hue)); color: oklch(52% 0.09 var(--hue)); }
 .listText { display: flex; flex-direction: column; gap: 0.125rem; min-width: 0; }
 .listHeadline { font: 500 1rem/1.25rem var(--ds-font-body); color: var(--ds-on-surface); }
 .listSupporting { font: 400 0.875rem/1.25rem var(--ds-font-body); color: var(--ds-on-surface-variant); }

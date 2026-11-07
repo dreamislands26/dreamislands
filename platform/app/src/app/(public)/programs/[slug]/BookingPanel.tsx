@@ -14,10 +14,12 @@ import { getAttribution, getGaClientId, getSessionId, track } from "../../_lib/t
 import { Badge, Button, Chip, Facts, Icon, IconButton, Radio, TextField, cx } from "../../ds/ui"
 import { BottomSheet, Dialog, overlayStyles as o } from "../../ds/overlay"
 import { PaymentMarks } from "../../ds/payment"
-import { monthLabel, slotsFor, type Slot } from "./departures"
+import { slotsFor, type Slot } from "./departures"
+import RangeCalendar from "../../ds/RangeCalendar"
 import s from "./program.module.css"
 
 export type PanelVariant = { id: string; label: string; duration_days: number; duration_nights: number; price_basic_usd: number; checkout: boolean }
+export type PanelRoom = { id: string; name: string; capacity: number | null; icon: string }
 type ThbVariant = { id: string; label: string; duration_days: number; duration_nights: number; price_basic_thb: number }
 
 const DEPOSIT_PCT = 20
@@ -46,9 +48,12 @@ export default function BookingPanel({
   waHref,
   placeLine,
   supplierPrice,
+  rooms = [],
 }: {
   programId: string
   programName: string
+  /** Rooms of the stay ("Where you stay"); the sheet offers them in a dropdown */
+  rooms?: PanelRoom[]
   propertyId?: string
   propertyName?: string
   country?: string
@@ -103,6 +108,8 @@ export default function BookingPanel({
   const deposit = Math.round(price * (DEPOSIT_PCT / 100))
   const meta = { program_id: programId, property_id: propertyId, property_name: propertyName, destination_country: country }
 
+  // The room picked in the sheet; a room's arrow in "Where you stay" opens the sheet with it (Oleg 07.11.2026)
+  const [roomId, setRoomId] = useState<string>(rooms[0]?.id ?? "")
   const openDialog = useCallback(() => {
     setOpen(true)
     track("open_reserve_modal", meta)
@@ -113,7 +120,8 @@ export default function BookingPanel({
   // (#reserve) open the dialog instead of jumping to nothing
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
-      const a = (e.target as Element | null)?.closest?.('a[href="#reserve"]')
+      const a = (e.target as Element | null)?.closest?.<HTMLElement>('a[href="#reserve"]')
+      if (a?.dataset.room) setRoomId(a.dataset.room)
       if (!a || !window.matchMedia("(max-width: 767px)").matches) return
       e.preventDefault()
       openDialog()
@@ -210,6 +218,9 @@ export default function BookingPanel({
         priceUsd={price}
         meta={meta}
         waHref={waHref}
+        rooms={rooms}
+        roomId={roomId}
+        onRoom={setRoomId}
       />
 
       {/* CF8: payment didn't go through */}
@@ -238,6 +249,42 @@ function SlotRow({ slot, on, onPick, sub, tall }: { slot: Slot; on: boolean; onP
         <span className={o.slotSub}>{sub}</span>
       </span>
     </button>
+  )
+}
+
+/** Room dropdown in the site's style (Oleg 07.11.2026): the card shows the picked room; tapped, it opens a
+ *  list of the rooms with their icons right under it, the picked one checked. */
+function RoomPicker({ rooms, room, onRoom }: { rooms: PanelRoom[]; room: PanelRoom; onRoom: (id: string) => void }) {
+  const [open, setOpen] = useState(false)
+  const many = rooms.length > 1
+  const guests = (n: number | null) => (n ? `Up to ${n} ${n === 1 ? "guest" : "guests"}` : null)
+  const row = (r: PanelRoom) => (
+    <>
+      <span className={s.roomPickIcon}><Icon name={r.icon} /></span>
+      <span className={s.roomPickText}>
+        <span className="ds-title-m">{r.name}</span>
+        {guests(r.capacity) && <span className="ds-body-s ds-muted">{guests(r.capacity)}</span>}
+      </span>
+    </>
+  )
+  return (
+    <div className={s.roomPick} data-open={open ? "" : undefined}>
+      <button type="button" className={s.roomPickHead} onClick={() => many && setOpen((o) => !o)} aria-expanded={many ? open : undefined} aria-haspopup={many ? "listbox" : undefined} disabled={!many}>
+        {row(room)}
+        {many && <Icon name="expand_more" size={24} className={s.roomPickChevron} />}
+      </button>
+      {many && (
+        <div className={s.roomPickList} aria-hidden={!open}>
+          <div role="listbox" aria-label="Room">
+            {rooms.filter((r) => r.id !== room.id).map((r) => (
+              <button key={r.id} type="button" role="option" aria-selected={false} tabIndex={open ? 0 : -1} className={s.roomPickOption} onClick={() => { onRoom(r.id); setOpen(false) }}>
+                {row(r)}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -270,12 +317,13 @@ function BookingDialog(props: {
   priceUsd: number
   meta: Record<string, string | undefined>
   waHref: string
+  rooms: PanelRoom[]
+  roomId: string
+  onRoom: (id: string) => void
 }) {
-  const { open, onClose, mobile, programId, programName, placeLine, priced, variants, variantId, onVariant, slots, slot, onSlot, pax, setPax, priceUsd, meta, waHref } = props
+  const { open, onClose, mobile, programId, programName, placeLine, priced, variants, variantId, onVariant, slots, slot, onSlot, pax, setPax, priceUsd, meta, waHref, rooms, roomId, onRoom } = props
+  const room = rooms.find((r) => r.id === roomId) ?? rooms[0]
   const [step, setStep] = useState<"choose" | "details" | "sent">("choose")
-  const months = useMemo(() => Array.from(new Set(slots.map((x) => x.monthKey))).slice(0, 3), [slots])
-  const [month, setMonth] = useState(months[0] ?? "")
-  const shown = slots.filter((x) => x.monthKey === (months.includes(month) ? month : months[0]))
   const [thbVariants, setThbVariants] = useState<ThbVariant[]>([])
   const [name, setName] = useState("")
   const [contact, setContact] = useState("")
@@ -322,6 +370,7 @@ function BookingDialog(props: {
         program_id: programId,
         arrival: slot.start,
         pax,
+        room: room?.name,
         guest_name: name,
         guest_email: isEmail ? contact : undefined,
         guest_whatsapp: isEmail ? undefined : contact,
@@ -426,6 +475,13 @@ function BookingDialog(props: {
   return (
     <BottomSheet open={open} onClose={close} title="Choose a departure" footer={reserve}>
       <div className={s.dep}>
+        {/* Room: a card with a dropdown (native select over it) (Oleg 07.11.2026) */}
+        {room && (
+          <section className={s.depGroup}>
+            <h3 className="ds-headline-s">Room</h3>
+            <RoomPicker rooms={rooms} room={room} onRoom={onRoom} />
+          </section>
+        )}
         {variants.length > 1 && (
           <section className={s.depGroup}>
             <h3 className="ds-headline-s">Length</h3>
@@ -441,34 +497,14 @@ function BookingDialog(props: {
           <Stepper pax={pax} setPax={setPax} />
         </section>
         <section className={s.depGroup}>
-          <div className={s.depRow}>
-            <h3 className="ds-headline-s">Dates</h3>
-            {mobile ? (
-              <label className={s.monthSelect}>
-                <select value={month} onChange={(e) => setMonth(e.target.value)} aria-label="Month">
-                  {months.map((k) => <option key={k} value={k}>{monthLabel(k)}</option>)}
-                </select>
-                <span className="ds-title-s">{monthLabel(months.includes(month) ? month : months[0])}</span>
-                <Icon name="expand_more" size={24} />
-              </label>
-            ) : null}
-          </div>
-          {!mobile && (
-            <div className={s.lengths}>
-              {months.map((k) => <Chip key={k} size="s" selected={k === (months.includes(month) ? month : months[0])} onClick={() => setMonth(k)}>{monthLabel(k)}</Chip>)}
+          {/* A calendar of the trips one can take; the picked stay is highlighted; the month sits on the title row (Oleg 07.11.2026) */}
+          <RangeCalendar ranges={slots} selected={slot} onPick={onSlot} heading={<h3 className="ds-headline-s">Dates</h3>} />
+          {slot && (
+            <div className={s.calPick}>
+              <span className="ds-title-m">{slot.title}</span>
+              <span className="ds-body-m ds-muted"><Facts items={[slot.weekdays, priceUsd ? `${usd(priceUsd)} per person` : null, `${days} days`]} /></span>
             </div>
           )}
-          <div className={o.slots} role="radiogroup" aria-label="Start date">
-            {shown.map((x) => (
-              <SlotRow
-                key={x.start}
-                slot={x}
-                on={x.start === slot?.start}
-                onPick={() => onSlot(x.start)}
-                sub={<Facts items={[x.weekdays, priceUsd ? `${usd(priceUsd)} per person` : null, `${days} days`]} />}
-              />
-            ))}
-          </div>
         </section>
         <p className={o.note} style={{ textAlign: "center" }}>
           {priced ? "Deposit by card, Apple Pay or Google Pay. A person confirms your trip on WhatsApp." : "No payment now. A person confirms availability and the price on WhatsApp."}
