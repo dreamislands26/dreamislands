@@ -19,6 +19,7 @@ import RangeCalendar from "../../ds/RangeCalendar"
 import s from "./program.module.css"
 
 export type PanelVariant = { id: string; label: string; duration_days: number; duration_nights: number; price_basic_usd: number; checkout: boolean }
+export type PanelRoom = { id: string; name: string; capacity: number | null; icon: string }
 type ThbVariant = { id: string; label: string; duration_days: number; duration_nights: number; price_basic_thb: number }
 
 const DEPOSIT_PCT = 20
@@ -47,9 +48,12 @@ export default function BookingPanel({
   waHref,
   placeLine,
   supplierPrice,
+  rooms = [],
 }: {
   programId: string
   programName: string
+  /** Rooms of the stay ("Where you stay"); the sheet offers them in a dropdown */
+  rooms?: PanelRoom[]
   propertyId?: string
   propertyName?: string
   country?: string
@@ -104,6 +108,8 @@ export default function BookingPanel({
   const deposit = Math.round(price * (DEPOSIT_PCT / 100))
   const meta = { program_id: programId, property_id: propertyId, property_name: propertyName, destination_country: country }
 
+  // The room picked in the sheet; a room's arrow in "Where you stay" opens the sheet with it (Oleg 07.11.2026)
+  const [roomId, setRoomId] = useState<string>(rooms[0]?.id ?? "")
   const openDialog = useCallback(() => {
     setOpen(true)
     track("open_reserve_modal", meta)
@@ -114,7 +120,8 @@ export default function BookingPanel({
   // (#reserve) open the dialog instead of jumping to nothing
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
-      const a = (e.target as Element | null)?.closest?.('a[href="#reserve"]')
+      const a = (e.target as Element | null)?.closest?.<HTMLElement>('a[href="#reserve"]')
+      if (a?.dataset.room) setRoomId(a.dataset.room)
       if (!a || !window.matchMedia("(max-width: 767px)").matches) return
       e.preventDefault()
       openDialog()
@@ -211,6 +218,9 @@ export default function BookingPanel({
         priceUsd={price}
         meta={meta}
         waHref={waHref}
+        rooms={rooms}
+        roomId={roomId}
+        onRoom={setRoomId}
       />
 
       {/* CF8: payment didn't go through */}
@@ -271,8 +281,12 @@ function BookingDialog(props: {
   priceUsd: number
   meta: Record<string, string | undefined>
   waHref: string
+  rooms: PanelRoom[]
+  roomId: string
+  onRoom: (id: string) => void
 }) {
-  const { open, onClose, mobile, programId, programName, placeLine, priced, variants, variantId, onVariant, slots, slot, onSlot, pax, setPax, priceUsd, meta, waHref } = props
+  const { open, onClose, mobile, programId, programName, placeLine, priced, variants, variantId, onVariant, slots, slot, onSlot, pax, setPax, priceUsd, meta, waHref, rooms, roomId, onRoom } = props
+  const room = rooms.find((r) => r.id === roomId) ?? rooms[0]
   const [step, setStep] = useState<"choose" | "details" | "sent">("choose")
   const [thbVariants, setThbVariants] = useState<ThbVariant[]>([])
   const [name, setName] = useState("")
@@ -424,6 +438,25 @@ function BookingDialog(props: {
   return (
     <BottomSheet open={open} onClose={close} title="Choose a departure" footer={reserve}>
       <div className={s.dep}>
+        {/* Room: a card with a dropdown (native select over it) (Oleg 07.11.2026) */}
+        {room && (
+          <section className={s.depGroup}>
+            <h3 className="ds-headline-s">Room</h3>
+            <label className={s.roomPick}>
+              <span className={s.roomPickIcon}><Icon name={room.icon} /></span>
+              <span className={s.roomPickText}>
+                <span className="ds-title-m">{room.name}</span>
+                {room.capacity ? <span className="ds-body-s ds-muted">Up to {room.capacity} {room.capacity === 1 ? "guest" : "guests"}</span> : null}
+              </span>
+              {rooms.length > 1 && <Icon name="expand_more" size={24} />}
+              {rooms.length > 1 && (
+                <select value={room.id} onChange={(e) => onRoom(e.target.value)} aria-label="Room">
+                  {rooms.map((r) => <option key={r.id} value={r.id}>{r.name}{r.capacity ? ` (up to ${r.capacity})` : ""}</option>)}
+                </select>
+              )}
+            </label>
+          </section>
+        )}
         {variants.length > 1 && (
           <section className={s.depGroup}>
             <h3 className="ds-headline-s">Length</h3>

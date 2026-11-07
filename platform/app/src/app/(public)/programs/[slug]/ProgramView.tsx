@@ -316,7 +316,7 @@ export default function ProgramView({
               <div>
                 <h2 className={s.h2}>Where you stay</h2>
                 {accommodations.map((a) => (
-                  <ListItem key={a.id} card icon={roomIcon(a)} headline={<span className={s.oneLine}>{enOnly(a.room_type) ?? a.room_type}</span>} supporting={<span className={s.roomFacts}><Facts items={[a.capacity ? `Up to ${a.capacity} ${a.capacity === 1 ? "guest" : "guests"}` : null, enOnly(a.description)]} /></span>} trailing={<ButtonLink href="#reserve" replace variant="tonal" trailingIcon="arrow_forward" aria-label="Check dates" className={s.roomCta}><span className={s.roomCtaText}>Check dates</span></ButtonLink>} />
+                  <ListItem key={a.id} card icon={roomIcon(a)} headline={<span className={s.oneLine}>{enOnly(a.room_type) ?? a.room_type}</span>} supporting={<span className={s.roomFacts}><Facts items={[a.capacity ? `Up to ${a.capacity} ${a.capacity === 1 ? "guest" : "guests"}` : null, enOnly(a.description)]} /></span>} trailing={<ButtonLink href="#reserve" replace variant="tonal" trailingIcon="arrow_forward" aria-label="Check dates" className={s.roomCta} data-room={a.id}><span className={s.roomCtaText}>Check dates</span></ButtonLink>} />
                 ))}
               </div>
             )}
@@ -357,6 +357,7 @@ export default function ProgramView({
             variants={variants.map((v) => ({ id: v.id, label: v.label, duration_days: v.duration_days, duration_nights: v.duration_nights, price_basic_usd: Number(v.price_basic_usd) || 0, checkout: v.price_basic_thb != null && Number(v.price_basic_thb) > 0 }))}
             waHref={waHref}
             supplierPrice={supplierPrice}
+            rooms={accommodations.map((a) => ({ id: a.id, name: enOnly(a.room_type) ?? a.room_type, capacity: a.capacity ?? null, icon: roomIcon(a) }))}
           />
         </div>
 
