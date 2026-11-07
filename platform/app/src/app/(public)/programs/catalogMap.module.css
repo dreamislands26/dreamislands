@@ -59,7 +59,8 @@
 .mini .heartOn { font-size: 1.0625rem; color: #ff4462; }
 .body { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 0 0.75rem 1.5rem; }
 .text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.125rem; color: inherit; text-decoration: none; }
-.open { flex: none; padding: 0 1.25rem; }
+.open { flex: none; width: 3rem; height: 3rem; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--ds-primary); color: var(--ds-on-primary); text-decoration: none; }
+.open :global(.ds-icon) { font-size: 1.5rem; }
 .titleRow { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
 .title { font: 500 1rem/1.25rem var(--ds-font-body); color: var(--ds-on-surface); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .rating { flex: none; display: inline-flex; align-items: center; gap: 0.125rem; font: 400 0.75rem/1rem var(--ds-font-body); color: var(--ds-on-surface-variant); }
