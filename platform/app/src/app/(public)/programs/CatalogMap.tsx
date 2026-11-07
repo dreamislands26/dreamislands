@@ -16,7 +16,7 @@ import "leaflet/dist/leaflet.css"
 import { Photo, SUPABASE_HOST } from "../ds/cards"
 import { isSaved, toggleSaved, useSaved, type SavedItem } from "../ds/saved"
 import { Facts, Icon } from "../ds/ui"
-import { MAP_DRAG, MAP_SELECT } from "./ResultsSheet"
+import { MAP_DRAG, MAP_SELECT, MAP_SHEET, type MapSheetDetail } from "./ResultsSheet"
 import m from "./catalogMap.module.css"
 import Flag from "../ds/Flag"
 
@@ -155,6 +155,7 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
     let map: import("leaflet").Map | undefined
     let cancelled = false
     let ro: ResizeObserver | undefined
+    let onSheet: ((e: Event) => void) | undefined
     Promise.all([import("leaflet"), refine(initial, token)]).then(([L, points]) => {
       if (cancelled || !el.current) return
       setPoints(points)
@@ -355,11 +356,23 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
       map.on("click", () => { if (current) select(null) })
       // Moving the map by hand lowers the results sheet
       map.on("dragstart", () => window.dispatchEvent(new Event(MAP_DRAG)))
+      // The top of the results sheet when it last rested over the map (half or collapsed): the map shows
+      // above it. When the user lowers or raises the sheet, the map slides by half the step, so what was
+      // in the middle of the part that shows stays in the middle (the zoom stays). Not when the sheet
+      // drops because the map is being dragged, and not while a place card is open.
+      let sheetTop = Math.round(window.innerHeight * 0.46)
+      onSheet = (e: Event) => {
+        const { top, byUser } = (e as CustomEvent<MapSheetDetail>).detail
+        if (top === null || top === sheetTop) return
+        if (byUser && map && !current) map.panBy([0, -(top - sheetTop) / 2], { duration: 0.35 })
+        sheetTop = top
+      }
+      window.addEventListener(MAP_SHEET, onSheet)
       const frame = () => {
         if (!map || current) return
         map.invalidateSize()
         if (points.length === 1) map.setView(points[0].at, 9)
-        else if (points.length) map.fitBounds(L.latLngBounds(points.map((p) => p.at)), { paddingTopLeft: [16, 118], paddingBottomRight: [16, Math.round(window.innerHeight * 0.54) + 16], maxZoom: 9 })
+        else if (points.length) map.fitBounds(L.latLngBounds(points.map((p) => p.at)), { paddingTopLeft: [16, 118], paddingBottomRight: [16, Math.max(16, window.innerHeight - sheetTop + 16)], maxZoom: 9 })
         else map.setView([10, 110], 4)
       }
       frame()
@@ -370,6 +383,7 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
     return () => {
       cancelled = true
       ro?.disconnect()
+      if (onSheet) window.removeEventListener(MAP_SHEET, onSheet)
       map?.remove()
       setSelected(null)
       window.dispatchEvent(new CustomEvent(MAP_SELECT, { detail: null }))

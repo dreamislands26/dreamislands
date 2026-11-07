@@ -1,6 +1,8 @@
 /* Mobile search (Figma 110:5430) and its filters sheet (Figma 231:6999) */
 /* Above the results sheet (z 45): the search and the chips stay in sight however far the sheet goes */
-.top { position: sticky; top: 0; z-index: 46; background: var(--ds-surface); padding-top: env(safe-area-inset-top); }
+.top { position: sticky; top: 0; z-index: 46; background: var(--ds-surface); padding-top: env(safe-area-inset-top); box-shadow: 0 1px 0 var(--ds-surface); }
+/* The shadow: the bar ends on a fractional pixel (133.375), and iOS drew a dark hairline at that edge
+   over the map and the full sheet (Oleg 07.11.2026); one pixel of the bar's own colour covers it */
 .bar { display: flex; align-items: center; gap: 1rem; padding: 0.5rem 0.75rem; }
 .round { background: var(--ds-surface-container-high) !important; flex: none; }
 /* Icon pinned left, text centred in the pill, Label/Large on-surface (Figma Search bar) */

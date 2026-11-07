@@ -81,7 +81,8 @@
   flex: none;
   text-decoration: none;
 }
-.chip:hover { background: var(--ds-surface-container-highest); }
+/* Hover only where there is a pointer: on iOS a tapped chip keeps :hover, which painted a selected chip grey */
+@media (hover: hover) { .chip:not(.chipSelected):hover { background: var(--ds-surface-container-highest); } }
 .chipDot { width: 1.3125rem; height: 1.3125rem; border-radius: 50%; background: var(--ds-secondary-container); color: var(--ds-on-secondary-container); flex: none; display: inline-flex; align-items: center; justify-content: center; }
 .chipDot :global(.ds-icon) { font-size: 0.875rem; }
 .chipS { height: 2.3125rem; padding: 0 0.75rem 0 0.625rem; } /* compact, used in filter sheets */

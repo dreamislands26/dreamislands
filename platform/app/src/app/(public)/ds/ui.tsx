@@ -108,7 +108,7 @@ export function Chip({ selected, icon, size, href, replace, onClick, children }:
     </>
   )
   // `replace`: filter chips swap the URL instead of stacking history, so Back leaves the page
-  if (href) return <Link href={href} replace={replace} scroll={replace ? false : undefined} className={cls} aria-current={selected ? "true" : undefined}>{inner}</Link>
+  if (href) return <Link href={href} replace={replace} scroll={replace ? false : undefined} className={cls} aria-current={selected ? "true" : undefined} onClick={onClick}>{inner}</Link>
   return <button type="button" className={cls} aria-pressed={!!selected} onClick={onClick}>{inner}</button>
 }
 

@@ -763,3 +763,5 @@ h1, h2 { font-family: var(--font-display); font-weight: 400; letter-spacing: -.0
 /* Pages with their own price bar (programme, place): the same 16px above that bar */
 @media (max-width: 767px) { .ds-root:has([data-own-bar]) .fab-support { bottom: calc(6.65rem + env(safe-area-inset-bottom)); } }
 @media (max-width: 767px) { .ds-root:has([data-own-bar="action"]) .fab-support { bottom: calc(7.05rem + env(safe-area-inset-bottom)); } } /* the place bar is a little taller */
+/* The search map on phones has no support button: it covered the map and the sheet (Oleg 07.11.2026) */
+@media (max-width: 767px) { .ds-root:has([data-search-top]) .fab-support { display: none; } }
