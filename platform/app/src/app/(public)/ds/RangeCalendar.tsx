@@ -1,5 +1,6 @@
 "use client"
-// Month calendar for picking a trip (Oleg 07.11.2026): the days a trip can start on are marked; tapping a day
+// Month calendar for picking a trip (Oleg 07.11.2026): every trip one can take is a pale band (its start day
+// dotted), so the step is plain; tapping a day
 // selects the trip that starts on it, or the latest one that covers it, and the whole stay is highlighted as
 // a band from arrival to departure. Days no trip covers are muted. Weeks start on Monday; dates are ISO
 // (YYYY-MM-DD, UTC).
@@ -27,6 +28,7 @@ export default function RangeCalendar({ ranges, selected, onPick }: { ranges: Ca
   const lead = (first.getUTCDay() + 6) % 7 // Monday first
   const count = new Date(Date.UTC(y, m, 0)).getUTCDate()
   const starts = new Set(ranges.map((r) => r.start))
+  const ends = new Set(ranges.map((r) => r.end))
   // The trip a tap on `k` picks: the one starting that day, else the latest one covering it
   const tripFor = (k: string) => (starts.has(k) ? k : [...ranges].reverse().find((r) => r.start <= k && k <= r.end)?.start)
   const title = first.toLocaleDateString("en-US", { timeZone: "UTC", month: "long", year: "numeric" })
@@ -45,6 +47,8 @@ export default function RangeCalendar({ ranges, selected, onPick }: { ranges: Ca
           const k = iso(new Date(Date.UTC(y, m - 1, i + 1)))
           const trip = tripFor(k)
           const inSel = !!selected && selected.start <= k && k <= selected.end
+          // Every trip one can take shows as a pale band, so the calendar's step is plain (Oleg 07.11.2026)
+          const avail = !!trip
           const edge = selected && (k === selected.start ? "start" : k === selected.end ? "end" : null)
           const col = (lead + i) % 7
           return (
@@ -53,6 +57,9 @@ export default function RangeCalendar({ ranges, selected, onPick }: { ranges: Ca
               type="button"
               className={s.day}
               data-in={inSel ? "" : undefined}
+              data-avail={avail ? "" : undefined}
+              data-range-start={starts.has(k) ? "" : undefined}
+              data-range-end={ends.has(k) ? "" : undefined}
               data-edge={edge ?? undefined}
               data-row-start={col === 0 || i === 0 ? "" : undefined}
               data-row-end={col === 6 || i === count - 1 ? "" : undefined}

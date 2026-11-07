@@ -1,5 +1,5 @@
-/* RangeCalendar: 7 columns, 40px rows. The selected stay is a mint band with dark round ends; trip start
-   days carry a small dot; days no trip covers are muted. */
+/* RangeCalendar: 7 columns, 40px rows. Trips one can take are pale bands, the selected stay a mint band with
+   dark round ends; trip start days carry a small dot; days no trip covers are muted. */
 .cal { display: flex; flex-direction: column; gap: 0.5rem; }
 .head { display: flex; align-items: center; justify-content: space-between; margin: 0 -0.5rem; }
 .grid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 0.25rem; }
@@ -9,10 +9,12 @@
 .day:disabled { color: var(--ds-on-surface-variant); opacity: 0.4; cursor: default; }
 /* A trip can start here */
 .day[data-start]::after { content: ""; position: absolute; left: 50%; bottom: 0.1875rem; width: 0.25rem; height: 0.25rem; margin-left: -0.125rem; border-radius: 50%; background: var(--ds-primary); z-index: 1; }
-/* The stay: the band runs cell to cell, rounded where a week row starts or ends */
-.day[data-in]::before { content: ""; position: absolute; inset: 0.125rem 0; background: var(--ds-secondary-container); }
-.day[data-in][data-row-start]::before, .day[data-edge="start"]::before { left: 0.125rem; border-top-left-radius: 1.25rem; border-bottom-left-radius: 1.25rem; }
-.day[data-in][data-row-end]::before, .day[data-edge="end"]::before { right: 0.125rem; border-top-right-radius: 1.25rem; border-bottom-right-radius: 1.25rem; }
+/* Bands run cell to cell and round off where a trip starts or ends and where a week row starts or ends.
+   Pale for every trip one can take, mint for the picked stay (other trips' ends inside it do not cut it). */
+.day[data-avail]::before { content: ""; position: absolute; inset: 0.125rem 0; background: var(--ds-surface-container-high); }
+.day[data-in]::before { background: var(--ds-secondary-container); }
+.day[data-avail][data-row-start]::before, .day[data-avail]:not([data-in])[data-range-start]::before, .day[data-edge="start"]::before { left: 0.1875rem; border-top-left-radius: 1.25rem; border-bottom-left-radius: 1.25rem; }
+.day[data-avail][data-row-end]::before, .day[data-avail]:not([data-in])[data-range-end]::before, .day[data-edge="end"]::before { right: 0.1875rem; border-top-right-radius: 1.25rem; border-bottom-right-radius: 1.25rem; }
 .day[data-in] { color: var(--ds-on-secondary-container); }
 .day[data-edge] > span { background: var(--ds-on-secondary-container); color: #fff; }
 .day[data-edge]::after { background: #fff; }
