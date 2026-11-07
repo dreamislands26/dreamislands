@@ -14,50 +14,86 @@ const CUSTOM_ICONS: Record<string, ReactNode> = {
       <path d="M12.7 5.9C13 4.1 14.5 3 16.7 3.1C16.5 5 14.9 6.1 12.7 5.9Z" />
     </>
   ),
-  // Rooms, drawn from above (Oleg 07.11.2026): one bed, two singles, a double, two bedrooms, a villa with its pool
+  // Rooms (Oleg 07.11.2026): beds from the front (one, two singles, a double), a house with bedrooms, a villa
+  // with its pool ladder, a Japanese house, a Singapore shophouse
   dit_bed_single: (
     <>
-      <rect x="7.5" y="4.75" width="9" height="16.5" rx="1.8" />
-      <rect x="9.1" y="6.4" width="5.8" height="3" rx="1.2" />
-      <path d="M7.5 11.8H16.5" />
+      <path d="M7 12.5V8.2C7 7.37 7.67 6.7 8.5 6.7H15.5C16.33 6.7 17 7.37 17 8.2V12.5" />
+      <rect x="9.4" y="9.3" width="5.2" height="2.4" rx="1" />
+      <rect x="5.5" y="12.5" width="13" height="4.5" rx="1.4" />
+      <path d="M7 17V19.3" />
+      <path d="M17 17V19.3" />
     </>
   ),
   dit_bed_twin: (
     <>
-      <rect x="3.25" y="4.75" width="7.25" height="16.5" rx="1.7" />
-      <rect x="4.75" y="6.4" width="4.25" height="3" rx="1.2" />
-      <path d="M3.25 11.8H10.5" />
-      <rect x="13.5" y="4.75" width="7.25" height="16.5" rx="1.7" />
-      <rect x="15" y="6.4" width="4.25" height="3" rx="1.2" />
-      <path d="M13.5 11.8H20.75" />
+      <path d="M3.6 13V9.4C3.6 8.74 4.14 8.2 4.8 8.2H9.2C9.86 8.2 10.4 8.74 10.4 9.4V13" />
+      <rect x="5" y="10.4" width="4" height="2" rx="0.9" />
+      <rect x="2.5" y="13" width="9" height="3.8" rx="1.2" />
+      <path d="M3.6 16.8V19" />
+      <path d="M10.4 16.8V19" />
+      <path d="M13.6 13V9.4C13.6 8.74 14.14 8.2 14.8 8.2H19.2C19.86 8.2 20.4 8.74 20.4 9.4V13" />
+      <rect x="15" y="10.4" width="4" height="2" rx="0.9" />
+      <rect x="12.5" y="13" width="9" height="3.8" rx="1.2" />
+      <path d="M13.6 16.8V19" />
+      <path d="M20.4 16.8V19" />
     </>
   ),
   dit_bed_double: (
     <>
-      <rect x="4" y="4.75" width="16" height="16.5" rx="2" />
-      <rect x="5.6" y="6.4" width="5.7" height="3" rx="1.2" />
-      <rect x="12.7" y="6.4" width="5.7" height="3" rx="1.2" />
-      <path d="M4 11.8H20" />
+      <path d="M4.25 12.5V7.9C4.25 7.07 4.92 6.4 5.75 6.4H18.25C19.08 6.4 19.75 7.07 19.75 7.9V12.5" />
+      <rect x="6.2" y="9.3" width="5" height="2.4" rx="1" />
+      <rect x="12.8" y="9.3" width="5" height="2.4" rx="1" />
+      <rect x="2.75" y="12.5" width="18.5" height="4.5" rx="1.4" />
+      <path d="M4.25 17V19.3" />
+      <path d="M19.75 17V19.3" />
     </>
   ),
   dit_rooms: (
     <>
-      <rect x="3.25" y="4.75" width="17.5" height="16.5" rx="1.75" />
-      <path d="M12 4.75V13.2" />
-      <path d="M12 16.8V21.25" />
-      <rect x="5.2" y="6.6" width="4.4" height="7" rx="1" />
-      <path d="M5.2 9.1H9.6" />
-      <rect x="14.4" y="6.6" width="4.4" height="7" rx="1" />
-      <path d="M14.4 9.1H18.8" />
+      <path d="M3 10.5L12 4.5L21 10.5" />
+      <path d="M5 9.2V20H19V9.2" />
+      <path d="M8.3 15.2V13C8.3 12.56 8.66 12.2 9.1 12.2H14.9C15.34 12.2 15.7 12.56 15.7 13V15.2" />
+      <rect x="7.2" y="15.2" width="9.6" height="2.6" rx="0.9" />
+      <path d="M8.3 17.8V20" />
+      <path d="M15.7 17.8V20" />
+      <rect x="10.6" y="7.6" width="2.8" height="2.4" rx="0.5" />
     </>
   ),
   dit_villa: (
     <>
-      <path d="M3.5 10L12 4.5L20.5 10" />
-      <path d="M5.75 8.6V14.75H18.25V8.6" />
-      <path d="M10.5 14.75V12.4C10.5 11.57 11.17 10.9 12 10.9C12.83 10.9 13.5 11.57 13.5 12.4V14.75" />
-      <rect x="3.25" y="17" width="17.5" height="5" rx="1.6" />
-      <path d="M6 19.7C7 19 8 19 9 19.7C10 20.4 11 20.4 12 19.7C13 19 14 19 15 19.7C16 20.4 17 20.4 18 19.7" />
+      <path d="M2.75 10.6L8.6 5.6L14.45 10.6" />
+      <path d="M4.3 9.4V15.5H12.9V9.4" />
+      <path d="M7.4 15.5V12.7H9.8V15.5" />
+      <path d="M16.4 17.2V8.3C16.4 7.42 17.12 6.7 18 6.7C18.88 6.7 19.6 7.42 19.6 8.3V17.2" />
+      <path d="M16.4 11.6H19.6" />
+      <path d="M16.4 14.4H19.6" />
+      <path d="M2.75 19.4C3.9 18.6 5.1 18.6 6.25 19.4C7.4 20.2 8.6 20.2 9.75 19.4C10.9 18.6 12.1 18.6 13.25 19.4C14.4 20.2 15.6 20.2 16.75 19.4C17.9 18.6 19.1 18.6 20.25 19.4" />
+      <path d="M5.5 22.2C6.65 21.4 7.85 21.4 9 22.2C10.15 23 11.35 23 12.5 22.2C13.65 21.4 14.85 21.4 16 22.2C17.15 23 18.35 23 18.5 22.2" />
+    </>
+  ),
+  dit_house_japanese: (
+    <>
+      <path d="M2.5 10.2C5.6 10.2 9 8.4 12 5.2C15 8.4 18.4 10.2 21.5 10.2" />
+      <path d="M10.6 6.6H13.4" />
+      <path d="M5.25 10V18.75" />
+      <path d="M18.75 10V18.75" />
+      <path d="M3.25 18.75H20.75" />
+      <rect x="8.25" y="12.25" width="7.5" height="6.5" rx="0.4" />
+      <path d="M12 12.25V18.75" />
+      <path d="M8.25 15.5H15.75" />
+    </>
+  ),
+  dit_house_singapore: (
+    <>
+      <path d="M3 9L12 4.75L21 9" />
+      <path d="M4.75 8.2V20H19.25V8.2" />
+      <path d="M4.75 14H19.25" />
+      <path d="M7.4 12.4V10.9C7.4 10.13 8.03 9.5 8.8 9.5C9.57 9.5 10.2 10.13 10.2 10.9V12.4" />
+      <path d="M13.8 12.4V10.9C13.8 10.13 14.43 9.5 15.2 9.5C15.97 9.5 16.6 10.13 16.6 10.9V12.4" />
+      <path d="M10.4 20V17.4C10.4 16.52 11.12 15.8 12 15.8C12.88 15.8 13.6 16.52 13.6 17.4V20" />
+      <path d="M6.5 16.4V18" />
+      <path d="M17.5 16.4V18" />
     </>
   ),
 }

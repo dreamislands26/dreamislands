@@ -84,10 +84,12 @@ const ACTIVITY_ICONS: [RegExp, string][] = [
 const activityIcon = (t: { title: string; text: string }) =>
   ACTIVITY_ICONS.find(([re]) => re.test(t.title))?.[1] ?? ACTIVITY_ICONS.find(([re]) => re.test(t.text))?.[1] ?? "spa"
 
-/** A room's icon from its kind, not its pool (Oleg 07.11.2026): villa, several bedrooms, one guest, twin or
- *  shared, else a double */
+/** A room's icon from its kind (Oleg 07.11.2026): Japanese or Singapore house, villa, several bedrooms, one
+ *  guest, twin or shared, else a double */
 function roomIcon(a: { room_type: string | null; description?: string | null; capacity?: number | null }) {
   const t = `${a.room_type ?? ""} ${a.description ?? ""}`.toLowerCase()
+  if (/japan/.test(t)) return "dit_house_japanese"
+  if (/singapore|shophouse/.test(t)) return "dit_house_singapore"
   if (/villa/.test(t)) return "dit_villa"
   if (/\b([2-9]|two|three|four) bedrooms?\b|apartment|suite with|house|residence/.test(t)) return "dit_rooms"
   if (a.capacity === 1 || /\bsingle\b|\bsolo\b/.test(t)) return "dit_bed_single"
