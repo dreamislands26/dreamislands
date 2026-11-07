@@ -252,6 +252,42 @@ function SlotRow({ slot, on, onPick, sub, tall }: { slot: Slot; on: boolean; onP
   )
 }
 
+/** Room dropdown in the site's style (Oleg 07.11.2026): the card shows the picked room; tapped, it opens a
+ *  list of the rooms with their icons right under it, the picked one checked. */
+function RoomPicker({ rooms, room, onRoom }: { rooms: PanelRoom[]; room: PanelRoom; onRoom: (id: string) => void }) {
+  const [open, setOpen] = useState(false)
+  const many = rooms.length > 1
+  const guests = (n: number | null) => (n ? `Up to ${n} ${n === 1 ? "guest" : "guests"}` : null)
+  const row = (r: PanelRoom) => (
+    <>
+      <span className={s.roomPickIcon}><Icon name={r.icon} /></span>
+      <span className={s.roomPickText}>
+        <span className="ds-title-m">{r.name}</span>
+        {guests(r.capacity) && <span className="ds-body-s ds-muted">{guests(r.capacity)}</span>}
+      </span>
+    </>
+  )
+  return (
+    <div className={s.roomPick} data-open={open ? "" : undefined}>
+      <button type="button" className={s.roomPickHead} onClick={() => many && setOpen((o) => !o)} aria-expanded={many ? open : undefined} aria-haspopup={many ? "listbox" : undefined} disabled={!many}>
+        {row(room)}
+        {many && <Icon name="expand_more" size={24} className={s.roomPickChevron} />}
+      </button>
+      {many && (
+        <div className={s.roomPickList} aria-hidden={!open}>
+          <div role="listbox" aria-label="Room">
+            {rooms.filter((r) => r.id !== room.id).map((r) => (
+              <button key={r.id} type="button" role="option" aria-selected={false} tabIndex={open ? 0 : -1} className={s.roomPickOption} onClick={() => { onRoom(r.id); setOpen(false) }}>
+                {row(r)}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function Stepper({ pax, setPax }: { pax: number; setPax: React.Dispatch<React.SetStateAction<number>> }) {
   return (
     <div className={o.stepper}>
@@ -443,19 +479,7 @@ function BookingDialog(props: {
         {room && (
           <section className={s.depGroup}>
             <h3 className="ds-headline-s">Room</h3>
-            <label className={s.roomPick}>
-              <span className={s.roomPickIcon}><Icon name={room.icon} /></span>
-              <span className={s.roomPickText}>
-                <span className="ds-title-m">{room.name}</span>
-                {room.capacity ? <span className="ds-body-s ds-muted">Up to {room.capacity} {room.capacity === 1 ? "guest" : "guests"}</span> : null}
-              </span>
-              {rooms.length > 1 && <Icon name="expand_more" size={24} />}
-              {rooms.length > 1 && (
-                <select value={room.id} onChange={(e) => onRoom(e.target.value)} aria-label="Room">
-                  {rooms.map((r) => <option key={r.id} value={r.id}>{r.name}{r.capacity ? ` (up to ${r.capacity})` : ""}</option>)}
-                </select>
-              )}
-            </label>
+            <RoomPicker rooms={rooms} room={room} onRoom={onRoom} />
           </section>
         )}
         {variants.length > 1 && (

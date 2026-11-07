@@ -57,14 +57,21 @@ export function BottomSheet({ open, onClose, title, footer, tall, wide, back, ch
     const b = body.current, sh = sheet.current
     let scrolled = false
     const sync = () => { if (b && sh) sh.dataset.more = scrolled && b.scrollTop + b.clientHeight < b.scrollHeight - 2 ? "1" : "" }
-    // Phones: scrolling the body down takes the sheet full screen over the header, corners gone; back at
-    // the top it returns under the header (Oleg 07.11.2026)
+    // Phones: scrolling the body takes the sheet full screen over the header with the site's unfold (as the
+    // programme sheet over its photo): over the header's height of scroll, --fp goes 0..1, the sheet rises
+    // over the header, its corners grow and it widens past both edges until the arc is gone (Oleg 07.11.2026)
+    const header = () => document.querySelector("[class*=mtop]")?.getBoundingClientRect().bottom || 56
+    let raf = 0
+    const unfold = () => {
+      raf = 0
+      if (!sh || !b) return
+      const p = window.innerWidth >= 768 ? 0 : Math.min(1, Math.max(0, b.scrollTop / header()))
+      sh.style.setProperty("--fp", p.toFixed(3))
+    }
     const onScroll = () => {
       scrolled = true
       sync()
-      if (!sh || !b || window.innerWidth >= 768) return
-      if (b.scrollTop > 8) sh.dataset.full = "1"
-      else if (b.scrollTop <= 0) delete sh.dataset.full
+      if (!raf) raf = requestAnimationFrame(unfold)
     }
     sync()
     b?.addEventListener("scroll", onScroll, { passive: true })
@@ -103,6 +110,7 @@ export function BottomSheet({ open, onClose, title, footer, tall, wide, back, ch
       document.body.style.overflow = prev
       document.removeEventListener("keydown", onKey)
       b?.removeEventListener("scroll", onScroll)
+      cancelAnimationFrame(raf)
       ro?.disconnect()
       sh?.removeEventListener("touchstart", onStart)
       sh?.removeEventListener("touchmove", onMove)
