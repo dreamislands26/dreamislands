@@ -12,6 +12,8 @@ const iso = (d: Date) => d.toISOString().slice(0, 10)
 const day = (k: string) => new Date(`${k}T00:00:00Z`)
 const add = (k: string, n: number) => { const d = day(k); d.setUTCDate(d.getUTCDate() + n); return iso(d) }
 const WD = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+/** "14.10" */
+const short = (k: string) => `${k.slice(8, 10)}.${k.slice(5, 7)}`
 
 /** `lengths`: stay lengths in days (both ends counted), `days`: the picked one; `onPick(arrival, days)` once a
  *  departure is chosen. `heading` goes on the month row, `tag` under it (it is told when a departure is due). */
@@ -62,7 +64,14 @@ export default function RangeCalendar({ earliest, latest, arrival, days, lengths
           <IconButton icon="arrow_forward" label="Next month" disabled={at >= months.length - 1} onClick={() => setMonth(months[at + 1])} />
         </div>
       </div>
-      {tag && <div className={s.tagRow}>{tag(picking)}</div>}
+      {/* The length tag, then the picked dates in green: it pops in with a small bounce each time the stay is
+          picked (keyed by the stay) (Oleg 07.11.2026) */}
+      {tag && (
+        <div className={s.tagRow}>
+          {tag(picking)}
+          {!picking && end && <span key={`${start}:${end}`} className={s.tagDates}>start {short(start)} → end {short(end)}</span>}
+        </div>
+      )}
       <div className={s.grid} role="grid" aria-label={title}>
         {WD.map((w) => <span key={w} className={s.wd}>{w.slice(0, 2)}</span>)}
         {Array.from({ length: Math.ceil((lead + count) / 7) * 7 }, (_, j) => {
