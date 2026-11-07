@@ -24,19 +24,28 @@ const LENGTHS: Length[] = [
   { key: "long", label: "10 days or more", min: 10, max: Infinity },
 ]
 
-export default function MobileSearch({ programs, outcomes, countries, bounds, state, chips, trackCohort }: {
+export default function MobileSearch({ programs, outcomes, countries, bounds, state, chips, trackCohorts }: {
   programs: LiteProgram[]
   outcomes: { slug: string; label: string; icon: string }[]
   countries: string[]
   bounds: [number, number]
   state: SearchState
   chips: { key: string; label: string; href: string; selected: boolean; icon: string }[]
-  trackCohort?: number
+  trackCohorts: number[]
 }) {
   const chipRow = useRef<HTMLDivElement>(null)
   const picked = chips.filter((c) => c.selected).map((c) => c.key).join(",")
   // The row starts at its beginning whenever the picked set changes
   useEffect(() => { chipRow.current?.scrollTo({ left: 0 }) }, [picked])
+  // A tapped chip turns mint at once, before the filtered page arrives; the row reorders when it does
+  const [tapped, setTapped] = useState<{ from: string; on: string[] } | null>(null)
+  const shownOn = tapped?.from === picked ? tapped.on : chips.filter((c) => c.selected).map((c) => c.key)
+  const tap = (key: string) => {
+    if (key === "all") return setTapped({ from: picked, on: ["all"] })
+    const rest = shownOn.filter((k) => k !== "all")
+    const on = rest.includes(key) ? rest.filter((k) => k !== key) : [...rest, key]
+    setTapped({ from: picked, on: on.length ? on : ["all"] })
+  }
   const router = useRouter()
   const go = (href: string, opts: { scroll: boolean }) => { startNavigation(href); router.replace(href, opts) }
   const back = useSafeBack("/")
@@ -54,13 +63,12 @@ export default function MobileSearch({ programs, outcomes, countries, bounds, st
   const count = useMemo(() => {
     const len = LENGTHS.find((l) => l.key === length)
     return programs.filter((p) =>
-      (trackCohort === undefined || p.cohort === trackCohort) &&
-      (!goals.length || goals.some((g) => p.outcomes.includes(g))) &&
+      ((!trackCohorts.length && !goals.length) || trackCohorts.includes(p.cohort) || goals.some((g) => p.outcomes.includes(g))) &&
       (!len || (p.minDays >= len.min && p.minDays <= len.max)) &&
       (!country || p.country === country) &&
       p.minPrice >= price[0] && (price[1] >= bounds[1] || p.minPrice <= price[1]),
     ).length
-  }, [programs, trackCohort, goals, length, country, price, bounds])
+  }, [programs, trackCohorts, goals, length, country, price, bounds])
 
   const apply = () => {
     setOpen(false)
@@ -102,7 +110,7 @@ export default function MobileSearch({ programs, outcomes, countries, bounds, st
       </div>
       {/* "All" always first, then the picked filters, so a goal chosen on the home page is in view (Oleg 07.11.2026) */}
       <div className={m.chips} ref={chipRow}>
-        {[...chips.slice(0, 1), ...chips.slice(1).filter((c) => c.selected), ...chips.slice(1).filter((c) => !c.selected)].map((c) => <Chip key={c.key} icon={c.icon || undefined} selected={c.selected} href={c.href} replace>{c.label}</Chip>)}
+        {[...chips.slice(0, 1), ...chips.slice(1).filter((c) => c.selected), ...chips.slice(1).filter((c) => !c.selected)].map((c) => <Chip key={c.key} icon={c.icon || undefined} selected={shownOn.includes(c.key)} href={c.href} replace onClick={() => tap(c.key)}>{c.label}</Chip>)}
       </div>
       </div>
 
