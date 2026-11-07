@@ -98,8 +98,8 @@ export function ProgramShell({ preview: p }: { preview?: Preview }) {
             </div>
             <p className={pr.factsMobile}><Skeleton className={s.center} /></p>
             <div className={pr.stats}>
-              <div><strong><Skeleton className={s.stat} /></strong><span>days</span></div>
-              <div><strong>2</strong><span>check-ins</span></div>
+              <span><Icon name="calendar_month" /><Skeleton className={s.stat} /></span>
+              <span><Icon name="monitoring" />2 check-ins</span>
             </div>
             <Lines n={3} />
             <p className={pr.facts}><Skeleton className={s.w60} /></p>

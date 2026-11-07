@@ -12,20 +12,20 @@ export const ICON_NAMES = [
   "directions_walk", "do_not_disturb_on", "done", "draft", "eco", "edit_note", "email", "energy", "error",
   "event", "event_available", "expand_more", "eyebrow", "face_retouching_natural", "fact_check", "favorite",
   "female", "fitness_center", "flight", "flight_land", "forest", "forum", "function", "grid_view", "group",
-  "healing", "heart_broken", "help", "height", "home_health", "host", "house", "http", "info", "input", "insights",
-  "ios_share", "key", "king_bed", "landscape", "list", "local_florist", "location_on", "lock", "login", "logout", "male",
+  "healing", "heart_broken", "help", "height", "home_health", "host", "http", "info", "input", "insights",
+  "ios_share", "key", "landscape", "list", "local_florist", "location_on", "lock", "login", "logout", "male",
   "mark_chat_read", "massage", "medical_information", "medical_services", "menu", "mobile", "monitor_weight",
   "monitoring", "note", "notes", "nutrition", "outbound", "paid", "payment", "payments", "pending", "person",
   "photo", "place", "pool", "post", "priority", "psychology", "psychology_alt", "public", "radio",
   "radio_button_unchecked", "relax", "remove", "resize", "reviews", "rocket_launch", "save", "score",
-  "script", "search", "self_improvement", "send", "signature", "single_bed", "sleep", "source", "spa", "sports_martial_arts",
+  "script", "search", "self_improvement", "send", "signature", "sleep", "source", "spa", "sports_martial_arts",
   "sprint", "star", "start", "step", "steps", "stethoscope", "storage", "support_agent", "surfing", "tab",
   "tablet", "tag", "temple_buddhist", "train", "translate", "travel_explore", "tune", "update", "verified",
-  "view_agenda", "villa", "visibility", "weekend", "weight", "width",
+  "view_agenda", "visibility", "weekend", "weight", "width",
 ]
 
 /** Glyphs Material Symbols lacks, drawn as SVG on its 24 grid (ds/ui.tsx CUSTOM_ICONS). Not in the font. */
-export const CUSTOM_ICON_NAMES = ["dit_apple"]
+export const CUSTOM_ICON_NAMES = ["dit_apple", "dit_bed_single", "dit_bed_twin", "dit_bed_double", "dit_rooms", "dit_villa"]
 
 const AXES = "opsz,wght,FILL,GRAD@20..48,300,0..1,0"
 

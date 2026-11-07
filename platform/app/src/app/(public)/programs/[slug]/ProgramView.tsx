@@ -88,11 +88,11 @@ const activityIcon = (t: { title: string; text: string }) =>
  *  shared, else a double */
 function roomIcon(a: { room_type: string | null; description?: string | null; capacity?: number | null }) {
   const t = `${a.room_type ?? ""} ${a.description ?? ""}`.toLowerCase()
-  if (/villa/.test(t)) return "villa"
-  if (/\b([2-9]|two|three|four) bedrooms?\b|apartment|suite with|house|residence/.test(t)) return "house"
-  if (a.capacity === 1 || /\bsingle\b|\bsolo\b/.test(t)) return "single_bed"
-  if (/twin|shared|dorm/.test(t)) return "bed"
-  return "king_bed"
+  if (/villa/.test(t)) return "dit_villa"
+  if (/\b([2-9]|two|three|four) bedrooms?\b|apartment|suite with|house|residence/.test(t)) return "dit_rooms"
+  if (a.capacity === 1 || /\bsingle\b|\bsolo\b/.test(t)) return "dit_bed_single"
+  if (/twin|shared|dorm/.test(t)) return "dit_bed_twin"
+  return "dit_bed_double"
 }
 
 /** Four "What you'll do" items: distinct activities from the schedule (no meals), else the method text. */
@@ -259,11 +259,11 @@ export default function ProgramView({
               </div>
             </div>
             <p className={s.factsMobile}><Facts items={[placeParts.length ? <span key="pl"><Flag of={primary?.country} /> {placeParts.join(" | ")}</span> : null, cohort?.fullName]} /></p>
+            {/* Small tags, not a big stats block (Oleg 07.11.2026); no reviews, no rating tag */}
             <div className={s.stats}>
-              {/* No reviews: no rating column (Oleg 07.11.2026) */}
-              {avg ? <div><strong>{avg.toFixed(1)}</strong><span>{reviews.length} reviews</span></div> : null}
-              {days && <div><strong>{days}</strong><span>days</span></div>}
-              <div><strong>2</strong><span>check-ins</span></div>
+              {avg ? <span><Icon name="star" fill />{avg.toFixed(1)} · {reviews.length} reviews</span> : null}
+              {days && <span><Icon name="calendar_month" />{days} days</span>}
+              <span><Icon name="monitoring" />2 check-ins</span>
             </div>
             {summary && <p className={s.summary}>{summary}</p>}
             <p className={s.facts}>

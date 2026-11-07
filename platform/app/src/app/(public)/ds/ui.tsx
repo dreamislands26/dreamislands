@@ -14,6 +14,52 @@ const CUSTOM_ICONS: Record<string, ReactNode> = {
       <path d="M12.7 5.9C13 4.1 14.5 3 16.7 3.1C16.5 5 14.9 6.1 12.7 5.9Z" />
     </>
   ),
+  // Rooms, drawn from above (Oleg 07.11.2026): one bed, two singles, a double, two bedrooms, a villa with its pool
+  dit_bed_single: (
+    <>
+      <rect x="7.5" y="4.75" width="9" height="16.5" rx="1.8" />
+      <rect x="9.1" y="6.4" width="5.8" height="3" rx="1.2" />
+      <path d="M7.5 11.8H16.5" />
+    </>
+  ),
+  dit_bed_twin: (
+    <>
+      <rect x="3.25" y="4.75" width="7.25" height="16.5" rx="1.7" />
+      <rect x="4.75" y="6.4" width="4.25" height="3" rx="1.2" />
+      <path d="M3.25 11.8H10.5" />
+      <rect x="13.5" y="4.75" width="7.25" height="16.5" rx="1.7" />
+      <rect x="15" y="6.4" width="4.25" height="3" rx="1.2" />
+      <path d="M13.5 11.8H20.75" />
+    </>
+  ),
+  dit_bed_double: (
+    <>
+      <rect x="4" y="4.75" width="16" height="16.5" rx="2" />
+      <rect x="5.6" y="6.4" width="5.7" height="3" rx="1.2" />
+      <rect x="12.7" y="6.4" width="5.7" height="3" rx="1.2" />
+      <path d="M4 11.8H20" />
+    </>
+  ),
+  dit_rooms: (
+    <>
+      <rect x="3.25" y="4.75" width="17.5" height="16.5" rx="1.75" />
+      <path d="M12 4.75V13.2" />
+      <path d="M12 16.8V21.25" />
+      <rect x="5.2" y="6.6" width="4.4" height="7" rx="1" />
+      <path d="M5.2 9.1H9.6" />
+      <rect x="14.4" y="6.6" width="4.4" height="7" rx="1" />
+      <path d="M14.4 9.1H18.8" />
+    </>
+  ),
+  dit_villa: (
+    <>
+      <path d="M3.5 10L12 4.5L20.5 10" />
+      <path d="M5.75 8.6V14.75H18.25V8.6" />
+      <path d="M10.5 14.75V12.4C10.5 11.57 11.17 10.9 12 10.9C12.83 10.9 13.5 11.57 13.5 12.4V14.75" />
+      <rect x="3.25" y="17" width="17.5" height="5" rx="1.6" />
+      <path d="M6 19.7C7 19 8 19 9 19.7C10 20.4 11 20.4 12 19.7C13 19 14 19 15 19.7C16 20.4 17 20.4 18 19.7" />
+    </>
+  ),
 }
 
 export function Icon({ name, size, fill, className, label }: { name: string; size?: number; fill?: boolean; className?: string; label?: string }) {
