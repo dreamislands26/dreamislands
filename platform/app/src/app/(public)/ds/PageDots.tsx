@@ -1,26 +1,38 @@
-// Gallery page dots, Instagram style (Oleg 07.11.2026): at most five in view; the current one is full white
-// and a little larger, the window of dots slides with it, and the dots at a window edge shrink when more lie
-// beyond that edge. Everything animates (position, size, opacity), so a swipe reads as a smooth slide.
+// Gallery page dots (Oleg 07.11.2026): the current photo's dot sits in the middle, stretched into a pill;
+// its neighbours are stretched a little, the rest are round and shrink towards the edges. The dots follow
+// the swipe itself (`progress` is the fractional photo position), so while you swipe the next dot slides
+// into the middle and grows as the current one shrinks away.
 import s from "./pageDots.module.css"
 
-const SHOWN = 5
-const PITCH = 10 // px between dot centres (6px dot + 4px gap)
+const GAP = 4 // px between dots
+const H = 6 // dot height, px
+const WIDTH = 140 // the strip; dots further out fade away
 
-export default function PageDots({ count, index, className }: { count: number; index: number; className?: string }) {
+/** Size and opacity of a dot `a` photos away from the current position (fractional while swiping) */
+function look(a: number) {
+  const w = a < 1 ? 18 - 8 * a : a < 2 ? 10 - 4 * (a - 1) : H // 18 → 10 → 6
+  const scale = a <= 1.5 ? 1 : Math.max(0, 1 - (a - 1.5) * 0.22) // the round ones shrink outwards
+  const opacity = (a < 1 ? 1 - 0.4 * a : 0.6) * Math.min(1, Math.max(0, 4.5 - a))
+  return { w: w * scale, h: H * scale, opacity }
+}
+
+export default function PageDots({ count, progress, className }: { count: number; progress: number; className?: string }) {
   if (count < 2) return null
-  const shown = Math.min(count, SHOWN)
-  const start = Math.max(0, Math.min(index - Math.floor(SHOWN / 2), count - shown))
+  const p = Math.min(count - 1, Math.max(0, progress))
+  const dots = Array.from({ length: count }, (_, k) => look(Math.abs(k - p)))
+  // Lay them out left to right, then shift so the position `p` lands in the middle of the strip
+  const centres: number[] = []
+  let x = 0
+  for (const d of dots) { centres.push(x + d.w / 2); x += d.w + GAP }
+  const lo = Math.floor(p), hi = Math.min(count - 1, lo + 1)
+  const at = centres[lo] + (centres[hi] - centres[lo]) * (p - lo)
+  const shift = WIDTH / 2 - at
+  const current = Math.round(p)
   return (
-    <span className={`${s.dots}${className ? ` ${className}` : ""}`} style={{ width: shown * PITCH }} role="img" aria-label={`Photo ${index + 1} of ${count}`}>
-      <span className={s.track} style={{ transform: `translateX(${-start * PITCH}px)` }}>
-        {Array.from({ length: count }, (_, k) => {
-          const pos = k - start
-          const out = pos < 0 || pos >= shown
-          const edge = (pos === 0 && start > 0) || (pos === shown - 1 && start + shown < count)
-          const scale = k === index ? 1.2 : out ? 0 : edge ? 0.55 : 0.9
-          return <i key={k} className={s.dot} data-on={k === index ? "" : undefined} style={{ left: k * PITCH, transform: `scale(${scale})` }} />
-        })}
-      </span>
+    <span className={`${s.dots}${className ? ` ${className}` : ""}`} style={{ width: WIDTH }} role="img" aria-label={`Photo ${current + 1} of ${count}`}>
+      {dots.map((d, k) => (
+        <i key={k} className={s.dot} style={{ left: shift + centres[k] - d.w / 2, width: d.w, height: d.h, marginTop: -d.h / 2, opacity: d.opacity }} />
+      ))}
     </span>
   )
 }

@@ -1,5 +1,4 @@
-/* PageDots: a 6px dot every 10px, white on photos with a soft shadow so they read on light pictures too */
+/* PageDots: white on photos with a soft shadow so they read on light pictures too. Size and place come
+   from the swipe position (PageDots.tsx); a short transition smooths the steps between scroll events. */
 .dots { position: relative; display: block; height: 0.75rem; overflow: hidden; pointer-events: none; }
-.track { position: absolute; inset: 0; transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1); }
-.dot { position: absolute; top: calc(50% - 3px); width: 6px; height: 6px; margin-left: 2px; border-radius: 50%; background: #fff; opacity: 0.55; box-shadow: 0 0 2px rgba(0, 0, 0, 0.35); transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1), opacity 0.3s; }
-.dot[data-on] { opacity: 1; }
+.dot { position: absolute; top: 50%; border-radius: 999px; background: #fff; box-shadow: 0 0 2px rgba(0, 0, 0, 0.3); transition: left 0.08s linear, width 0.08s linear, height 0.08s linear, margin 0.08s linear, opacity 0.08s linear; }
