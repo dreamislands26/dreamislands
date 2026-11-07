@@ -111,6 +111,9 @@
   --ds-gutter: 1.5rem;
   --ds-page-pad: clamp(var(--ds-gutter), calc((100vw - 80rem) / 2), 5rem);
 }
+/* Phones: one side gutter for every page, the same 0.75rem as the home page (Figma 97:2767). Oleg 07.11.2026:
+   other pages ran at 1.5rem, which read as a bug next to the home page. */
+@media (max-width: 767px) { :root { --ds-gutter: 0.75rem; } }
 
 :root[data-theme="dark"] {
   --ds-primary: #80dba7;

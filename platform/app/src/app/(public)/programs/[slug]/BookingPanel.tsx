@@ -6,12 +6,13 @@
 //  - CF5 analogue: "Your details" step, then Stripe Checkout (production flow)
 //  - CF7: request sent; CF8: payment didn't go through (?booking=cancelled)
 // Payloads to /api/bookings/public are unchanged from production.
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import { useSearchParams } from "next/navigation"
 import { useRouter } from "@/lib/i18n-nav"
 import { getAttribution, getGaClientId, getSessionId, track } from "../../_lib/track"
 import { Badge, Button, Chip, Facts, Icon, IconButton, Radio, TextField, cx } from "../../ds/ui"
-import { Dialog, overlayStyles as o } from "../../ds/overlay"
+import { BottomSheet, Dialog, overlayStyles as o } from "../../ds/overlay"
 import { PaymentMarks } from "../../ds/payment"
 import { monthLabel, slotsFor, type Slot } from "./departures"
 import s from "./program.module.css"
@@ -69,6 +70,32 @@ export default function BookingPanel({
   const slot = slots.find((x) => x.start === start) ?? slots[0]
   const [pax, setPax] = useState(1)
   const [open, setOpen] = useState(false)
+  // Phones: at the end of the page the fixed bar morphs into the card before the footer (Oleg 07.11.2026).
+  // While the card ([data-bar-dock] in ProgramView) rises into view, --p goes 0..1 and the bar takes the card's
+  // shape (insets, corners, padding); when the card is fully on screen the bar sits exactly on it and hands over.
+  const barRef = useRef<HTMLDivElement>(null)
+  const [dock, setDock] = useState<HTMLElement | null>(null)
+  const [docked, setDocked] = useState(false)
+  useEffect(() => {
+    const el = document.querySelector<HTMLElement>("[data-bar-dock]")
+    setDock(el)
+    if (!el) return
+    let raf = 0
+    const update = () => {
+      raf = 0
+      const bar = barRef.current, card = el.firstElementChild as HTMLElement | null
+      if (!bar || !card) return
+      const r = card.getBoundingClientRect(), vh = window.innerHeight
+      const p = Math.min(1, Math.max(0, (vh - r.top) / r.height))
+      bar.style.setProperty("--p", String(p))
+      setDocked(r.bottom <= vh)
+    }
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update) }
+    update()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    window.addEventListener("resize", onScroll)
+    return () => { window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); if (raf) cancelAnimationFrame(raf) }
+  }, [dock])
   const [failed, setFailed] = useState(params.get("booking") === "cancelled")
   const price = v?.price_basic_usd ?? 0
   const fmtSup = (n: number) => `${supplierPrice!.currency} ${Math.round(n).toLocaleString("en-US")}`
@@ -102,6 +129,19 @@ export default function BookingPanel({
 
   const cta = (withDates: boolean) => (priced ? `Reserve${withDates && slot ? ` ${slot.title}` : ""}` : `Request${withDates && slot ? ` ${slot.title}` : " dates"}`)
 
+  const barBody = (
+    <>
+      <div className={s.barPrice}>
+        <span className={s.barTop}>
+          <strong>{sup ? `from ${sup}` : price > 0 ? usd(price) : "On request"}</strong>
+          <span className="ds-sep" />
+          <span>{days} days</span>
+        </span>
+        <span className={s.barSub}><Facts items={[slot?.title, priced ? `${usd(deposit)} deposit` : "no payment now"]} /></span>
+      </div>
+      <Button variant="filled" size="l" onClick={openDialog}>{priced ? "Reserve" : "Request"}</Button>
+    </>
+  )
   return (
     <>
       {/* CF3 desktop: pill + Reserve card · Departures */}
@@ -145,18 +185,11 @@ export default function BookingPanel({
         </div>
       </aside>
 
-      {/* CF3 mobile: bottom action bar */}
-      <div className={s.bar}>
-        <div className={s.barPrice}>
-          <span className={s.barTop}>
-            <strong>{sup ? `from ${sup}` : price > 0 ? usd(price) : "On request"}</strong>
-            <span className="ds-sep" />
-            <span>{days} days</span>
-          </span>
-          <span className={s.barSub}><Facts items={[slot?.title, priced ? `${usd(deposit)} deposit` : "no payment now"]} /></span>
-        </div>
-        <Button variant="filled" size="l" onClick={openDialog}>{priced ? "Reserve" : "Request"}</Button>
+      {/* CF3 mobile: bottom action bar; at the end of the page it becomes the card in [data-bar-dock] */}
+      <div ref={barRef} className={cx(s.bar, docked && s.barDocked)} data-own-bar="program" aria-hidden={docked || undefined}>
+        {barBody}
       </div>
+      {dock && createPortal(<div className={cx(s.barCard, !docked && s.barCardWaiting)}>{barBody}</div>, dock)}
 
       <BookingDialog
         open={open}
@@ -180,12 +213,8 @@ export default function BookingPanel({
       />
 
       {/* CF8: payment didn't go through */}
-      <Dialog open={failed} onClose={closeFailed}>
-        <div className={s.dialogHead}>
-          <Badge icon="credit_card_off" tone="error" size="s" />
-          <IconButton icon="close" label="Close" onClick={closeFailed} />
-        </div>
-        <h2 className="ds-headline-s">Payment didn&apos;t go through</h2>
+      <Dialog open={failed} onClose={closeFailed} title="Payment didn’t go through">
+        <Badge icon="credit_card_off" tone="error" size="s" />
         <p className="ds-body-m ds-muted" style={{ margin: 0 }}>Your card was not charged. Check the card details and try again, or message us on WhatsApp and we will help you finish the booking.</p>
         <div className={s.box}>
           <div className={o.sumRow}><span className="ds-ink">{programName}</span><span>{slot?.title}</span></div>
@@ -335,12 +364,8 @@ function BookingDialog(props: {
 
   if (step === "sent") {
     return (
-      <Dialog open={open} onClose={close}>
-        <div className={s.dialogHead}>
-          <Badge icon="mark_chat_read" size="s" />
-          <IconButton icon="close" label="Close" onClick={close} />
-        </div>
-        <h2 className="ds-headline-s">Request sent</h2>
+      <Dialog open={open} onClose={close} title="Request sent">
+        <Badge icon="mark_chat_read" size="s" />
         <p className="ds-body-m ds-muted" style={{ margin: 0 }}>A person checks availability and the final price and writes to you on WhatsApp within a day. Nothing is charged.</p>
         <div className={s.dialogActions}>
           <a href="/start" className={s.filledLink}>Take your Wellness Journey</a>
@@ -352,12 +377,7 @@ function BookingDialog(props: {
 
   if (step === "details") {
     return (
-      <Dialog open={open} onClose={close}>
-        <div className={s.dialogHead}>
-          <IconButton icon="arrow_back" label="Back" onClick={() => setStep("choose")} />
-          <IconButton icon="close" label="Close" onClick={close} />
-        </div>
-        <h2 className="ds-headline-s">{isPriced ? "Pay your deposit" : "Request your dates"}</h2>
+      <Dialog open={open} onClose={close} title={isPriced ? "Pay your deposit" : "Request your dates"} back={() => setStep("choose")}>
         <div className={s.box}>
           <span className="ds-title-m">{programName}</span>
           <span className="ds-body-m ds-muted"><Facts items={[placeLine, slot?.title, `${pax} ${pax === 1 ? "guest" : "guests"}`]} /></span>
@@ -388,62 +408,73 @@ function BookingDialog(props: {
     )
   }
 
-  // CF4: Choose a departure
-  return (
-    <Dialog open={open} onClose={close} title="Choose a departure">
-      {variants.length > 1 && (
-        <div className={s.lengths} role="radiogroup" aria-label="Programme length">
-          {variants.map((x) => (
-            <Chip key={x.id} selected={x.id === variantId} onClick={() => onVariant(x.id)}>{x.duration_days} days</Chip>
-          ))}
-        </div>
-      )}
-      <div className={s.guestsRow}>
-        <span className={mobile ? "ds-title-s" : "ds-title-m"}>Guests</span>
-        <Stepper pax={pax} setPax={setPax} />
-      </div>
-      {mobile ? (
-        <label className={s.monthSelect}>
-          <select value={month} onChange={(e) => setMonth(e.target.value)} aria-label="Month">
-            {months.map((k) => <option key={k} value={k}>{monthLabel(k)}</option>)}
-          </select>
-          <span className="ds-title-s">{monthLabel(months.includes(month) ? month : months[0])}</span>
-          <Icon name="expand_more" size={16} />
-        </label>
+  // CF4: Choose a departure. Same sheet as Filters (Oleg 07.11.2026): section headings, the action in the
+  // sheet's footer, compact rows so a usual case fits one phone screen.
+  const reserve = (
+    <Button variant="filled" size="l" className={s.depGo} onClick={() => setStep("details")} disabled={!slot}>
+      {priced ? (
+        <>
+          {mobile ? "Reserve" : `Reserve ${slot?.title ?? ""}`}
+          <span className="ds-sep" style={{ background: "currentColor", opacity: 0.4 }} />
+          {usd(deposit)} deposit
+        </>
       ) : (
-        <div className={s.lengths}>
-          {months.map((k) => <Chip key={k} selected={k === (months.includes(month) ? month : months[0])} onClick={() => setMonth(k)}>{monthLabel(k)}</Chip>)}
-        </div>
+        `Request ${slot?.title ?? "dates"}`
       )}
-      <div className={o.slots}>
-        {shown.map((x) => (
-          <div key={x.start} className={s.slotGroup}>
-            {mobile && <span className="ds-label-m ds-muted">{x.dayLabel}</span>}
-            <SlotRow
-              slot={x}
-              tall={!mobile}
-              on={x.start === slot?.start}
-              onPick={() => onSlot(x.start)}
-              sub={mobile ? <Facts items={[priceUsd ? `${usd(priceUsd)} per person` : null, `${days} days`]} /> : <Facts items={[x.weekdays, priceUsd ? `${usd(priceUsd)} per person` : null]} />}
-            />
-          </div>
-        ))}
-      </div>
-      <Button variant="filled" size="l" block onClick={() => setStep("details")} disabled={!slot}>
-        {priced ? (
-          <>
-            {mobile ? "Reserve" : `Reserve ${slot?.title ?? ""}`}
-            <span className="ds-sep" style={{ background: "currentColor", opacity: 0.4 }} />
-            {usd(deposit)} deposit
-          </>
-        ) : (
-          `Request ${slot?.title ?? "dates"}`
+    </Button>
+  )
+  return (
+    <BottomSheet open={open} onClose={close} title="Choose a departure" footer={reserve}>
+      <div className={s.dep}>
+        {variants.length > 1 && (
+          <section className={s.depGroup}>
+            <h3 className="ds-headline-s">Length</h3>
+            <div className={s.lengths} role="radiogroup" aria-label="Programme length">
+              {variants.map((x) => (
+                <Chip key={x.id} size="s" selected={x.id === variantId} onClick={() => onVariant(x.id)}>{x.duration_days} days</Chip>
+              ))}
+            </div>
+          </section>
         )}
-      </Button>
-      <p className={o.note} style={{ textAlign: "center" }}>
-        {priced ? "Deposit by card, Apple Pay or Google Pay. A person confirms your trip on WhatsApp." : "No payment now. A person confirms availability and the price on WhatsApp."}
-      </p>
-      {priced && <div className={s.marksRow}><PaymentMarks /></div>}
-    </Dialog>
+        <section className={s.depRow}>
+          <h3 className="ds-headline-s">Guests</h3>
+          <Stepper pax={pax} setPax={setPax} />
+        </section>
+        <section className={s.depGroup}>
+          <div className={s.depRow}>
+            <h3 className="ds-headline-s">Dates</h3>
+            {mobile ? (
+              <label className={s.monthSelect}>
+                <select value={month} onChange={(e) => setMonth(e.target.value)} aria-label="Month">
+                  {months.map((k) => <option key={k} value={k}>{monthLabel(k)}</option>)}
+                </select>
+                <span className="ds-title-s">{monthLabel(months.includes(month) ? month : months[0])}</span>
+                <Icon name="expand_more" size={24} />
+              </label>
+            ) : null}
+          </div>
+          {!mobile && (
+            <div className={s.lengths}>
+              {months.map((k) => <Chip key={k} size="s" selected={k === (months.includes(month) ? month : months[0])} onClick={() => setMonth(k)}>{monthLabel(k)}</Chip>)}
+            </div>
+          )}
+          <div className={o.slots} role="radiogroup" aria-label="Start date">
+            {shown.map((x) => (
+              <SlotRow
+                key={x.start}
+                slot={x}
+                on={x.start === slot?.start}
+                onPick={() => onSlot(x.start)}
+                sub={<Facts items={[x.weekdays, priceUsd ? `${usd(priceUsd)} per person` : null, `${days} days`]} />}
+              />
+            ))}
+          </div>
+        </section>
+        <p className={o.note} style={{ textAlign: "center" }}>
+          {priced ? "Deposit by card, Apple Pay or Google Pay. A person confirms your trip on WhatsApp." : "No payment now. A person confirms availability and the price on WhatsApp."}
+        </p>
+        {priced && <div className={s.marksRow}><PaymentMarks /></div>}
+      </div>
+    </BottomSheet>
   )
 }

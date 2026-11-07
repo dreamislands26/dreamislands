@@ -43,7 +43,7 @@
   /* Full-width photo, then the sheet over it, as on the real page */
   .detail.detail { display: block; padding: 0; }
   .gallery { aspect-ratio: auto; height: 22.5rem; border-radius: 0; }
-  .info { position: relative; align-items: center; margin-top: -1.75rem; padding: 1.5rem 1.5rem 0; border-radius: 2.25rem 2.25rem 0 0; background: var(--ds-surface); }
+  .info { position: relative; align-items: center; margin-top: -1.75rem; padding: 1.5rem var(--ds-gutter) 0; border-radius: 2.25rem 2.25rem 0 0; background: var(--ds-surface); }
   .crumb { display: none; }
   .detailTitle { width: 70%; }
   .button { display: none; }

@@ -1,6 +1,6 @@
 /* S1 · Главная · Mobile (Figma 97:2767, revision 17.10.2026): 0.75rem side padding, sections 2rem apart */
 .root { display: none; }
-@media (max-width: 767px) { .root { display: block; padding-bottom: 12px; overflow-x: clip; } }
+@media (max-width: 767px) { .root { display: block; padding-bottom: 3rem; overflow-x: clip; } } /* room before the footer */
 
 .root p, .root h1, .root h2, .root h3 { margin: 0; }
 
@@ -99,6 +99,7 @@
 .glow { box-shadow: 0 0 2.175rem rgba(181, 255, 176, 0.3); } /* Take Survey glow (Figma) */
 .promiseTonal.onTonal { background: var(--ds-surface-container-low); } /* the decide banner is tonal itself */
 /* Primary / secondary pair (Figma Promise 197:26097, 214:30685): 48px, Title/Medium; secondary is DS Tonal L */
+.wideBtn { height: 3rem; font: 500 1rem/1.25rem var(--ds-font-body); } /* full-width secondary button under a rail */
 .promiseTonal { border-radius: var(--ds-r-full); background: var(--ds-secondary-container); color: var(--ds-on-secondary-container); display: flex; align-items: center; justify-content: center; text-decoration: none; }
 
 /* See all programs: 2-column grid, fade over the last row, Load more */

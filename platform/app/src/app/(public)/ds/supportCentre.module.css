@@ -1,0 +1,58 @@
+/* Support centre page (/support), its FAQ sheet and the support chat sheet. */
+
+.actions { display: flex; gap: 0.75rem; margin-top: 0.75rem; }
+.allLink { border: 0; background: none; padding: 0 0.75rem; margin-right: -0.75rem; height: 2.5rem; font: 500 0.875rem/1.25rem var(--ds-font-body); color: var(--ds-primary); cursor: pointer; }
+
+.cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.75rem; }
+.card {
+  position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 1rem; min-height: 9.5rem;
+  padding: 1.25rem; border: 0; border-radius: var(--ds-r-xl); background: var(--ds-surface-container-low);
+  color: var(--ds-on-surface); text-align: left; cursor: pointer; overflow: hidden;
+}
+.card::after { content: ""; position: absolute; inset: 0; background: var(--ds-on-surface); opacity: 0; transition: opacity 0.15s; pointer-events: none; }
+.card:hover::after { opacity: var(--ds-state-hover); }
+.card:active::after { opacity: var(--ds-state-pressed); }
+.cardQ { font: 500 1rem/1.375rem var(--ds-font-body); padding-right: 1.5rem; }
+.cardGo { position: absolute; right: 1.25rem; bottom: 1.25rem; color: var(--ds-on-surface-variant); }
+
+.contacts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; max-width: 47.5rem; }
+.contact { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; border-radius: var(--ds-r-xl); background: var(--ds-surface-container-low); color: var(--ds-on-surface); text-decoration: none; }
+.contact > span:last-child { display: flex; flex-direction: column; gap: 0.125rem; min-width: 0; }
+
+@media (max-width: 900px) {
+  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 767px) {
+  .actions > * { flex: 1; }
+  .contacts { grid-template-columns: 1fr; }
+  .card { min-height: 8.5rem; padding: 1rem; gap: 0.75rem; }
+  .cardQ { font-size: 0.9375rem; line-height: 1.25rem; }
+  .cardGo { right: 1rem; bottom: 1rem; }
+}
+
+/* FAQ sheet */
+.topics { display: flex; flex-direction: column; gap: 1.5rem; padding-top: 0.25rem; }
+.topic { display: flex; flex-direction: column; gap: 0.75rem; }
+.topic h3 { margin: 0; padding: 0 0.5rem; }
+.topic details { scroll-margin-top: 0.5rem; }
+.footNote { padding-left: 0.75rem; font: 400 0.875rem/1.25rem var(--ds-font-body); color: var(--ds-on-surface-variant); }
+
+/* Chat sheet */
+.chat { display: flex; flex-direction: column; gap: 1rem; min-height: 100%; }
+.agent { display: flex; align-items: center; gap: 0.75rem; padding: 0.25rem 0.5rem 0; }
+.agent p { margin: 0; }
+.thread { display: flex; flex-direction: column; gap: 0.5rem; padding: 0 0.25rem; }
+.them, .me { max-width: 85%; padding: 0.75rem 1rem; border-radius: var(--ds-r-lg-plus); font: 400 0.9375rem/1.375rem var(--ds-font-body); }
+.them p, .me p { margin: 0; }
+.them { align-self: flex-start; background: var(--ds-surface-container-low); color: var(--ds-on-surface); border-bottom-left-radius: var(--ds-r-xs); }
+.me { align-self: flex-end; background: var(--ds-primary-container); color: var(--ds-on-primary-container); border-bottom-right-radius: var(--ds-r-xs); }
+.wa { display: inline-flex; align-items: center; gap: 0.25rem; margin-top: 0.5rem; font: 500 0.875rem/1.25rem var(--ds-font-body); color: var(--ds-primary); text-decoration: none; }
+.wa :global(.ds-icon) { font-size: 1.125rem; }
+.starters { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+
+.composer { flex: 1; display: flex; align-items: center; gap: 0.5rem; padding-left: 0.75rem; }
+.composer input {
+  flex: 1; min-width: 0; height: 3rem; padding: 0 1.25rem; border: 0; border-radius: var(--ds-r-full);
+  background: var(--ds-surface-container-highest); color: var(--ds-on-surface); font: 400 1rem/1.25rem var(--ds-font-body);
+}
+.composer input:focus { outline: none; }

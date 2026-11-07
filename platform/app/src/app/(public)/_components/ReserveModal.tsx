@@ -1,6 +1,7 @@
 "use client"
 import Image from "next/image"
 import { useEffect, useState } from "react"
+import { BottomSheet } from "../ds/overlay"
 import { track, getGaClientId, getSessionId, getAttribution } from "../_lib/track"
 
 type ReserveProgram = {
@@ -211,61 +212,9 @@ export default function ReserveModal({
       <button type="button" className={triggerClassName} style={triggerStyle} onClick={openModal}>
         {triggerLabel}
       </button>
-      {open && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          onClick={close}
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 60,
-            background: "rgba(20,32,27,.45)",
-            backdropFilter: "blur(4px)",
-            display: "flex",
-            alignItems: "flex-end",
-            justifyContent: "center",
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: "100%",
-              maxWidth: 520,
-              maxHeight: "92dvh",
-              overflowY: "auto",
-              background: "var(--bg)",
-              borderTopLeftRadius: "var(--r-lg)",
-              borderTopRightRadius: "var(--r-lg)",
-              padding: "24px 22px 32px",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: 16,
-              }}
-            >
-              <div className="eyebrow">{caseMode ? "Submit your case" : isUnpriced ? "Request availability" : "Reserve dates"}</div>
-              <button
-                type="button"
-                onClick={close}
-                aria-label="Close"
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: "50%",
-                  background: "var(--surface-2)",
-                  display: "grid",
-                  placeItems: "center",
-                  color: "var(--ink)",
-                }}
-              >
-                {"×"}
-              </button>
-            </div>
+      {/* One bottom sheet for the whole site (Oleg 07.11.2026): DS BottomSheet head, not a local one */}
+      <BottomSheet open={open} onClose={close} title={caseMode ? "Submit your case" : isUnpriced ? "Request availability" : "Reserve dates"}>
+        <div style={{ padding: "0 0.75rem" }}>
 
             {requestSubmitted ? (
               <div style={{ display: "grid", gap: 14 }}>
@@ -450,9 +399,8 @@ export default function ReserveModal({
                 <button type="button" className="btn btn-ghost btn-block" onClick={close}>Cancel</button>
               </form>
             )}
-          </div>
         </div>
-      )}
+      </BottomSheet>
     </>
   )
 }

@@ -127,17 +127,24 @@ const NAV_AFTER = [
 /** Mobile menu (hamburger) with the production links; the destinations list unfolds in place. */
 export function MobileMenu({ variant }: { variant?: "photo" }) {
   const [open, setOpen] = useState(false)
+  const [closing, setClosing] = useState(false)
   const [dest, setDest] = useState(false)
-  const close = () => { setOpen(false); setDest(false) }
+  // Wolt-style: the menu springs out of the button and shrinks back into it before it unmounts
+  const close = () => {
+    if (closing) return
+    setClosing(true)
+    window.setTimeout(() => { setOpen(false); setClosing(false); setDest(false) }, 120)
+  }
   const t = useT()
   return (
     <>
-      <button type="button" className={cx(s.burger, variant === "photo" && s.burgerPhoto)} aria-label={t("Menu")} aria-expanded={open} onClick={() => setOpen((v) => !v)}>
-        <Icon name={open ? "close" : "menu"} />
+      <button type="button" className={cx(s.burger, variant === "photo" && s.burgerPhoto, open && !closing && s.burgerOpen)} aria-label={t("Menu")} aria-expanded={open} onClick={() => (open ? close() : setOpen(true))}>
+        <Icon name={open && !closing ? "close" : "menu"} />
       </button>
       {open && (
-        <div className={s.sheetScrim} onClick={close}>
-          <nav className={s.sheet} aria-label={t("Menu")} onClick={(e) => e.stopPropagation()}>
+        <div className={cx(s.sheetScrim, closing && s.scrimClosing)} onClick={close}>
+          <nav className={cx(s.sheet, closing && s.sheetClosing)} aria-label={t("Menu")} onClick={(e) => e.stopPropagation()}>
+            <Link href="/" className={s.sheetLink} onClick={close}>{t("Home")}</Link>
             {NAV_BEFORE.map((l) => <Link key={l.label} href={l.href} className={s.sheetLink} onClick={close}>{t(l.label)}</Link>)}
             <button type="button" className={s.sheetLink} aria-expanded={dest} onClick={() => setDest((v) => !v)}>
               {t("Destinations")}<Icon name={dest ? "remove" : "add"} />
@@ -151,6 +158,14 @@ export function MobileMenu({ variant }: { variant?: "photo" }) {
               </div>
             )}
             {NAV_AFTER.map((l) => <Link key={l.label} href={l.href} className={s.sheetLink} onClick={close}>{t(l.label)}</Link>)}
+            <Link href="/support" className={cx(s.supportCard, s.sheetSupport)} onClick={close}>
+              <span className={s.supportIcon}><Icon name="support_agent" /></span>
+              <span className={s.supportText}>
+                <span className="ds-title-m">{t("Support centre")}</span>
+                <span className="ds-body-s ds-muted">{t("FAQ and chat with a coordinator")}</span>
+              </span>
+              <Icon name="arrow_forward" />
+            </Link>
           </nav>
         </div>
       )}
@@ -274,6 +289,27 @@ function useCollapsedOnScroll() {
   return collapsed
 }
 
+/** True once the footer has scrolled up behind the tab bar: the bar's fade then takes the footer's colour,
+ *  so the footer runs to the bottom of the screen instead of ending in a band of page colour (Oleg 07.11.2026). */
+function useOverFooter() {
+  const [over, setOver] = useState(false)
+  const pathname = usePathname()
+  useEffect(() => {
+    let raf = 0
+    const check = () => {
+      raf = 0
+      const f = document.querySelector("footer")
+      setOver(!!f && f.getBoundingClientRect().top < window.innerHeight - 8)
+    }
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(check) }
+    check()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    window.addEventListener("resize", onScroll)
+    return () => { window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); if (raf) cancelAnimationFrame(raf) }
+  }, [pathname])
+  return over
+}
+
 /** Records in-site navigation for the on-page back arrows (see navHistory.ts). */
 export function NavTracker() {
   useTrackNav()
@@ -283,13 +319,14 @@ export function NavTracker() {
 export function NavigationBar() {
   const pathname = useShownPath(usePathname())
   const collapsed = useCollapsedOnScroll()
+  const overFooter = useOverFooter()
   const tr = useT()
   // Detail pages and the Wellness Journey own the bottom edge (action bar / focus mode).
   if (OWN_MOBILE_BAR.some((r) => r.test(pathname)) && !/\/medical$/.test(pathname)) return null
   return (
     <>
       <div className={s.tabbarSpacer} aria-hidden />
-      <nav className={cx(s.tabbar, collapsed && s.tabbarMin)} aria-label={tr("Tabs")} data-tabbar>
+      <nav className={cx(s.tabbar, collapsed && s.tabbarMin, overFooter && s.tabbarOnFooter)} aria-label={tr("Tabs")} data-tabbar>
         <div className={s.tabsCap}>
           {TABS.map((t) => {
             const active = t.match(pathname)
@@ -325,6 +362,14 @@ export function Footer() {
               {t("The wellness intelligence and travel platform for Asia. Baseline first. Match intelligently. Measure what changed.")}
             </p>
             <SocialLinks />
+            <Link href="/support" className={s.supportCard}>
+              <span className={s.supportIcon}><Icon name="support_agent" /></span>
+              <span className={s.supportText}>
+                <span className="ds-title-m">{t("Support centre")}</span>
+                <span className="ds-body-s ds-muted">{t("FAQ and chat with a coordinator")}</span>
+              </span>
+              <Icon name="arrow_forward" />
+            </Link>
           </div>
           <div className={s.footerCol}>
             <h3>{t("Explore")}</h3>

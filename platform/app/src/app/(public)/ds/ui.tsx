@@ -143,10 +143,10 @@ export function SeeAll({ href, count, label = "See All" }: { href: string; count
   )
 }
 
-export function SectionHead({ title, sub, action, level = 2, titleClass = "ds-headline-m" }: { title: ReactNode; sub?: ReactNode; action?: ReactNode; level?: 2 | 3; titleClass?: string }) {
+export function SectionHead({ title, sub, action, level = 2, titleClass = "ds-headline-m", className }: { title: ReactNode; sub?: ReactNode; action?: ReactNode; level?: 2 | 3; titleClass?: string; className?: string }) {
   const H = level === 2 ? "h2" : "h3"
   return (
-    <div className={s.sectionHead}>
+    <div className={cx(s.sectionHead, className)}>
       <div>
         <H className={titleClass}>{title}</H>
         {sub && <p className={cx("ds-body-m", s.sectionSub)}>{sub}</p>}
@@ -177,7 +177,8 @@ export function Tabs({ items, active }: { items: { key: string; label: string; h
   )
 }
 
-export function ListItem({ icon, headline, supporting, href, trailing }: { icon: string; headline: ReactNode; supporting?: ReactNode; href?: string; trailing?: ReactNode }) {
+/** `card`: a tap anywhere on the row presses its trailing link (see CardClick). */
+export function ListItem({ icon, headline, supporting, href, trailing, card }: { icon: string; headline: ReactNode; supporting?: ReactNode; href?: string; trailing?: ReactNode; card?: boolean }) {
   const body = (
     <>
       <span className={s.leading}><Icon name={icon} className={s.icon} /></span>
@@ -189,7 +190,7 @@ export function ListItem({ icon, headline, supporting, href, trailing }: { icon:
     </>
   )
   if (href) return <Link href={href} className={s.listItem}>{body}</Link>
-  return <div className={s.listItem}>{body}</div>
+  return <div className={s.listItem} data-card={card ? "" : undefined} style={card ? { cursor: "pointer" } : undefined}>{body}</div>
 }
 
 export function Radio({ on }: { on?: boolean }) {
@@ -229,11 +230,12 @@ export function Stars({ value = 5 }: { value?: number }) {
 
 export { cx }
 
-export function Faq({ items }: { items: { q: string; a: ReactNode }[] }) {
+/** Questions that unfold. `openId` opens the item with that `id` (support centre: a tapped question card). */
+export function Faq({ items, openId }: { items: { q: string; a: ReactNode; id?: string }[]; openId?: string }) {
   return (
     <div className={s.faq}>
       {items.map((it) => (
-        <details key={it.q} className={s.faqItem}>
+        <details key={it.q} id={it.id ? `faq-${it.id}` : undefined} open={!!it.id && it.id === openId} className={s.faqItem}>
           <summary>
             {it.q}
             <Icon name="expand_more" />
