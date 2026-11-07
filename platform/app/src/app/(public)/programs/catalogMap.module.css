@@ -7,6 +7,11 @@
 /* Selected pin: neutral near-black (the DS dark surfaces carry a green tint the pin should not have) */
 .pinWrap { --pin-on: #1c1c1e; }
 .on .pin { background: var(--pin-on); color: #fff; }
+/* China programmes: a gold rim and a soft gold glow on the chip and the photos (Oleg 07.11.2026) */
+.gold { --gold: #e2b34a; --gold-glow: 0 0 1rem 0.25rem rgba(226, 179, 74, 0.65); }
+.gold .pin { box-shadow: 0 0 0 0.125rem var(--gold), var(--gold-glow), var(--ds-elev-2); }
+.gold .thumb { border-color: var(--gold); box-shadow: var(--gold-glow), var(--ds-elev-2); }
+.on .gold .thumb { border-color: var(--gold); }
 
 /* Photos standing on the chip: one per property, a fan when there are several (the cheapest in front).
    Their own marker in a pane under the chips (CatalogMap), anchored at the same point: the bottom edge

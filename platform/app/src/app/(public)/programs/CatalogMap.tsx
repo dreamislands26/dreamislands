@@ -34,6 +34,10 @@ const APART_MAX = 16 // a picked place zooms in at most this far to stand apart 
 // A picked place clears its neighbours with its photo too: the pill (28px) and the 48px photo on it
 const APART_X = 64
 const APART_Y = 84
+// Pin photos may overlap a neighbour this far (px from each edge) before they fold or hide (Oleg 07.11.2026:
+// more photos on the map, a little overlap is fine; the prices sit above the photos anyway)
+const PHOTO_SLACK_X = 16
+const PHOTO_SLACK_Y = 14
 const GROUP_KM = 60 // places chained closer than this form one group (an island, a stretch of coast)
 
 /** Pin thumbnail source: our photos go through the image optimiser at 256px (a 48px thumb at 3x is 144px; 256 is the next size the optimiser makes). */
@@ -167,10 +171,11 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
       // not even a neighbour's, ever covers a price.
       const photoPane = map.createPane("pinPhotos")
       photoPane.style.zIndex = "590" // markers are 600
-      const pin = (label: string) => L.divIcon({ className: m.pinWrap, html: `<span class="${m.marker}"><span class="${m.pin}">${label}</span></span>`, iconSize: undefined })
-      const photoIcon = (photos: string[]) => {
+      // China programmes glow gold on the map, chip and photos (Oleg 07.11.2026)
+      const pin = (label: string, gold: boolean) => L.divIcon({ className: m.pinWrap, html: `<span class="${m.marker}${gold ? ` ${m.gold}` : ""}"><span class="${m.pin}">${label}</span></span>`, iconSize: undefined })
+      const photoIcon = (photos: string[], gold: boolean) => {
         const imgs = photos.map((src, i) => `<img class="${m.thumb}" style="--i:${i}" src="${attr(thumbSrc(src))}" alt="" loading="lazy" decoding="async" draggable="false">`).join("")
-        return L.divIcon({ className: m.pinWrap, html: `<span class="${m.photoAt}"><span class="${m.thumbs}" data-n="${photos.length}">${imgs}</span></span>`, iconSize: undefined })
+        return L.divIcon({ className: m.pinWrap, html: `<span class="${m.photoAt}${gold ? ` ${m.gold}` : ""}"><span class="${m.thumbs}" data-n="${photos.length}">${imgs}</span></span>`, iconSize: undefined })
       }
       type Mk = import("leaflet").Marker
       type Shown = { mk: Mk; ph?: Mk; min: number; key?: string }
@@ -186,8 +191,8 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
           mk?.setZIndexOffset(on ? 1000 : 0)
         }
       }
-      // Photos only where they fit: a pin whose photos would cover another pin's price shows just its
-      // price. The selected pin keeps its photos, then the cheapest pins go first.
+      // Photos only where they fit: a pin whose photos would cover much of another pin shows just its
+      // price (a little overlap is allowed, PHOTO_SLACK). The selected pin keeps its photos, then the cheapest pins go first.
       const declutter = () => {
         if (!map) return
         type Box = { l: number; r: number; t: number; b: number }
@@ -198,7 +203,10 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
           return el && chip ? [{ ...x, el: ph, chip: { l: chip.left, r: chip.right, t: chip.top, b: chip.bottom }, thumbs: ph?.querySelector<HTMLElement>(`.${m.thumbs}`) }] : []
         })
         const taken: Box[] = shown.map((x) => x.chip)
-        const hits = (a: Box, own: Box) => taken.some((t) => t !== own && a.l < t.r && a.r > t.l && a.t < t.b && a.b > t.t)
+        const hits = (box: Box, own: Box) => {
+          const a = { l: box.l + PHOTO_SLACK_X, r: box.r - PHOTO_SLACK_X, t: box.t + PHOTO_SLACK_Y, b: box.b - PHOTO_SLACK_Y }
+          return taken.some((t) => t !== own && a.l < t.r && a.r > t.l && a.t < t.b && a.b > t.t)
+        }
         const order = [...shown].sort((a, b) => Number(b.key === current) - Number(a.key === current) || a.min - b.min)
         for (const x of order) {
           if (!x.thumbs || !x.el) continue
@@ -262,16 +270,17 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
       }
       selectRef.current = select
       // The chip and, when there are photos, the photos; a tap on either picks the pin
-      const pair = (at: [number, number], label: string, photos: string[], onTap: () => void, onAdd?: () => void) => {
+      const isChina = (ps: MapPoint[]) => ps.some((p) => p.country === "China")
+      const pair = (at: [number, number], label: string, photos: string[], gold: boolean, onTap: () => void, onAdd?: () => void) => {
         const tap = (e: import("leaflet").LeafletMouseEvent) => { L.DomEvent.stopPropagation(e); onTap() }
-        const mk = L.marker(at, { icon: pin(label), keyboard: false }).on("click", tap)
-        const ph = photos.length ? L.marker(at, { icon: photoIcon(photos), keyboard: false, pane: "pinPhotos" }).on("click", tap) : undefined
+        const mk = L.marker(at, { icon: pin(label, gold), keyboard: false }).on("click", tap)
+        const ph = photos.length ? L.marker(at, { icon: photoIcon(photos, gold), keyboard: false, pane: "pinPhotos" }).on("click", tap) : undefined
         // Leaflet rebuilds the elements whenever the layer comes back (zooming past DETAIL_ZOOM)
         if (onAdd) for (const x of [mk, ph]) x?.on("add", onAdd)
         return { mk, ph }
       }
       for (const p of points) {
-        const { mk, ph } = pair(p.at, p.label, pinPhotos(p.programs), () => select(p.key), () => { if (current === p.key) mark(p.key, true) })
+        const { mk, ph } = pair(p.at, p.label, pinPhotos(p.programs), isChina([p]), () => select(p.key), () => { if (current === p.key) mark(p.key, true) })
         markers.set(p.key, { mk, ph, min: p.min, key: p.key })
       }
       // Places whose prices would overlap at this zoom merge into one pin: the cheapest price, the
@@ -299,7 +308,7 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
           const id = pts.map((p) => p.key).join("|")
           let x = merged.get(id)
           if (!x) {
-            x = { ...pair(best.at, best.label, pinPhotos(pts.flatMap((p) => p.programs)), () => openGroup(pts)), min: best.min }
+            x = { ...pair(best.at, best.label, pinPhotos(pts.flatMap((p) => p.programs)), isChina(pts), () => openGroup(pts)), min: best.min }
             merged.set(id, x)
           }
           return x
@@ -335,7 +344,7 @@ export default function CatalogMap({ points: initial, token }: { points: MapPoin
         const at: [number, number] = [ps.reduce((a, p) => a + p.at[0], 0) / ps.length, ps.reduce((a, p) => a + p.at[1], 0) / ps.length]
         // The country pin shows its cheapest place: tapping it zooms in and opens that place's card
         const best = ps.reduce((a, b) => (b.min < a.min ? b : a))
-        const { mk, ph } = pair(at, usd(best.min), pinPhotos(ps.flatMap((p) => p.programs)), () => select(best.key))
+        const { mk, ph } = pair(at, usd(best.min), pinPhotos(ps.flatMap((p) => p.programs)), isChina(ps), () => select(best.key))
         countryList.push({ mk, ph, min: best.min })
         return ph ? [ph, mk] : [mk]
       }))
