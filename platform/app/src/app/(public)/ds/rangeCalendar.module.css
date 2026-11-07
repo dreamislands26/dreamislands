@@ -34,6 +34,8 @@
 .day[data-avail][data-junction][data-row-start]:not([data-in])::before { left: calc(50% - 1.125rem); border-top-left-radius: 1.125rem; border-bottom-left-radius: 1.125rem; }
 .day[data-pale-after] { background: radial-gradient(circle at 0 50%, transparent 1.375rem, var(--ds-surface-container-high) calc(1.375rem + 0.5px)) right center / 50% 2.25rem no-repeat; }
 .day[data-pale-before] { background: radial-gradient(circle at 100% 50%, transparent 1.375rem, var(--ds-surface-container-high) calc(1.375rem + 0.5px)) left center / 50% 2.25rem no-repeat; }
+/* Days in the trips one can take: green too (Oleg 07.11.2026); the picked stay stays dark */
+.day[data-avail]:not([data-in]):not([data-out]) { color: var(--ds-primary); }
 .day[data-in] { color: var(--ds-on-secondary-container); }
 .day[data-edge] > span { background: var(--ds-on-secondary-container); color: #fff; }
 .day[data-edge]::after { background: #fff; }
