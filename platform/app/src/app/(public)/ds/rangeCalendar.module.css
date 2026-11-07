@@ -1,0 +1,19 @@
+/* RangeCalendar: 7 columns, 40px rows. The selected stay is a mint band with dark round ends; trip start
+   days carry a small dot; days no trip covers are muted. */
+.cal { display: flex; flex-direction: column; gap: 0.5rem; }
+.head { display: flex; align-items: center; justify-content: space-between; margin: 0 -0.5rem; }
+.grid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 0.25rem; }
+.wd { height: 2rem; display: flex; align-items: center; justify-content: center; font: 500 0.75rem/1rem var(--ds-font-body); color: var(--ds-on-surface-variant); }
+.day { position: relative; height: 2.5rem; padding: 0; border: 0; background: none; display: flex; align-items: center; justify-content: center; font: 500 0.9375rem/1 var(--ds-font-body); color: var(--ds-on-surface); cursor: pointer; }
+.day > span { position: relative; z-index: 1; width: 2.25rem; height: 2.25rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s, color 0.2s; }
+.day:disabled { color: var(--ds-on-surface-variant); opacity: 0.4; cursor: default; }
+/* A trip can start here */
+.day[data-start]::after { content: ""; position: absolute; left: 50%; bottom: 0.1875rem; width: 0.25rem; height: 0.25rem; margin-left: -0.125rem; border-radius: 50%; background: var(--ds-primary); z-index: 1; }
+/* The stay: the band runs cell to cell, rounded where a week row starts or ends */
+.day[data-in]::before { content: ""; position: absolute; inset: 0.125rem 0; background: var(--ds-secondary-container); }
+.day[data-in][data-row-start]::before, .day[data-edge="start"]::before { left: 0.125rem; border-top-left-radius: 1.25rem; border-bottom-left-radius: 1.25rem; }
+.day[data-in][data-row-end]::before, .day[data-edge="end"]::before { right: 0.125rem; border-top-right-radius: 1.25rem; border-bottom-right-radius: 1.25rem; }
+.day[data-in] { color: var(--ds-on-secondary-container); }
+.day[data-edge] > span { background: var(--ds-on-secondary-container); color: #fff; }
+.day[data-edge]::after { background: #fff; }
+@media (hover: hover) { .day:not(:disabled):not([data-in]):hover > span { background: var(--ds-surface-container-high); } }

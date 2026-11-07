@@ -14,7 +14,8 @@ import { getAttribution, getGaClientId, getSessionId, track } from "../../_lib/t
 import { Badge, Button, Chip, Facts, Icon, IconButton, Radio, TextField, cx } from "../../ds/ui"
 import { BottomSheet, Dialog, overlayStyles as o } from "../../ds/overlay"
 import { PaymentMarks } from "../../ds/payment"
-import { monthLabel, slotsFor, type Slot } from "./departures"
+import { slotsFor, type Slot } from "./departures"
+import RangeCalendar from "../../ds/RangeCalendar"
 import s from "./program.module.css"
 
 export type PanelVariant = { id: string; label: string; duration_days: number; duration_nights: number; price_basic_usd: number; checkout: boolean }
@@ -273,9 +274,6 @@ function BookingDialog(props: {
 }) {
   const { open, onClose, mobile, programId, programName, placeLine, priced, variants, variantId, onVariant, slots, slot, onSlot, pax, setPax, priceUsd, meta, waHref } = props
   const [step, setStep] = useState<"choose" | "details" | "sent">("choose")
-  const months = useMemo(() => Array.from(new Set(slots.map((x) => x.monthKey))).slice(0, 3), [slots])
-  const [month, setMonth] = useState(months[0] ?? "")
-  const shown = slots.filter((x) => x.monthKey === (months.includes(month) ? month : months[0]))
   const [thbVariants, setThbVariants] = useState<ThbVariant[]>([])
   const [name, setName] = useState("")
   const [contact, setContact] = useState("")
@@ -441,34 +439,15 @@ function BookingDialog(props: {
           <Stepper pax={pax} setPax={setPax} />
         </section>
         <section className={s.depGroup}>
-          <div className={s.depRow}>
-            <h3 className="ds-headline-s">Dates</h3>
-            {mobile ? (
-              <label className={s.monthSelect}>
-                <select value={month} onChange={(e) => setMonth(e.target.value)} aria-label="Month">
-                  {months.map((k) => <option key={k} value={k}>{monthLabel(k)}</option>)}
-                </select>
-                <span className="ds-title-s">{monthLabel(months.includes(month) ? month : months[0])}</span>
-                <Icon name="expand_more" size={24} />
-              </label>
-            ) : null}
-          </div>
-          {!mobile && (
-            <div className={s.lengths}>
-              {months.map((k) => <Chip key={k} size="s" selected={k === (months.includes(month) ? month : months[0])} onClick={() => setMonth(k)}>{monthLabel(k)}</Chip>)}
+          <h3 className="ds-headline-s">Dates</h3>
+          {/* A calendar of the trips one can take; the picked stay is highlighted (Oleg 07.11.2026) */}
+          <RangeCalendar ranges={slots} selected={slot} onPick={onSlot} />
+          {slot && (
+            <div className={s.calPick}>
+              <span className="ds-title-m">{slot.title}</span>
+              <span className="ds-body-m ds-muted"><Facts items={[slot.weekdays, priceUsd ? `${usd(priceUsd)} per person` : null, `${days} days`]} /></span>
             </div>
           )}
-          <div className={o.slots} role="radiogroup" aria-label="Start date">
-            {shown.map((x) => (
-              <SlotRow
-                key={x.start}
-                slot={x}
-                on={x.start === slot?.start}
-                onPick={() => onSlot(x.start)}
-                sub={<Facts items={[x.weekdays, priceUsd ? `${usd(priceUsd)} per person` : null, `${days} days`]} />}
-              />
-            ))}
-          </div>
         </section>
         <p className={o.note} style={{ textAlign: "center" }}>
           {priced ? "Deposit by card, Apple Pay or Google Pay. A person confirms your trip on WhatsApp." : "No payment now. A person confirms availability and the price on WhatsApp."}

@@ -1,0 +1,72 @@
+"use client"
+// Month calendar for picking a trip (Oleg 07.11.2026): the days a trip can start on are marked; tapping a day
+// selects the trip that starts on it, or the latest one that covers it, and the whole stay is highlighted as
+// a band from arrival to departure. Days no trip covers are muted. Weeks start on Monday; dates are ISO
+// (YYYY-MM-DD, UTC).
+import { useMemo, useState } from "react"
+import { IconButton } from "./ui"
+import s from "./rangeCalendar.module.css"
+
+export type CalRange = { start: string; end: string }
+
+const iso = (d: Date) => d.toISOString().slice(0, 10)
+const day = (k: string) => new Date(`${k}T00:00:00Z`)
+const WD = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
+export default function RangeCalendar({ ranges, selected, onPick }: { ranges: CalRange[]; selected?: CalRange; onPick: (start: string) => void }) {
+  const months = useMemo(() => {
+    const set = new Set<string>()
+    for (const r of ranges) { set.add(r.start.slice(0, 7)); set.add(r.end.slice(0, 7)) }
+    return [...set].sort()
+  }, [ranges])
+  const [month, setMonth] = useState(selected?.start.slice(0, 7) ?? months[0] ?? iso(new Date()).slice(0, 7))
+  const at = Math.max(0, months.indexOf(month))
+  const key = months[at] ?? month
+  const [y, m] = key.split("-").map(Number)
+  const first = new Date(Date.UTC(y, m - 1, 1))
+  const lead = (first.getUTCDay() + 6) % 7 // Monday first
+  const count = new Date(Date.UTC(y, m, 0)).getUTCDate()
+  const starts = new Set(ranges.map((r) => r.start))
+  // The trip a tap on `k` picks: the one starting that day, else the latest one covering it
+  const tripFor = (k: string) => (starts.has(k) ? k : [...ranges].reverse().find((r) => r.start <= k && k <= r.end)?.start)
+  const title = first.toLocaleDateString("en-US", { timeZone: "UTC", month: "long", year: "numeric" })
+
+  return (
+    <div className={s.cal}>
+      <div className={s.head}>
+        <IconButton icon="arrow_back" label="Previous month" disabled={at <= 0} onClick={() => setMonth(months[at - 1])} />
+        <span className="ds-title-m">{title}</span>
+        <IconButton icon="arrow_forward" label="Next month" disabled={at >= months.length - 1} onClick={() => setMonth(months[at + 1])} />
+      </div>
+      <div className={s.grid} role="grid" aria-label={title}>
+        {WD.map((w) => <span key={w} className={s.wd}>{w.slice(0, 2)}</span>)}
+        {Array.from({ length: lead }, (_, i) => <span key={`l${i}`} />)}
+        {Array.from({ length: count }, (_, i) => {
+          const k = iso(new Date(Date.UTC(y, m - 1, i + 1)))
+          const trip = tripFor(k)
+          const inSel = !!selected && selected.start <= k && k <= selected.end
+          const edge = selected && (k === selected.start ? "start" : k === selected.end ? "end" : null)
+          const col = (lead + i) % 7
+          return (
+            <button
+              key={k}
+              type="button"
+              className={s.day}
+              data-in={inSel ? "" : undefined}
+              data-edge={edge ?? undefined}
+              data-row-start={col === 0 || i === 0 ? "" : undefined}
+              data-row-end={col === 6 || i === count - 1 ? "" : undefined}
+              data-start={starts.has(k) ? "" : undefined}
+              disabled={!trip}
+              aria-pressed={inSel}
+              aria-label={day(k).toLocaleDateString("en-US", { timeZone: "UTC", weekday: "long", month: "long", day: "numeric" })}
+              onClick={() => trip && onPick(trip)}
+            >
+              <span>{i + 1}</span>
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
