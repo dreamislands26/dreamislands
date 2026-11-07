@@ -281,3 +281,8 @@ html:has(.ds-root), body:has(.ds-root) { background: var(--ds-surface); color: v
 .ds-consent-primary { background: var(--ds-primary); color: var(--ds-on-primary); }
 @media (max-width: 767px) { .ds-consent { bottom: calc(96px + env(safe-area-inset-bottom)); padding: 16px 20px; } .ds-consent-actions { width: 100%; } .ds-consent-btn { flex: 1; } }
 .ds-root:has([data-focus]) .fab-wa { display: none; }
+
+/* Auto-translated locales (/zh, /id): hidden until AutoTranslate has swapped the English text, so it does not
+   flash. Shown anyway after 1.5s, so a page never stays blank if the script fails. */
+.ds-root[data-autotr="pending"] { visibility: hidden; animation: autotrReveal 0s 1.5s forwards; }
+@keyframes autotrReveal { to { visibility: visible; } }
