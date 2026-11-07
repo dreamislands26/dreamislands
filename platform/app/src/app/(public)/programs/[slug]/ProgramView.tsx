@@ -263,7 +263,7 @@ export default function ProgramView({
             <p className={s.factsMobile}><Facts items={[placeParts.length ? <span key="pl"><Flag of={primary?.country} /> {placeParts.join(" | ")}</span> : null, cohort?.fullName]} /></p>
             {/* Small tags, not a big stats block (Oleg 07.11.2026); no reviews, no rating tag */}
             <div className={s.stats}>
-              {avg ? <span><Icon name="star" fill />{avg.toFixed(1)} · {reviews.length} reviews</span> : null}
+              {avg ? <span><Icon name="star" fill />{avg.toFixed(1)} · {reviews.length} {reviews.length === 1 ? "review" : "reviews"}</span> : null}
               {days && <span><Icon name="calendar_month" />{days} days</span>}
               <span><Icon name="monitoring" />2 check-ins</span>
             </div>

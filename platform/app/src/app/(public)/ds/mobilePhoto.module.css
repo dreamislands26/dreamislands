@@ -12,6 +12,20 @@
   .mPhotoBar { position: absolute; left: 0; right: 0; top: 0.75rem; display: flex; justify-content: space-between; padding: 0 1rem; } /* under the site header (Oleg 06.11.2026) */
   .mPhotoActions { display: flex; gap: 0.5rem; }
   /* Page dots at the bottom centre, clear of the sheet that overlaps the photo by 1.75rem */
-  .mDots { position: absolute; left: 50%; bottom: 2.75rem; transform: translateX(-50%); }
+  .mDots { position: absolute; left: 50%; bottom: 2.75rem; transform: translateX(-50%); transition: bottom 0.35s cubic-bezier(0.2, 0, 0, 1); }
+
+  /* Full-screen photo (MobilePhoto): the photo grows to the bottom of the screen plus the 1.75rem the sheet
+     overlaps it, so the sheet leaves the screen entirely; the page stops scrolling. The programme bar always floats; the
+     place's action bar floats here */
+  .mPhoto { transition: height 0.35s cubic-bezier(0.2, 0, 0, 1); }
+  :global(html[data-photo-full]) .mPhoto { height: calc(100dvh - 3.5rem - env(safe-area-inset-top) + 1.75rem); }
+  :global(html[data-photo-full]) { overflow: hidden; }
+  :global(html[data-photo-full]) .mDots { bottom: calc(1.75rem + 6.25rem + env(safe-area-inset-bottom)); }
+  :global(html[data-photo-full] .fab-support) { display: none; }
+  :global(html[data-photo-full] [data-own-bar="action"]) {
+    left: var(--ds-gutter); right: var(--ds-gutter); bottom: calc(var(--ds-gutter) + env(safe-area-inset-bottom));
+    padding: 0.75rem 0.75rem 0.75rem 1.25rem; border-radius: var(--ds-r-xl-plus); box-shadow: var(--ds-elev-3);
+  }
+  :global([data-own-bar="action"]) { transition: left 0.35s cubic-bezier(0.2, 0, 0, 1), right 0.35s cubic-bezier(0.2, 0, 0, 1), bottom 0.35s cubic-bezier(0.2, 0, 0, 1), padding 0.35s cubic-bezier(0.2, 0, 0, 1), border-radius 0.35s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.35s; }
 
 }

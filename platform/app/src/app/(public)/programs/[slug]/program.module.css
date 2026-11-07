@@ -178,12 +178,14 @@
 
   /* Bottom action bar (CF3 mobile) */
   /* No spacer here: the tab bar spacer after the footer already keeps the end of the page clear of this bar */
-  .bar { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; position: fixed; left: 0; right: 0; bottom: 0; z-index: 56; padding: 1rem var(--ds-gutter) calc(1.75rem + env(safe-area-inset-bottom)); border-radius: 2.25rem 2.25rem 0 0; background: var(--ds-surface-container-high); }
-  /* Morph into the end card (--p 0..1 from BookingPanel): side insets, all corners round, card padding */
+  /* Always floating (Oleg 07.11.2026): inset like the cards, round, with a shadow. At the end of the page it
+     settles into the end card (--p 0..1 from BookingPanel): it slides down onto the card and its shadow
+     fades; shape and padding are already the card's. */
   .bar {
-    left: calc(var(--ds-gutter) * var(--p, 0)); right: calc(var(--ds-gutter) * var(--p, 0));
-    border-radius: 2.25rem 2.25rem calc(var(--ds-r-xl-plus) * var(--p, 0)) calc(var(--ds-r-xl-plus) * var(--p, 0));
-    padding: 1rem calc(var(--ds-gutter) + (1rem - var(--ds-gutter)) * var(--p, 0)) calc((1.75rem + env(safe-area-inset-bottom)) * (1 - var(--p, 0)) + 1rem * var(--p, 0)) calc(var(--ds-gutter) + (1.25rem - var(--ds-gutter)) * var(--p, 0));
+    display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; position: fixed; z-index: 56;
+    left: var(--ds-gutter); right: var(--ds-gutter); bottom: calc((var(--ds-gutter) + env(safe-area-inset-bottom)) * (1 - var(--p, 0)));
+    padding: 1rem 1rem 1rem 1.25rem; border-radius: var(--ds-r-xl-plus); background: var(--ds-surface-container-high);
+    box-shadow: 0 0.5rem 2rem rgba(23, 40, 30, calc(0.14 * (1 - var(--p, 0))));
   }
   .barDocked { visibility: hidden; pointer-events: none; }
   .barCardWaiting { visibility: hidden; }
