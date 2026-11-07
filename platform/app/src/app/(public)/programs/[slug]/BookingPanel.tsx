@@ -439,9 +439,8 @@ function BookingDialog(props: {
           <Stepper pax={pax} setPax={setPax} />
         </section>
         <section className={s.depGroup}>
-          <h3 className="ds-headline-s">Dates</h3>
-          {/* A calendar of the trips one can take; the picked stay is highlighted (Oleg 07.11.2026) */}
-          <RangeCalendar ranges={slots} selected={slot} onPick={onSlot} />
+          {/* A calendar of the trips one can take; the picked stay is highlighted; the month sits on the title row (Oleg 07.11.2026) */}
+          <RangeCalendar ranges={slots} selected={slot} onPick={onSlot} heading={<h3 className="ds-headline-s">Dates</h3>} />
           {slot && (
             <div className={s.calPick}>
               <span className="ds-title-m">{slot.title}</span>

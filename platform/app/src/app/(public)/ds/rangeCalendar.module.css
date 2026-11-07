@@ -1,7 +1,10 @@
 /* RangeCalendar: 7 columns, 40px rows. Trips one can take are pale bands, the selected stay a mint band with
    dark round ends; trip start days carry a small dot; days no trip covers are muted. */
 .cal { display: flex; flex-direction: column; gap: 0.5rem; }
-.head { display: flex; align-items: center; justify-content: space-between; margin: 0 -0.5rem; }
+.head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.nav { display: flex; align-items: center; margin-right: -0.5rem; }
+.head:not(:has(> :not(.nav))) .nav { flex: 1; justify-content: space-between; margin: 0 -0.5rem; } /* no heading: arrows at both ends */
+.month { min-width: 8.5rem; text-align: center; white-space: nowrap; }
 .grid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 0.25rem; }
 .wd { height: 2rem; display: flex; align-items: center; justify-content: center; font: 500 0.75rem/1rem var(--ds-font-body); color: var(--ds-on-surface-variant); }
 .day { position: relative; height: 2.5rem; padding: 0; border: 0; background: none; display: flex; align-items: center; justify-content: center; font: 500 0.9375rem/1 var(--ds-font-body); color: var(--ds-on-surface); cursor: pointer; }

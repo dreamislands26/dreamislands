@@ -4,7 +4,7 @@
 // selects the trip that starts on it, or the latest one that covers it, and the whole stay is highlighted as
 // a band from arrival to departure. Days no trip covers are muted. Weeks start on Monday; dates are ISO
 // (YYYY-MM-DD, UTC).
-import { useMemo, useState } from "react"
+import { useMemo, useState, type ReactNode } from "react"
 import { IconButton } from "./ui"
 import s from "./rangeCalendar.module.css"
 
@@ -14,7 +14,8 @@ const iso = (d: Date) => d.toISOString().slice(0, 10)
 const day = (k: string) => new Date(`${k}T00:00:00Z`)
 const WD = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
-export default function RangeCalendar({ ranges, selected, onPick }: { ranges: CalRange[]; selected?: CalRange; onPick: (start: string) => void }) {
+/** `heading`: the section title, put on the month row (left; the month and its arrows go right). */
+export default function RangeCalendar({ ranges, selected, onPick, heading }: { ranges: CalRange[]; selected?: CalRange; onPick: (start: string) => void; heading?: ReactNode }) {
   const months = useMemo(() => {
     const set = new Set<string>()
     for (const r of ranges) { set.add(r.start.slice(0, 7)); set.add(r.end.slice(0, 7)) }
@@ -36,9 +37,12 @@ export default function RangeCalendar({ ranges, selected, onPick }: { ranges: Ca
   return (
     <div className={s.cal}>
       <div className={s.head}>
-        <IconButton icon="arrow_back" label="Previous month" disabled={at <= 0} onClick={() => setMonth(months[at - 1])} />
-        <span className="ds-title-m">{title}</span>
-        <IconButton icon="arrow_forward" label="Next month" disabled={at >= months.length - 1} onClick={() => setMonth(months[at + 1])} />
+        {heading}
+        <div className={s.nav}>
+          <IconButton icon="arrow_back" label="Previous month" disabled={at <= 0} onClick={() => setMonth(months[at - 1])} />
+          <span className={`ds-title-m ${s.month}`}>{title}</span>
+          <IconButton icon="arrow_forward" label="Next month" disabled={at >= months.length - 1} onClick={() => setMonth(months[at + 1])} />
+        </div>
       </div>
       <div className={s.grid} role="grid" aria-label={title}>
         {WD.map((w) => <span key={w} className={s.wd}>{w.slice(0, 2)}</span>)}
