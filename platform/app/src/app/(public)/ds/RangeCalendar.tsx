@@ -67,6 +67,11 @@ export default function RangeCalendar({ ranges, selected, onPick, heading }: { r
           // into, and the next band starts with a notch round it, as at the picked stay's ends
           const junction = !inSel && starts.has(k) && ranges.some((r) => r.start < k && r.end === k)
           const paleAfter = (edge === "end" || junction) && runs(k, shift(1))
+          // The pale band rounds off only where no trip carries on (overlapping trips: a trip's end inside the
+          // next one is no edge of the band)
+          const covers = (a: string, b: string) => ranges.some((r) => r.start <= a && b <= r.end)
+          const capLeft = avail && !covers(shift(-1), k)
+          const capRight = avail && !covers(k, shift(1))
           return (
             <button
               key={k}
@@ -80,6 +85,8 @@ export default function RangeCalendar({ ranges, selected, onPick, heading }: { r
               data-pale-before={paleBefore ? "" : undefined}
               data-pale-after={paleAfter ? "" : undefined}
               data-junction={junction ? "" : undefined}
+              data-cap-left={capLeft ? "" : undefined}
+              data-cap-right={capRight ? "" : undefined}
               data-row-start={col === 0 ? "" : undefined}
               data-row-end={col === 6 ? "" : undefined}
               data-out={out ? "" : undefined}
