@@ -1,5 +1,5 @@
 /* RangeCalendar: 7 columns, 40px rows. Trips one can take are pale bands, the selected stay a mint band with
-   dark round ends; trip start days carry a small dot; days no trip covers are muted. */
+   dark round ends; trip start days carry a small dot; days no trip covers are grey. */
 .cal { display: flex; flex-direction: column; gap: 0.5rem; }
 .head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
 .nav { display: flex; align-items: center; margin-right: -0.5rem; }
@@ -9,7 +9,8 @@
 .wd { height: 2rem; display: flex; align-items: center; justify-content: center; font: 500 0.75rem/1rem var(--ds-font-body); color: var(--ds-on-surface-variant); }
 .day { position: relative; height: 2.5rem; padding: 0; border: 0; background: none; display: flex; align-items: center; justify-content: center; font: 500 0.9375rem/1 var(--ds-font-body); color: var(--ds-on-surface); cursor: pointer; }
 .day > span { position: relative; z-index: 1; width: 2.25rem; height: 2.25rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s, color 0.2s; }
-.day:disabled { color: var(--ds-on-surface-variant); opacity: 0.4; cursor: default; }
+/* This month's days with no trip: solid grey, no transparency (Oleg 07.11.2026) */
+.day:disabled { color: var(--ds-on-surface-variant); cursor: default; }
 /* Days of the months around: faded with their bands, the numbers fainter still (Oleg 07.11.2026); not tappable */
 .day[data-out] { opacity: 1; pointer-events: none; color: var(--ds-on-surface); }
 .day[data-out]::before { opacity: 0.3; }
