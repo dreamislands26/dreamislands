@@ -334,6 +334,7 @@ function BookingDialog(props: {
         program_id: programId,
         arrival: slot.start,
         pax,
+        room: room?.name,
         guest_name: name,
         guest_email: isEmail ? contact : undefined,
         guest_whatsapp: isEmail ? undefined : contact,
