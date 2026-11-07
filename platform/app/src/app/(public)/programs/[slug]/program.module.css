@@ -154,15 +154,18 @@
   .titleRow { justify-content: center; text-align: center; }
   .title { font: 600 1.5rem/1.2 var(--ds-font-display); text-align: center; }
   .factsMobile { margin: -1.5rem 0 0; text-align: center; font: 400 0.875rem/1.25rem var(--ds-font-body); color: var(--ds-on-surface-variant); }
-  .stats { display: grid; grid-template-columns: repeat(3, 1fr); padding: 1rem 0; border-radius: var(--ds-r-xl-plus); background: var(--ds-surface-container-low); }
+  .stats { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; padding: 0.625rem 0; border-radius: var(--ds-r-xl-plus); background: var(--ds-surface-container-low); }
   .stats > div { display: flex; flex-direction: column; align-items: center; }
   .stats strong { font: 700 1.125rem/1.2 var(--ds-font-display); color: var(--ds-on-surface); }
   .stats span { font: 400 0.75rem/1rem var(--ds-font-body); color: var(--ds-on-surface-variant); letter-spacing: 0.1px; }
   .summary { color: var(--ds-on-surface); }
+  /* What to expect, What you'll do, Things to know: each list in one card, like the stats (Oleg 07.11.2026) */
+  .sectionCard { margin-top: 0.75rem; padding: 0.25rem 1rem; border-radius: var(--ds-r-xl-plus); background: var(--ds-surface-container-low); }
   .body { padding-top: 2rem; gap: 2rem; }
   .content { gap: 2rem; }
   .after { gap: 2rem; padding-top: 2rem; }
-  .ctaRow { margin-top: 1rem; }
+  .todoCard { margin-top: 0.75rem; padding: 0.25rem 1rem 1rem; border-radius: var(--ds-r-xl-plus); background: var(--ds-surface-container-low); }
+  .todoCard .ctaRow { margin-top: 0.5rem; }
   /* A room's button shrinks to its arrow; the name and facts get the room back and wrap */
   .roomCta.roomCta { width: 2.5rem; height: 2.5rem; padding: 0; justify-content: center; }
   .roomCtaText { display: none; }

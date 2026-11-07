@@ -78,7 +78,7 @@ function Title({ text, className }: { text?: string; className: string }) {
 
 const lines = (n: number, last = s.w60) => Array.from({ length: n }, (_, i) => <Skeleton key={i} className={i === n - 1 ? last : undefined} />)
 const Lines = ({ n, last }: { n: number; last?: string }) => <div className={s.lines}>{lines(n, last)}</div>
-const SkItem = ({ icon }: { icon: string }) => <ListItem icon={icon} headline={<Skeleton className={s.itemHead} />} supporting={<Skeleton className={s.itemSub} />} />
+const SkItem = ({ icon, hue }: { icon: string; hue?: number }) => <ListItem icon={icon} hue={hue} headline={<Skeleton className={s.itemHead} />} supporting={<Skeleton className={s.itemSub} />} />
 
 /** Programme page (programs/[slug]/ProgramView + BookingPanel). */
 export function ProgramShell({ preview: p }: { preview?: Preview }) {
@@ -98,7 +98,6 @@ export function ProgramShell({ preview: p }: { preview?: Preview }) {
             </div>
             <p className={pr.factsMobile}><Skeleton className={s.center} /></p>
             <div className={pr.stats}>
-              <div><strong><Skeleton className={s.stat} /></strong><span>reviews</span></div>
               <div><strong><Skeleton className={s.stat} /></strong><span>days</span></div>
               <div><strong>2</strong><span>check-ins</span></div>
             </div>
@@ -107,10 +106,12 @@ export function ProgramShell({ preview: p }: { preview?: Preview }) {
             <ButtonLink href="#reserve" variant="tonal" size="l" className={pr.checkDates}>Check dates</ButtonLink>
             <div className={pr.highlights}>
               <h2 className={pr.mobileOnlyTitle}>What to expect</h2>
-              <SkItem icon="home_health" />
-              <SkItem icon="location_on" />
-              <SkItem icon="calendar_month" />
-              <ListItem icon="monitoring" headline="Measure what changed" supporting="Your Wellness Journey before the trip and again after it" />
+              <div className={pr.sectionCard}>
+                <SkItem icon="home_health" hue={160} />
+                <SkItem icon="location_on" hue={225} />
+                <SkItem icon="calendar_month" hue={60} />
+                <ListItem icon="monitoring" hue={285} headline="Measure what changed" supporting="Your Wellness Journey before the trip and again after it" />
+              </div>
             </div>
           </div>
         </section>

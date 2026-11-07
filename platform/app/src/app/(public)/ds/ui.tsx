@@ -178,10 +178,12 @@ export function Tabs({ items, active }: { items: { key: string; label: string; h
 }
 
 /** `card`: a tap anywhere on the row presses its trailing link (see CardClick). */
-export function ListItem({ icon, headline, supporting, href, trailing, card }: { icon: string; headline: ReactNode; supporting?: ReactNode; href?: string; trailing?: ReactNode; card?: boolean }) {
+/** `hue` (OKLCH, 0–360) tints the icon plate: a pale plate and a deeper icon of one hue, the palette of the
+ *  home goal tiles. Without it the plate is neutral. */
+export function ListItem({ icon, headline, supporting, href, trailing, card, hue }: { icon: string; headline: ReactNode; supporting?: ReactNode; href?: string; trailing?: ReactNode; card?: boolean; hue?: number }) {
   const body = (
     <>
-      <span className={s.leading}><Icon name={icon} className={s.icon} /></span>
+      <span className={cx(s.leading, hue !== undefined && s.leadingTint)} style={hue !== undefined ? { ["--hue" as string]: hue } : undefined}><Icon name={icon} className={s.icon} /></span>
       <span className={s.listText}>
         <span className={s.listHeadline}>{headline}</span>
         {supporting && <span className={s.listSupporting}>{supporting}</span>}

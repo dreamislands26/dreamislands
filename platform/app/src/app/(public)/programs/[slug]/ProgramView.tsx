@@ -56,6 +56,34 @@ function icsHref(b: ConfirmedBooking, programName: string) {
   return "data:text/calendar;charset=utf8," + encodeURIComponent(lines.join("\r\n"))
 }
 
+/** Icon plate hues for the What to expect and What you'll do lists: the home goal tile palette, in an order
+ *  where neighbours differ (mint, sky, peach, lavender, sage, coral, sand) */
+const HUES = [160, 225, 60, 285, 130, 25, 95]
+/** An icon for an activity from its title and text; spa when nothing matches */
+const ACTIVITY_ICONS: [RegExp, string][] = [
+  [/arriv|airport|transfer|check-?in|welcome/i, "flight_land"],
+  [/depart|farewell|check-?out/i, "flight"],
+  [/tcm|acupunct|moxib|chinese medicine|consult|doctor|clinic/i, "stethoscope"],
+  [/foot bath|bath|sauna|onsen|hot spring|spa\b/i, "spa"],
+  [/herbal|tea\b|infusion|oil pulling/i, "local_florist"],
+  [/massage|tuina|thai massage/i, "massage"],
+  [/yoga|meditat|breath|qigong|tai ?chi|mindful/i, "self_improvement"],
+  [/rainforest|forest|jungle|garden|plantation/i, "forest"],
+  [/beach|sea|island|snorkel/i, "beach_access"],
+  [/surf/i, "surfing"],
+  [/boat|cruise|kayak/i, "directions_boat"],
+  [/hike|trek|walk|trail/i, "directions_walk"],
+  [/pool|swim|aqua/i, "pool"],
+  [/gym|training|workout|fitness|strength|muay|boxing/i, "fitness_center"],
+  [/run|sprint/i, "directions_run"],
+  [/temple|culture|cultural|heritage|park|museum|old town/i, "temple_buddhist"],
+  [/detox|juice|nutrition|diet|cook|meal plan/i, "nutrition"],
+  [/sleep|rest|relax/i, "bedtime"],
+  [/assess|scan|test|measure|screen/i, "monitoring"],
+]
+const activityIcon = (t: { title: string; text: string }) =>
+  ACTIVITY_ICONS.find(([re]) => re.test(t.title))?.[1] ?? ACTIVITY_ICONS.find(([re]) => re.test(t.text))?.[1] ?? "spa"
+
 /** Four "What you'll do" items: distinct activities from the schedule (no meals), else the method text. */
 function whatYoullDo(program: ProgramDetail) {
   const seen = new Set<string>()
@@ -221,7 +249,8 @@ export default function ProgramView({
             </div>
             <p className={s.factsMobile}><Facts items={[placeParts.length ? <span key="pl"><Flag of={primary?.country} /> {placeParts.join(" | ")}</span> : null, cohort?.fullName]} /></p>
             <div className={s.stats}>
-              <div><strong>{avg ? avg.toFixed(1) : "New"}</strong><span>{avg ? `${reviews.length} reviews` : "no reviews yet"}</span></div>
+              {/* No reviews: no rating column (Oleg 07.11.2026) */}
+              {avg ? <div><strong>{avg.toFixed(1)}</strong><span>{reviews.length} reviews</span></div> : null}
               {days && <div><strong>{days}</strong><span>days</span></div>}
               <div><strong>2</strong><span>check-ins</span></div>
             </div>
@@ -232,7 +261,9 @@ export default function ProgramView({
             <ButtonLink href="#reserve" replace variant="tonal" size="l" trailingIcon="arrow_forward" className={s.checkDates}>Check dates</ButtonLink>
             <div className={s.highlights}>
               <h2 className={s.mobileOnlyTitle}>What to expect</h2>
-              {highlights.map((h) => <ListItem key={h.h} icon={h.icon} headline={h.h} supporting={h.t} />)}
+              <div className={s.sectionCard}>
+                {highlights.map((h, i) => <ListItem key={h.h} icon={h.icon} hue={HUES[i % HUES.length]} headline={h.h} supporting={h.t} />)}
+              </div>
             </div>
           </div>
         </section>
@@ -255,12 +286,15 @@ export default function ProgramView({
                     </div>
                   ))}
                 </div>
-                <div className={s.todoList}>
-                  {todo.map((t) => <ListItem key={t.title} icon="self_improvement" headline={t.title} supporting={t.text || undefined} />)}
-                </div>
-                <div className={s.ctaRow}>
-                  <ButtonLink href="#reserve" replace variant="tonal" trailingIcon="arrow_forward">Check dates</ButtonLink>
-                  <ButtonLink href={waHref} variant="tonal" target="_blank" rel="noreferrer" className={s.waBtn}><Brand.wa width={18} height={18} aria-hidden />Message on WhatsApp</ButtonLink>
+                {/* Phone: the list and its buttons in one card (Oleg 07.11.2026); desktop: the buttons under the rows */}
+                <div className={s.todoCard}>
+                  <div className={s.todoList}>
+                    {todo.map((t, i) => <ListItem key={t.title} icon={activityIcon(t)} hue={HUES[(i + 1) % HUES.length]} headline={t.title} supporting={t.text || undefined} />)}
+                  </div>
+                  <div className={s.ctaRow}>
+                    <ButtonLink href="#reserve" replace variant="tonal" trailingIcon="arrow_forward">Check dates</ButtonLink>
+                    <ButtonLink href={waHref} variant="tonal" target="_blank" rel="noreferrer" className={s.waBtn}><Brand.wa width={18} height={18} aria-hidden />Message on WhatsApp</ButtonLink>
+                  </div>
                 </div>
               </div>
             )}
@@ -322,7 +356,7 @@ export default function ProgramView({
                 {program.target_guest && <div className={s.knownCard}><Icon name="info" className={s.knownInfo} /><h3>Who it&apos;s for</h3><p>{shortLine(enOnly(program.target_guest), 140)}</p></div>}
                 {primary?.country && <div className={s.knownCard}><Icon name="info" className={s.knownInfo} /><h3>Visa and language</h3><p>See the <a href={`/destinations/${countrySlug(primary.country)}`}>{primary.country} guide</a>. Your coordinator checks the rules for your dates.</p></div>}
               </div>
-              <div className={s.knownList}>
+              <div className={`${s.knownList} ${s.sectionCard}`}>
                 {program.target_guest && <ListItem icon="person" headline="Who it's for" supporting={shortLine(enOnly(program.target_guest), 140)} />}
                 {primary?.country && <ListItem icon="badge" headline="Visa and language" supporting={`See the ${primary.country} guide. Your coordinator checks the rules for your dates.`} />}
               </div>
