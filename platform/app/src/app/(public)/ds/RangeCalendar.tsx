@@ -59,7 +59,10 @@ export default function RangeCalendar({ ranges, selected, onPick, heading }: { r
           const shift = (n: number) => iso(new Date(Date.UTC(y, m - 1, i + 1 + n)))
           const runs = (a: string, b: string) => ranges.some((r) => r.start <= a && b <= r.end && !(selected && selected.start <= a && b <= selected.end))
           const paleBefore = edge === "start" && runs(shift(-1), k)
-          const paleAfter = edge === "end" && runs(k, shift(1))
+          // A day one trip ends on and the next starts on (overlapping trips): a pale circle the earlier band runs
+          // into, and the next band starts with a notch round it, as at the picked stay's ends
+          const junction = !inSel && starts.has(k) && ranges.some((r) => r.start < k && r.end === k)
+          const paleAfter = (edge === "end" || junction) && runs(k, shift(1))
           return (
             <button
               key={k}
@@ -72,6 +75,7 @@ export default function RangeCalendar({ ranges, selected, onPick, heading }: { r
               data-edge={edge ?? undefined}
               data-pale-before={paleBefore ? "" : undefined}
               data-pale-after={paleAfter ? "" : undefined}
+              data-junction={junction ? "" : undefined}
               data-row-start={col === 0 || i === 0 ? "" : undefined}
               data-row-end={col === 6 || i === count - 1 ? "" : undefined}
               data-start={starts.has(k) ? "" : undefined}

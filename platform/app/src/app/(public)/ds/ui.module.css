@@ -58,7 +58,8 @@
   cursor: pointer;
 }
 .iconBtn::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: currentColor; opacity: 0; z-index: -1; transition: opacity 0.15s; }
-.iconBtn:hover::after { opacity: var(--ds-state-hover); }
+/* Hover only with a pointer: iOS keeps :hover on a tapped button (Oleg 07.11.2026) */
+@media (hover: hover) { .iconBtn:hover::after { opacity: var(--ds-state-hover); } }
 .iconBtn .icon { font-size: 1.5rem; }
 .ibTonal { background: var(--ds-secondary-container); color: var(--ds-on-secondary-container); }
 .ibFilled { background: var(--ds-primary); color: var(--ds-on-primary); }
