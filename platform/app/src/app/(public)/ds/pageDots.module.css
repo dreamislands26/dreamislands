@@ -1,4 +1,5 @@
-/* PageDots: white on photos with a soft shadow so they read on light pictures too. Size and place come
-   from the swipe position (PageDots.tsx); a short transition smooths the steps between scroll events. */
-.dots { position: relative; display: block; height: 0.75rem; overflow: hidden; pointer-events: none; }
-.dot { position: absolute; top: 50%; border-radius: 999px; background: #fff; box-shadow: 0 0 2px rgba(0, 0, 0, 0.3); transition: left 0.08s linear, width 0.08s linear, height 0.08s linear, margin 0.08s linear, opacity 0.08s linear; }
+/* PageDots: white on photos. Place, size and alpha are written per frame from the swipe (PageDots.tsx), so
+   no transitions here. One soft shadow for the whole strip (drop-shadow of what is drawn), so it never
+   shows through a see-through dot or changes while the dots move. */
+.dots { position: relative; display: block; height: 0.75rem; pointer-events: none; filter: drop-shadow(0 0 1.5px rgba(0, 0, 0, 0.35)); }
+.dot { position: absolute; left: 0; top: 50%; width: 6px; height: 6px; border-radius: 999px; background: #fff; will-change: transform; }

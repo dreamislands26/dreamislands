@@ -12,7 +12,7 @@ import PageDots from "./PageDots"
 export default function MobilePhoto({ images, title, fallback, save }: { images: { url: string; alt: string }[]; title: string; fallback: string; save?: SavedItem }) {
   const back = useSafeBack(fallback)
   const [open, setOpen] = useState(false)
-  const [p, setP] = useState(0) // photo position while swiping (fractional)
+  const track = useRef<HTMLDivElement>(null)
   const list = useSaved()
   const saved = save ? isSaved(list, save.kind, save.id) : false
   const box = useRef<HTMLDivElement>(null)
@@ -51,11 +51,8 @@ export default function MobilePhoto({ images, title, fallback, save }: { images:
   return (
     <div ref={box} className={s.mPhoto}>
       <div
+        ref={track}
         className={s.mPhotoTrack}
-        onScroll={(e) => {
-          const el = e.currentTarget
-          setP(el.clientWidth ? el.scrollLeft / el.clientWidth : 0)
-        }}
       >
         {(images.length ? images : [{ url: "", alt: title }]).slice(0, 12).map((im, k) => (
           <button key={im.url + k} type="button" className={s.mPhotoSlide} onClick={() => setOpen(true)} aria-label="Open photos">
@@ -70,7 +67,7 @@ export default function MobilePhoto({ images, title, fallback, save }: { images:
           {save && <IconButton icon="favorite" fill={saved} label={saved ? "Remove from saved" : "Save"} variant="photo" onClick={() => toggleSaved(save)} />}
         </div>
       </div>
-      <PageDots count={Math.min(images.length, 12)} progress={p} className={s.mDots} />
+      <PageDots count={Math.min(images.length, 12)} scroller={track} className={s.mDots} />
       <Dialog open={open} onClose={() => setOpen(false)} title={title} wide>
         <div style={{ display: "grid", gap: 8 }}>
           {images.map((im, k) => <Photo key={im.url + k} src={im.url} alt={im.alt} sizes="640px" style={{ aspectRatio: "3 / 2" }} />)}
