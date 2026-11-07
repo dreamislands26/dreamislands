@@ -6,6 +6,8 @@ import PageTransition from "./ds/PageTransition"
 import CardClick from "./ds/CardClick"
 import { ICON_FONT_HREF } from "./ds/icon-font"
 import SupportFab from "./_components/SupportFab"
+import LocaleNotice from "./_components/LocaleNotice"
+import AutoTranslate from "./_components/AutoTranslate"
 import AuthProvider from "./_components/account/AuthProvider"
 import { Footer, MobileTopBar, NavigationBar, NavTracker, TopAppBar } from "./ds/chrome"
 import { LocaleProvider } from "@/lib/i18n-client"
@@ -21,7 +23,7 @@ export default async function PublicLayout({
   const locale = await getLocale()
   return (
     <LocaleProvider locale={locale} messages={getMessages(locale)}>
-    <div className="ds-root">
+    <div className="ds-root" data-autotr={locale === "en" ? undefined : "pending"}>
       {/* Material Symbols Rounded, Light, only the glyphs in ds/icon-font.ts. Hoisted to <head> by React. */}
       <link
         rel="stylesheet"
@@ -43,6 +45,8 @@ export default async function PublicLayout({
         <SupportFab />
         <NavigationBar />
         <CardClick />
+        <LocaleNotice />
+        <AutoTranslate />
       </AuthProvider>
     </div>
     </LocaleProvider>
