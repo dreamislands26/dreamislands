@@ -51,7 +51,7 @@ export function BottomSheet({ open, onClose, title, footer, tall, wide, back, ch
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose()
     document.addEventListener("keydown", onKey)
     // Keyboard users land inside the sheet (it shows no ring itself, see overlay.module.css)
-    sheet.current?.focus()
+    sheet.current?.focus({ preventScroll: true }) // no scroll: the sheet is still sliding in from below
     // Footer shadow only while there is more content below, and not on open: it shows once the body has
     // been scrolled (Oleg 07.11.2026, the shadow on a just-opened sheet read as a glitch)
     const b = body.current, sh = sheet.current

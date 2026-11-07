@@ -95,7 +95,7 @@
 .error { font: 400 0.875rem/1.25rem var(--ds-font-body); color: var(--ds-error); margin: 0; }
 
 /* Bottom sheet (Figma "Bottom sheet"). Opens up to the bottom of the site header; scrolled, it unfolds to full screen (Oleg 07.11.2026) */
-.sheetScrim { position: fixed; inset: 0; z-index: 95; overflow: hidden; background: rgba(0, 0, 0, 0.3); display: flex; align-items: flex-end; animation: fade 0.18s ease; }
+.sheetScrim { position: fixed; inset: 0; z-index: 95; overflow: clip; background: rgba(0, 0, 0, 0.3); display: flex; align-items: flex-end; animation: fade 0.18s ease; }
 .bs { position: relative; width: 100%; max-height: calc(100dvh - 3.5rem - env(safe-area-inset-top)); display: flex; flex-direction: column; border-radius: var(--ds-r-xl-plus) var(--ds-r-xl-plus) 0 0; background: var(--ds-surface); color: var(--ds-on-surface); box-shadow: var(--ds-elev-3); animation: sheet 0.28s cubic-bezier(0.2, 0, 0, 1); transition: transform 0.2s ease; }
 .bsHead { position: relative; flex: none; padding: 1.5rem 3.5rem 1.5rem; text-align: center; touch-action: none; }
 .bsHandle { position: absolute; top: 0.5rem; left: 50%; width: 2rem; height: 0.25rem; margin-left: -1rem; border-radius: 0.125rem; background: var(--ds-outline-variant); }
