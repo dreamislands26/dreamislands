@@ -24,6 +24,11 @@
      (the bar is 5rem tall, 0.75rem above the bottom) */
   :global(html[data-photo-full]) .mDots { position: fixed; bottom: calc(var(--ds-gutter) + 5rem + 1rem + env(safe-area-inset-bottom)); }
   :global(html[data-photo-full] .fab-support) { display: none; }
+  /* Over the full photo the bar is slightly see-through with a soft blur of the photo behind (Oleg 07.11.2026) */
+  :global(html[data-photo-full] [data-own-bar]) {
+    background: color-mix(in srgb, var(--ds-surface-container-high) 76%, transparent);
+    -webkit-backdrop-filter: blur(14px) saturate(1.3); backdrop-filter: blur(14px) saturate(1.3);
+  }
   :global(html[data-photo-full] [data-own-bar="action"]) {
     left: var(--ds-gutter); right: var(--ds-gutter); bottom: calc(var(--ds-gutter) + env(safe-area-inset-bottom));
     padding: 0.75rem 0.75rem 0.75rem 1.25rem; border-radius: var(--ds-r-xl-plus); box-shadow: var(--ds-elev-3);
