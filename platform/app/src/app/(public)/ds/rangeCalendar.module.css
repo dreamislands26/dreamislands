@@ -10,6 +10,10 @@
 .day { position: relative; height: 2.5rem; padding: 0; border: 0; background: none; display: flex; align-items: center; justify-content: center; font: 500 0.9375rem/1 var(--ds-font-body); color: var(--ds-on-surface); cursor: pointer; }
 .day > span { position: relative; z-index: 1; width: 2.25rem; height: 2.25rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s, color 0.2s; }
 .day:disabled { color: var(--ds-on-surface-variant); opacity: 0.4; cursor: default; }
+/* Days of the months around: faded with their bands, not tappable */
+.day[data-out] { opacity: 0.3; pointer-events: none; }
+.day[data-out]:not([data-avail]) { opacity: 0.18; }
+.day[data-out] { color: var(--ds-on-surface); }
 /* A trip can start here */
 .day[data-start]::after { content: ""; position: absolute; left: 50%; bottom: 0.1875rem; width: 0.25rem; height: 0.25rem; margin-left: -0.125rem; border-radius: 50%; background: var(--ds-primary); z-index: 1; }
 /* Bands run cell to cell and round off where a trip starts or ends and where a week row starts or ends.

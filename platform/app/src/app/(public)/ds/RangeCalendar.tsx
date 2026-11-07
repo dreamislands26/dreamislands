@@ -46,15 +46,19 @@ export default function RangeCalendar({ ranges, selected, onPick, heading }: { r
       </div>
       <div className={s.grid} role="grid" aria-label={title}>
         {WD.map((w) => <span key={w} className={s.wd}>{w.slice(0, 2)}</span>)}
-        {Array.from({ length: lead }, (_, i) => <span key={`l${i}`} />)}
-        {Array.from({ length: count }, (_, i) => {
-          const k = iso(new Date(Date.UTC(y, m - 1, i + 1)))
+        {/* Whole weeks: the days of the months around are faded, bands and all, so a trip running into the
+            next month is seen to carry on (Oleg 07.11.2026) */}
+        {Array.from({ length: Math.ceil((lead + count) / 7) * 7 }, (_, j) => {
+          const i = j - lead // day of this month, 0-based (negative or past the end: the months around)
+          const out = i < 0 || i >= count
+          const date = new Date(Date.UTC(y, m - 1, i + 1))
+          const k = iso(date)
           const trip = tripFor(k)
           const inSel = !!selected && selected.start <= k && k <= selected.end
           // Every trip one can take shows as a pale band, so the calendar's step is plain (Oleg 07.11.2026)
           const avail = !!trip
           const edge = selected && (k === selected.start ? "start" : k === selected.end ? "end" : null)
-          const col = (lead + i) % 7
+          const col = j % 7
           // Another trip runs on past the picked stay's arrival or departure: that half of the day stays pale
           const shift = (n: number) => iso(new Date(Date.UTC(y, m - 1, i + 1 + n)))
           const runs = (a: string, b: string) => ranges.some((r) => r.start <= a && b <= r.end && !(selected && selected.start <= a && b <= selected.end))
@@ -76,15 +80,18 @@ export default function RangeCalendar({ ranges, selected, onPick, heading }: { r
               data-pale-before={paleBefore ? "" : undefined}
               data-pale-after={paleAfter ? "" : undefined}
               data-junction={junction ? "" : undefined}
-              data-row-start={col === 0 || i === 0 ? "" : undefined}
-              data-row-end={col === 6 || i === count - 1 ? "" : undefined}
+              data-row-start={col === 0 ? "" : undefined}
+              data-row-end={col === 6 ? "" : undefined}
+              data-out={out ? "" : undefined}
               data-start={starts.has(k) ? "" : undefined}
-              disabled={!trip}
+              disabled={!trip || out}
+              tabIndex={out ? -1 : undefined}
+              aria-hidden={out || undefined}
               aria-pressed={inSel}
               aria-label={day(k).toLocaleDateString("en-US", { timeZone: "UTC", weekday: "long", month: "long", day: "numeric" })}
               onClick={() => trip && onPick(trip)}
             >
-              <span>{i + 1}</span>
+              <span>{date.getUTCDate()}</span>
             </button>
           )
         })}
