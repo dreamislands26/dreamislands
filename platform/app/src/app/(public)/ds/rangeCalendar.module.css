@@ -15,8 +15,8 @@
 .day[data-out] { opacity: 1; pointer-events: none; color: var(--ds-on-surface); }
 .day[data-out]::before { opacity: 0.3; }
 .day[data-out] > span { opacity: 0.18; }
-/* A trip can start here */
-.day[data-start]::after { content: ""; position: absolute; left: 50%; bottom: 0.1875rem; width: 0.25rem; height: 0.25rem; margin-left: -0.125rem; border-radius: 50%; background: var(--ds-primary); z-index: 1; }
+/* The first and last day of every trip one can take: a see-through green ring instead of a dot (Oleg 07.11.2026) */
+.day[data-range-start]:not([data-edge]) > span, .day[data-range-end]:not([data-edge]) > span { box-shadow: inset 0 0 0 1.5px rgba(96, 187, 137, 0.5); }
 /* Bands run cell to cell and round off where a trip starts or ends and where a week row starts or ends.
    Pale for every trip one can take, mint for the picked stay (other trips' ends inside it do not cut it). */
 .day[data-avail]::before { content: ""; position: absolute; inset: 0.125rem 0; background: var(--ds-surface-container-high); }
@@ -36,6 +36,7 @@
 .day[data-pale-before] { background: radial-gradient(circle at 100% 50%, transparent 1.375rem, var(--ds-surface-container-high) calc(1.375rem + 0.5px)) left center / 50% 2.25rem no-repeat; }
 /* Days in the trips one can take and in the picked stay: green too (Oleg 07.11.2026) */
 .day[data-avail]:not([data-out]) { color: var(--ds-primary); }
+/* In the picked stay a deeper, more saturated green, to read on the mint band */
+.day[data-in]:not([data-out]) { color: oklch(57% 0.14 152); }
 .day[data-edge] > span { background: var(--ds-on-secondary-container); color: #fff; }
-.day[data-edge]::after { background: #fff; }
 @media (hover: hover) { .day:not(:disabled):not([data-in]):hover > span { background: var(--ds-surface-container-high); } }
