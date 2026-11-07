@@ -10,6 +10,7 @@
   .mPhotoSlide > div { height: 100%; border-radius: 0 !important; }
   .mPhotoBar { position: absolute; left: 0; right: 0; top: 0.75rem; display: flex; justify-content: space-between; padding: 0 1rem; } /* under the site header (Oleg 06.11.2026) */
   .mPhotoActions { display: flex; gap: 0.5rem; }
-  .mCounter { position: absolute; right: 1.25rem; bottom: 3rem; height: 1.5rem; padding: 0.25rem 0.625rem; border-radius: var(--ds-r-full); background: rgba(0, 0, 0, 0.6); color: #fff; font: 500 0.75rem/1rem var(--ds-font-body); }
+  /* Page dots at the bottom centre, clear of the sheet that overlaps the photo by 1.75rem */
+  .mDots { position: absolute; left: 50%; bottom: 2.75rem; transform: translateX(-50%); }
 
 }

@@ -1,5 +1,5 @@
 "use client"
-// CF3/CF2 mobile: full-bleed photo under the site header, back / share / save over it and a "1 / N" counter.
+// CF3/CF2 mobile: full-bleed photo under the site header, back / share / save over it and page dots (PageDots) at the bottom centre.
 import { useEffect, useRef, useState } from "react"
 import { useSafeBack } from "./navHistory"
 import { Photo } from "./cards"
@@ -7,6 +7,7 @@ import { Dialog } from "./overlay"
 import { IconButton } from "./ui"
 import { isSaved, toggleSaved, useSaved, type SavedItem } from "./saved"
 import s from "./mobilePhoto.module.css"
+import PageDots from "./PageDots"
 
 export default function MobilePhoto({ images, title, fallback, save }: { images: { url: string; alt: string }[]; title: string; fallback: string; save?: SavedItem }) {
   const back = useSafeBack(fallback)
@@ -69,7 +70,7 @@ export default function MobilePhoto({ images, title, fallback, save }: { images:
           {save && <IconButton icon="favorite" fill={saved} label={saved ? "Remove from saved" : "Save"} variant="photo" onClick={() => toggleSaved(save)} />}
         </div>
       </div>
-      {images.length > 1 && <span className={s.mCounter}>{i + 1} / {Math.min(images.length, 12)}</span>}
+      <PageDots count={Math.min(images.length, 12)} index={i} className={s.mDots} />
       <Dialog open={open} onClose={() => setOpen(false)} title={title} wide>
         <div style={{ display: "grid", gap: 8 }}>
           {images.map((im, k) => <Photo key={im.url + k} src={im.url} alt={im.alt} sizes="640px" style={{ aspectRatio: "3 / 2" }} />)}
