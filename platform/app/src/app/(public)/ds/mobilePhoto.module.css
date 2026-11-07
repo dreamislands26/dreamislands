@@ -6,7 +6,8 @@
   .mPhoto { display: block; position: sticky; top: calc(3.5rem + env(safe-area-inset-top)); z-index: 0; height: 22.5rem; margin: 0; }
   .mPhotoTrack { display: flex; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
   .mPhotoTrack::-webkit-scrollbar { display: none; }
-  .mPhotoSlide { flex: 0 0 100%; height: 100%; scroll-snap-align: start; padding: 0; border: 0; display: block; }
+  /* snap-stop: a fast flick still moves one photo, never a batch (Oleg 07.11.2026) */
+  .mPhotoSlide { flex: 0 0 100%; height: 100%; scroll-snap-align: start; scroll-snap-stop: always; padding: 0; border: 0; display: block; }
   .mPhotoSlide > div { height: 100%; border-radius: 0 !important; }
   .mPhotoBar { position: absolute; left: 0; right: 0; top: 0.75rem; display: flex; justify-content: space-between; padding: 0 1rem; } /* under the site header (Oleg 06.11.2026) */
   .mPhotoActions { display: flex; gap: 0.5rem; }
