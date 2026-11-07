@@ -16,7 +16,7 @@
 .day[data-out]::before { opacity: 0.3; }
 .day[data-out] > span { opacity: 0.18; }
 /* The first and last day of every trip one can take: a see-through green ring instead of a dot (Oleg 07.11.2026) */
-.day[data-range-start]:not([data-edge]) > span, .day[data-range-end]:not([data-edge]) > span { box-shadow: inset 0 0 0 1.5px rgba(96, 187, 137, 0.5); }
+.day[data-range-start]:not([data-edge]) > span, .day[data-range-end]:not([data-edge]) > span { box-shadow: inset 0 0 0 1.5px rgba(96, 187, 137, 0.28); }
 /* Bands run cell to cell and round off where a trip starts or ends and where a week row starts or ends.
    Pale for every trip one can take, mint for the picked stay (other trips' ends inside it do not cut it). */
 .day[data-avail]::before { content: ""; position: absolute; inset: 0.125rem 0; background: var(--ds-surface-container-high); }
