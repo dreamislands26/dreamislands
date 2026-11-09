@@ -52,8 +52,13 @@
 /* The chat ends at "Powered by Cura": take back the sheet body's 1.5rem bottom padding, it doubled the gap
    above the Support centre link (Oleg 09.11.2026) */
 .cura { height: calc(100% + 1.5rem); margin-bottom: -1.5rem; }
+/* Input, "Powered by Cura" and the Support centre link sit on one white panel across the sheet, its top
+   corners as the sheet's (Oleg 09.11.2026). --chat-edge = distance from the chat to the sheet's edge. */
+.cura { --chat-edge: 0.75rem; }
+.cura :global(#cura-chat-root), .cura :global(#cura-chat-root.cura-chat-open) :global(#cura-chat-panel), .cura :global(#cura-chat-panel) { overflow: visible !important; }
+:global([role="dialog"]):has(.chatFootBtn) > :last-child { background: var(--ds-surface-container-lowest); }
 /* Desktop dialog: wider side margins, 1.5rem like its head (Oleg 09.11.2026) */
-@media (min-width: 768px) { .cura { padding: 0 0.75rem; } }
+@media (min-width: 768px) { .cura { padding: 0 0.75rem; --chat-edge: 1.5rem; } }
 .cura :global(#cura-chat-root) {
   --cura-primary: var(--ds-primary); --cura-primary-ink: var(--ds-on-primary);
   --cura-font: var(--ds-font-body); --cura-heading: var(--ds-on-surface); --cura-ink: var(--ds-on-surface);
@@ -104,7 +109,8 @@
 /* Programme cards the assistant sends */
 .cura :global(.cura-chat-card) { border: 0 !important; box-shadow: none !important; border-radius: var(--ds-r-lg-plus) !important; background: var(--ds-surface-container-low) !important; color: var(--ds-on-surface) !important; }
 /* Composer: our pill input and filled round send button */
-.cura :global(#cura-chat-composer) { padding: 0.5rem 0 0 !important; margin: 0 !important; border: 0 !important; background: none !important; box-shadow: none !important; }
+.cura :global(#cura-chat-composer) { padding: 1rem var(--chat-edge) 0 !important; margin: 0.5rem calc(-1 * var(--chat-edge)) 0 !important; border: 0 !important; box-shadow: none !important;
+  background: var(--ds-surface-container-lowest) !important; border-radius: var(--ds-r-xl-plus) var(--ds-r-xl-plus) 0 0 !important; }
 .cura :global(.cura-chat-composer-row) { display: flex !important; align-items: center !important; gap: 0.5rem !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: none !important; box-shadow: none !important; }
 .cura :global(#cura-chat-input) {
   flex: 1; min-width: 0; min-height: 3rem !important; max-height: 8rem; padding: 0.875rem 1.25rem !important; margin: 0 !important; border: 0 !important; outline: none !important;
@@ -129,7 +135,7 @@
 .cura :global(#cura-chat-lead-submit), .cura :global(#cura-chat-book) { min-height: 3rem; border: 0 !important; border-radius: var(--ds-r-full) !important; background: var(--ds-primary) !important; color: var(--ds-on-primary) !important; font: 500 1rem/1.25rem var(--ds-font-body) !important; }
 /* Only "Powered by Cura" (required by the agent); the privacy line is hidden (Oleg 09.11.2026) */
 .cura :global(.cura-chat-footer-privacy) { display: none !important; }
-.cura :global(#cura-chat-footer) { padding: 0.5rem 0 0 !important; margin: 0 !important; border: 0 !important; background: none !important; color: var(--ds-on-surface-variant) !important; font: 400 0.75rem/1rem var(--ds-font-body) !important; }
+.cura :global(#cura-chat-footer) { padding: 0.5rem var(--chat-edge) 0 !important; margin: 0 calc(-1 * var(--chat-edge)) !important; border: 0 !important; background: var(--ds-surface-container-lowest) !important; color: var(--ds-on-surface-variant) !important; font: 400 0.75rem/1rem var(--ds-font-body) !important; }
 
 /* Full-width Support centre button under the chat: the sheet footer pads 0.75rem left and 1.5rem right
    (made for a note plus a button), so pull the right edge out to the same 0.75rem gutter */
