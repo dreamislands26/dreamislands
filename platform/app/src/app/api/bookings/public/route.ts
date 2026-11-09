@@ -32,6 +32,9 @@ type PublicBookingPayload = {
   // The room picked in the booking sheet (name, as shown). No bookings column for it yet: it reaches the
   // team in the notification e-mail (Oleg 07.11.2026)
   room?: string
+  // A fixed departure the guest picked (programme with partner-set sessions), as shown: "Retreat No. 3, Nov 26 to Dec 3".
+  // Kept in inquiry_context and the notification e-mail; its dates go to arrival/departure.
+  session?: string
   // Medical case intake (ReserveModal case mode): no checkout, no program required
   request_type?: string
   case_summary?: string
@@ -375,9 +378,12 @@ async function handleAvailabilityRequest(req: Request, body: PublicBookingPayloa
   const guestName = (body.guest_name ?? "").trim()
   const guestEmail = (body.guest_email ?? "").trim() || null
   const guestWhatsapp = (body.guest_whatsapp ?? "").trim() || null
+  const departure = (body.departure ?? "").trim()
+  const session = cleanRoom(body.session)
 
   if (!programId) return bad("program_id required")
   if (!guestName) return bad("guest_name required")
+  if (departure && (!ISO_DATE.test(departure) || !arrival || departure < arrival)) return bad("departure must be YYYY-MM-DD, on or after arrival")
   if (!guestEmail && !guestWhatsapp) return bad("guest_email or guest_whatsapp required")
   if (arrival && !ISO_DATE.test(arrival)) return bad("arrival must be YYYY-MM-DD")
   if (!Number.isInteger(pax) || pax < 1 || pax > 20) return bad("pax must be 1–20")
@@ -414,6 +420,7 @@ async function handleAvailabilityRequest(req: Request, body: PublicBookingPayloa
     destination_country: body.destination_country ?? null,
     source_page: body.source_page ?? null,
     room: cleanRoom(body.room),
+    session,
     guest_contact: { email: guestEmail, whatsapp: guestWhatsapp },
     attribution: {
       market_country: body.market_country ?? null,
@@ -432,6 +439,7 @@ async function handleAvailabilityRequest(req: Request, body: PublicBookingPayloa
       user_id: guestUser.id,
       program_id: programId,
       arrival: arrival || null,
+      departure: departure || null,
       pax,
       status: "inquiry",
       payment_status: "unpaid",
@@ -472,6 +480,7 @@ async function handleAvailabilityRequest(req: Request, body: PublicBookingPayloa
     pax,
     sourcePage: body.source_page ?? null,
     room: cleanRoom(body.room),
+    session,
   })
 
   return NextResponse.json({ success: true, booking: { id: booking.id } }, { headers: cors })
@@ -680,6 +689,7 @@ async function notifyAvailabilityRequest(args: {
   pax: number
   sourcePage: string | null
   room?: string | null
+  session?: string | null
 }) {
   try {
     const origin = new URL(args.req.url).origin
@@ -696,6 +706,7 @@ async function notifyAvailabilityRequest(args: {
       pax: args.pax,
       sourcePage: args.sourcePage,
       room: args.room ?? null,
+      session: args.session ?? null,
       adminBookingUrl: `${origin}/admin/bookings`,
     })
     await sendEmail({ to: recipients, ...mail, tag: "availability_request" })

@@ -48,3 +48,13 @@ export function stayFor(start: string, days: number): Slot {
   const title = `${fmt(s, { month: "short", day: "numeric" })} to ${sameMonth ? fmt(e, { day: "numeric" }) : fmt(e, { month: "short", day: "numeric" })}`
   return { start, end: iso(e), title, weekdays: `${fmt(s, { weekday: "short" })} to ${fmt(e, { weekday: "short" })}`, monthKey: start.slice(0, 7), dayLabel: fmt(s, { weekday: "short", month: "short", day: "numeric" }) }
 }
+
+/** A fixed departure set by the partner (e.g. a retreat cohort), from programs.translations.en.sessions */
+export type FixedSession = { start: string; end: string; name?: string | null }
+
+/** A fixed session in the same shape as a weekly slot; its length comes from its own dates */
+export function fixedSlot(fs: FixedSession): Slot {
+  const s = new Date(`${fs.start}T00:00:00Z`)
+  const days = Math.round((new Date(`${fs.end}T00:00:00Z`).getTime() - s.getTime()) / 86400000) + 1
+  return stayFor(fs.start, days)
+}
