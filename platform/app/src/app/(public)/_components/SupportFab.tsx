@@ -1,15 +1,13 @@
 "use client"
 /** Floating Support button (headset): opens the support chat sheet (the Cura chat inside the site, SupportChat.tsx).
- *  A link to the chat page as a fallback before the page is interactive. Sits above the WhatsApp button. */
-import { CURA_CHAT, openSupportChat } from "../ds/SupportChat"
+ *  Links to the Support centre before the page is interactive. Sits above the WhatsApp button. */
+import { openSupportChat } from "../ds/SupportChat"
 
 export default function SupportFab() {
   return (
     <a
       className="fab-support"
-      href={CURA_CHAT}
-      target="_blank"
-      rel="noopener noreferrer"
+      href="/support"
       aria-label="Support"
       title="Support"
       onClick={(e) => { e.preventDefault(); openSupportChat() }}
