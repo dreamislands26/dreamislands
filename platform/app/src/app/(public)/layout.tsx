@@ -6,6 +6,9 @@ import PageTransition from "./ds/PageTransition"
 import CardClick from "./ds/CardClick"
 import { ICON_FONT_HREF } from "./ds/icon-font"
 import SupportFab from "./_components/SupportFab"
+import SupportChat from "./ds/SupportChat"
+import { CURA_AGENT, CURA_SERVER, CURA_WIDGET } from "./_lib/cura"
+import Script from "next/script"
 import LocaleNotice from "./_components/LocaleNotice"
 import AutoTranslate from "./_components/AutoTranslate"
 import AuthProvider from "./_components/account/AuthProvider"
@@ -43,6 +46,9 @@ export default async function PublicLayout({
         <Footer />
         <WhatsAppFab />
         <SupportFab />
+        <SupportChat />
+        {/* Cura chat widget: draws into the page, hidden until SupportChat moves it into its sheet */}
+        <Script src={CURA_WIDGET} data-agent-id={CURA_AGENT} data-server={CURA_SERVER} data-lang={locale} strategy="afterInteractive" />
         <NavigationBar />
         <CardClick />
         <LocaleNotice />

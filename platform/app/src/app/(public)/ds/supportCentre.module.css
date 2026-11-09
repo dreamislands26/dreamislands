@@ -37,22 +37,97 @@
 .topic details { scroll-margin-top: 0.5rem; }
 .footNote { padding-left: 0.75rem; font: 400 0.875rem/1.25rem var(--ds-font-body); color: var(--ds-on-surface-variant); }
 
-/* Chat sheet */
-.chat { display: flex; flex-direction: column; gap: 1rem; min-height: 100%; }
-.agent { display: flex; align-items: center; gap: 0.75rem; padding: 0.25rem 0.5rem 0; }
-.agent p { margin: 0; }
-.thread { display: flex; flex-direction: column; gap: 0.5rem; padding: 0 0.25rem; }
-.them, .me { max-width: 85%; padding: 0.75rem 1rem; border-radius: var(--ds-r-lg-plus); font: 400 0.9375rem/1.375rem var(--ds-font-body); }
-.them p, .me p { margin: 0; }
-.them { align-self: flex-start; background: var(--ds-surface-container-low); color: var(--ds-on-surface); border-bottom-left-radius: var(--ds-r-xs); }
-.me { align-self: flex-end; background: var(--ds-primary-container); color: var(--ds-on-primary-container); border-bottom-right-radius: var(--ds-r-xs); }
-.wa { display: inline-flex; align-items: center; gap: 0.25rem; margin-top: 0.5rem; font: 500 0.875rem/1.25rem var(--ds-font-body); color: var(--ds-primary); text-decoration: none; }
-.wa :global(.ds-icon) { font-size: 1.125rem; }
-.starters { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+/* Support chat sheet (SupportChat.tsx). Status line under the sheet title, from the widget's real state */
+.status { display: flex; align-items: center; justify-content: center; gap: 0.375rem; margin-top: 0.25rem; font: 400 0.8125rem/1.125rem var(--ds-font-body); color: var(--ds-on-surface-variant); }
+.statusDot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--ds-outline); flex: none; }
+.status[data-status="online"] .statusDot { background: var(--ds-primary); }
+.status[data-status="connecting"] .statusDot, .status[data-status="reconnecting"] .statusDot { background: #e0a43a; animation: statusPulse 1.2s ease-in-out infinite; }
+.status[data-status="unavailable"] .statusDot { background: var(--ds-error, #ba1a1a); }
+@keyframes statusPulse { 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) { .status .statusDot { animation: none; } }
 
-.composer { flex: 1; display: flex; align-items: center; gap: 0.5rem; padding-left: 0.75rem; }
-.composer input {
-  flex: 1; min-width: 0; height: 3rem; padding: 0 1.25rem; border: 0; border-radius: var(--ds-r-full);
-  background: var(--ds-surface-container-highest); color: var(--ds-on-surface); font: 400 1rem/1.25rem var(--ds-font-body);
+/* Cura's chat (#cura-chat-root, moved in here while the sheet is open), restyled to the site. The widget
+   ships id-based rules, some with !important (its phone layout), hence the !important on layout here. */
+.cura { height: 100%; min-height: 0; }
+/* Desktop dialog: wider side margins, 1.5rem like its head (Oleg 09.11.2026) */
+@media (min-width: 768px) { .cura { padding: 0 0.75rem; } }
+.cura :global(#cura-chat-root) {
+  --cura-primary: var(--ds-primary); --cura-primary-ink: var(--ds-on-primary);
+  --cura-font: var(--ds-font-body); --cura-heading: var(--ds-on-surface); --cura-ink: var(--ds-on-surface);
+  --cura-bubble-ink: var(--ds-on-surface); --cura-muted: var(--ds-on-surface-variant); --cura-paper: var(--ds-surface);
+  --cura-card: var(--ds-surface-container-low); --cura-hairline: var(--ds-outline-variant);
+  position: static !important; inset: auto !important; width: 100% !important; height: 100% !important;
+  display: block !important; z-index: auto !important; font-family: var(--ds-font-body);
 }
-.composer input:focus { outline: none; }
+.cura :global(#cura-chat-launcher), .cura :global(#cura-chat-collapse), .cura :global(#cura-chat-satellite), .cura :global(#cura-chat-header) { display: none !important; }
+.cura :global(#cura-chat-root.cura-chat-open) :global(#cura-chat-panel), .cura :global(#cura-chat-panel) {
+  position: relative !important; inset: auto !important; width: 100% !important; height: 100% !important; max-height: none !important;
+  display: flex !important; flex-direction: column; opacity: 1 !important; pointer-events: auto !important; transform: none !important;
+  border: 0 !important; border-radius: 0 !important; background: none !important; box-shadow: none !important;
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important; transition: none !important; animation: none !important;
+}
+/* Cura's decoration: the gradient edge round the panel and the fade at the top of the thread */
+.cura :global(#cura-chat-panel)::before, .cura :global(#cura-chat-panel)::after, .cura :global(#cura-chat-transcript)::before, .cura :global(#cura-chat-transcript)::after { display: none !important; }
+/* Thread */
+.cura :global(#cura-chat-transcript) { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0.25rem 0 1rem !important; gap: 0.5rem; background: none !important; }
+.cura :global(.cura-chat-msg-avatar) { display: none !important; }
+.cura :global(.cura-chat-msg) { margin: 0 !important; padding: 0 !important; gap: 0 !important; }
+.cura :global(.cura-chat-msg-bubble) {
+  max-width: 85%; padding: 0.75rem 1rem !important; border: 0 !important; box-shadow: none !important; border-radius: var(--ds-r-lg-plus) !important;
+  font: 400 0.9375rem/1.375rem var(--ds-font-body) !important; letter-spacing: 0 !important;
+  background: var(--ds-surface-container-low) !important; color: var(--ds-on-surface) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+}
+.cura :global(.cura-chat-msg-assistant .cura-chat-msg-bubble) { border-bottom-left-radius: var(--ds-r-xs) !important; }
+.cura :global(.cura-chat-msg-user .cura-chat-msg-bubble) { background: var(--ds-primary-container) !important; color: var(--ds-on-primary-container) !important; border-bottom-right-radius: var(--ds-r-xs) !important; }
+.cura :global(.cura-chat-msg-bubble a) { color: var(--ds-primary); }
+.cura :global(.cura-chat-typing-bubble) { background: var(--ds-surface-container-low) !important; border: 0 !important; box-shadow: none !important; border-radius: var(--ds-r-lg-plus) var(--ds-r-lg-plus) var(--ds-r-lg-plus) var(--ds-r-xs) !important; }
+/* Quick replies: a keyboard over the input, as in Telegram (moved there by SupportChat.tsx). Two per row,
+   white keys with green text (Oleg 09.11.2026), slide up as they appear; the widget empties the node once the visitor writes. */
+.cura :global(#cura-chat-suggestions) {
+  flex: none; display: grid !important; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; gap: 0.5rem; padding: 0.5rem 0 0 !important; margin: 0 !important;
+  animation: curaKeys 0.32s cubic-bezier(0.2, 0, 0, 1);
+}
+.cura :global(#cura-chat-suggestions:empty) { display: none !important; }
+.cura :global(.cura-chat-suggestion) {
+  display: flex; align-items: center; justify-content: center; min-height: 3rem; height: auto !important; padding: 0.5rem 0.75rem !important;
+  border: 0 !important; box-shadow: none !important; border-radius: var(--ds-r-lg) !important;
+  background: var(--ds-surface-container-high) !important; color: var(--ds-primary) !important;
+  font: 500 0.875rem/1.125rem var(--ds-font-body) !important; text-align: center !important; cursor: pointer; transition: transform 0.12s ease;
+}
+.cura :global(.cura-chat-suggestion:active) { transform: scale(0.97); }
+@media (hover: hover) { .cura :global(.cura-chat-suggestion:hover) { background: var(--ds-surface-container-highest) !important; } }
+@keyframes curaKeys { from { opacity: 0; transform: translateY(0.75rem); } }
+@media (prefers-reduced-motion: reduce) { .cura :global(#cura-chat-suggestions) { animation: none; } }
+/* Programme cards the assistant sends */
+.cura :global(.cura-chat-card) { border: 0 !important; box-shadow: none !important; border-radius: var(--ds-r-lg-plus) !important; background: var(--ds-surface-container-low) !important; color: var(--ds-on-surface) !important; }
+/* Composer: our pill input and filled round send button */
+.cura :global(#cura-chat-composer) { padding: 0.5rem 0 0 !important; margin: 0 !important; border: 0 !important; background: none !important; box-shadow: none !important; }
+.cura :global(.cura-chat-composer-row) { display: flex !important; align-items: center !important; gap: 0.5rem !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: none !important; box-shadow: none !important; }
+.cura :global(#cura-chat-input) {
+  flex: 1; min-width: 0; min-height: 3rem !important; max-height: 8rem; padding: 0.875rem 1.25rem !important; margin: 0 !important; border: 0 !important; outline: none !important;
+  border-radius: 1.5rem !important; background: var(--ds-surface-container-highest) !important; color: var(--ds-on-surface) !important;
+  font: 400 1rem/1.25rem var(--ds-font-body) !important; resize: none;
+  /* A green outline so the field is easy to find (Oleg 09.11.2026), a little stronger while typing */
+  box-shadow: inset 0 0 0 1px var(--ds-primary) !important; transition: box-shadow 0.15s ease;
+}
+.cura :global(#cura-chat-input:focus) { box-shadow: inset 0 0 0 1.5px var(--ds-primary) !important; }
+.cura :global(#cura-chat-input::placeholder) { color: var(--ds-on-surface-variant); opacity: 0.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cura :global(#cura-chat-send) {
+  width: 3rem !important; height: 3rem !important; min-width: 3rem; flex: none; padding: 0 !important; margin: 0 !important; border: 0 !important; box-shadow: none !important;
+  border-radius: var(--ds-r-full) !important; background: var(--ds-primary) !important; color: var(--ds-on-primary) !important; opacity: 1 !important;
+  display: inline-flex !important; align-items: center; justify-content: center;
+}
+.cura :global(#cura-chat-send:disabled) { background: var(--ds-surface-container-highest) !important; color: var(--ds-on-surface-variant) !important; }
+.cura :global(#cura-chat-send svg) { width: 1.25rem; height: 1.25rem; }
+/* Status banner and lead form, in our colours */
+.cura :global(#cura-chat-banner) { font-family: var(--ds-font-body); }
+.cura :global(#cura-chat-lead-open) { color: var(--ds-primary) !important; font: 500 0.875rem/1.25rem var(--ds-font-body) !important; }
+.cura :global(#cura-chat-lead-form input:not([type="checkbox"])) { min-height: 3rem; border: 0 !important; border-radius: var(--ds-r-full) !important; background: var(--ds-surface-container-highest) !important; color: var(--ds-on-surface) !important; padding: 0 1.25rem !important; font: 400 1rem/1.25rem var(--ds-font-body) !important; }
+.cura :global(#cura-chat-lead-submit), .cura :global(#cura-chat-book) { min-height: 3rem; border: 0 !important; border-radius: var(--ds-r-full) !important; background: var(--ds-primary) !important; color: var(--ds-on-primary) !important; font: 500 1rem/1.25rem var(--ds-font-body) !important; }
+/* Privacy line and "Powered by Cura" (required by the agent) */
+.cura :global(#cura-chat-footer) { padding: 0.5rem 0 0 !important; margin: 0 !important; border: 0 !important; background: none !important; color: var(--ds-on-surface-variant) !important; font: 400 0.75rem/1rem var(--ds-font-body) !important; }
+
+/* Full-width Support centre button under the chat: the sheet footer pads 0.75rem left and 1.5rem right
+   (made for a note plus a button), so pull the right edge out to the same 0.75rem gutter */
+.chatFootBtn { flex: 1; margin-right: -0.75rem; }
+@media (min-width: 768px) { .chatFootBtn { margin: 0 0 0 0.75rem; } }
