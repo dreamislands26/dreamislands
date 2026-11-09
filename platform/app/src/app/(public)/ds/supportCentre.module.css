@@ -49,6 +49,9 @@
 /* Cura's chat (#cura-chat-root, moved in here while the sheet is open), restyled to the site. The widget
    ships id-based rules, some with !important (its phone layout), hence the !important on layout here. */
 .cura { height: 100%; min-height: 0; }
+/* The chat ends at "Powered by Cura": take back the sheet body's 1.5rem bottom padding, it doubled the gap
+   above the Support centre link (Oleg 09.11.2026) */
+.cura { height: calc(100% + 1.5rem); margin-bottom: -1.5rem; }
 /* Desktop dialog: wider side margins, 1.5rem like its head (Oleg 09.11.2026) */
 @media (min-width: 768px) { .cura { padding: 0 0.75rem; } }
 .cura :global(#cura-chat-root) {
@@ -89,10 +92,10 @@
 }
 .cura :global(#cura-chat-suggestions:empty) { display: none !important; }
 .cura :global(.cura-chat-suggestion) {
-  display: flex; align-items: center; justify-content: center; min-height: 3rem; height: auto !important; padding: 0.5rem 0.75rem !important;
+  display: flex; align-items: center; justify-content: center; min-height: 2.75rem; height: auto !important; padding: 0.375rem 0.625rem !important;
   border: 0 !important; box-shadow: none !important; border-radius: var(--ds-r-lg) !important;
   background: var(--ds-surface-container-high) !important; color: var(--ds-primary) !important;
-  font: 500 0.875rem/1.125rem var(--ds-font-body) !important; text-align: center !important; cursor: pointer; transition: transform 0.12s ease;
+  font: 500 0.8125rem/1rem var(--ds-font-body) !important; text-align: center !important; cursor: pointer; transition: transform 0.12s ease;
 }
 .cura :global(.cura-chat-suggestion:active) { transform: scale(0.97); }
 @media (hover: hover) { .cura :global(.cura-chat-suggestion:hover) { background: var(--ds-surface-container-highest) !important; } }
