@@ -90,6 +90,11 @@ function CuraSlot({ onStatus }: { onStatus: (s: Status) => void }) {
         here.appendChild(root)
         if (!c.isOpen?.()) c.openPanel?.()
       }
+      // Quick replies as a keyboard over the input, as in Telegram (Oleg 09.11.2026): the widget keeps
+      // filling the same #cura-chat-suggestions node, and inserts messages without it once it has left
+      // the thread, so moving it once is enough.
+      const sug = root.querySelector("#cura-chat-suggestions"), composer = root.querySelector("#cura-chat-composer")
+      if (sug && composer && sug.nextElementSibling !== composer) composer.before(sug)
       const c = controller()
       const banner = root.querySelector("#cura-chat-banner")?.textContent ?? ""
       if (!c || c.stopped || c.phase === "error") onStatus("unavailable")

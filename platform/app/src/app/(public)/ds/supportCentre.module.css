@@ -79,13 +79,23 @@
 .cura :global(.cura-chat-msg-user .cura-chat-msg-bubble) { background: var(--ds-primary-container) !important; color: var(--ds-on-primary-container) !important; border-bottom-right-radius: var(--ds-r-xs) !important; }
 .cura :global(.cura-chat-msg-bubble a) { color: var(--ds-primary); }
 .cura :global(.cura-chat-typing-bubble) { background: var(--ds-surface-container-low) !important; border: 0 !important; box-shadow: none !important; border-radius: var(--ds-r-lg-plus) var(--ds-r-lg-plus) var(--ds-r-lg-plus) var(--ds-r-xs) !important; }
-/* Quick-start suggestions as our chips */
-.cura :global(#cura-chat-suggestions) { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.25rem 0 0 !important; margin: 0 !important; }
-.cura :global(.cura-chat-suggestion) {
-  height: auto !important; min-height: 2.3125rem; padding: 0.5rem 0.875rem !important; border: 0 !important; box-shadow: none !important; border-radius: var(--ds-r-full) !important;
-  background: var(--ds-surface-container-high) !important; color: var(--ds-on-surface) !important; font: 500 0.875rem/1.125rem var(--ds-font-body) !important; text-align: left;
+/* Quick replies: a keyboard over the input, as in Telegram (moved there by SupportChat.tsx). Two per row,
+   tonal, slide up as they appear; the widget empties the node once the visitor writes. */
+.cura :global(#cura-chat-suggestions) {
+  flex: none; display: grid !important; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; gap: 0.5rem; padding: 0.5rem 0 0 !important; margin: 0 !important;
+  animation: curaKeys 0.32s cubic-bezier(0.2, 0, 0, 1);
 }
-@media (hover: hover) { .cura :global(.cura-chat-suggestion:hover) { background: var(--ds-surface-container-highest) !important; } }
+.cura :global(#cura-chat-suggestions:empty) { display: none !important; }
+.cura :global(.cura-chat-suggestion) {
+  display: flex; align-items: center; justify-content: center; min-height: 3rem; height: auto !important; padding: 0.5rem 0.75rem !important;
+  border: 0 !important; box-shadow: none !important; border-radius: var(--ds-r-lg) !important;
+  background: var(--ds-secondary-container) !important; color: var(--ds-on-secondary-container) !important;
+  font: 500 0.875rem/1.125rem var(--ds-font-body) !important; text-align: center !important; cursor: pointer; transition: transform 0.12s ease;
+}
+.cura :global(.cura-chat-suggestion:active) { transform: scale(0.97); }
+@media (hover: hover) { .cura :global(.cura-chat-suggestion:hover) { filter: brightness(0.97); } }
+@keyframes curaKeys { from { opacity: 0; transform: translateY(0.75rem); } }
+@media (prefers-reduced-motion: reduce) { .cura :global(#cura-chat-suggestions) { animation: none; } }
 /* Programme cards the assistant sends */
 .cura :global(.cura-chat-card) { border: 0 !important; box-shadow: none !important; border-radius: var(--ds-r-lg-plus) !important; background: var(--ds-surface-container-low) !important; color: var(--ds-on-surface) !important; }
 /* Composer: our pill input and filled round send button */
@@ -96,7 +106,7 @@
   border-radius: 1.5rem !important; background: var(--ds-surface-container-highest) !important; color: var(--ds-on-surface) !important;
   font: 400 1rem/1.25rem var(--ds-font-body) !important; resize: none;
 }
-.cura :global(#cura-chat-input::placeholder) { color: var(--ds-on-surface-variant); opacity: 1; }
+.cura :global(#cura-chat-input::placeholder) { color: var(--ds-on-surface-variant); opacity: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cura :global(#cura-chat-send) {
   width: 3rem !important; height: 3rem !important; min-width: 3rem; flex: none; padding: 0 !important; margin: 0 !important; border: 0 !important; box-shadow: none !important;
   border-radius: var(--ds-r-full) !important; background: var(--ds-primary) !important; color: var(--ds-on-primary) !important; opacity: 1 !important;
