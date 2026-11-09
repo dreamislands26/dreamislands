@@ -49,6 +49,8 @@
 /* Cura's chat (#cura-chat-root, moved in here while the sheet is open), restyled to the site. The widget
    ships id-based rules, some with !important (its phone layout), hence the !important on layout here. */
 .cura { height: 100%; min-height: 0; }
+/* Desktop dialog: wider side margins, 1.5rem like its head (Oleg 09.11.2026) */
+@media (min-width: 768px) { .cura { padding: 0 0.75rem; } }
 .cura :global(#cura-chat-root) {
   --cura-primary: var(--ds-primary); --cura-primary-ink: var(--ds-on-primary);
   --cura-font: var(--ds-font-body); --cura-heading: var(--ds-on-surface); --cura-ink: var(--ds-on-surface);
@@ -80,7 +82,7 @@
 .cura :global(.cura-chat-msg-bubble a) { color: var(--ds-primary); }
 .cura :global(.cura-chat-typing-bubble) { background: var(--ds-surface-container-low) !important; border: 0 !important; box-shadow: none !important; border-radius: var(--ds-r-lg-plus) var(--ds-r-lg-plus) var(--ds-r-lg-plus) var(--ds-r-xs) !important; }
 /* Quick replies: a keyboard over the input, as in Telegram (moved there by SupportChat.tsx). Two per row,
-   neutral (not green, Oleg 09.11.2026), slide up as they appear; the widget empties the node once the visitor writes. */
+   white keys with green text (Oleg 09.11.2026), slide up as they appear; the widget empties the node once the visitor writes. */
 .cura :global(#cura-chat-suggestions) {
   flex: none; display: grid !important; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; gap: 0.5rem; padding: 0.5rem 0 0 !important; margin: 0 !important;
   animation: curaKeys 0.32s cubic-bezier(0.2, 0, 0, 1);
@@ -89,7 +91,7 @@
 .cura :global(.cura-chat-suggestion) {
   display: flex; align-items: center; justify-content: center; min-height: 3rem; height: auto !important; padding: 0.5rem 0.75rem !important;
   border: 0 !important; box-shadow: none !important; border-radius: var(--ds-r-lg) !important;
-  background: var(--ds-surface-container-high) !important; color: var(--ds-on-surface) !important;
+  background: var(--ds-surface-container-high) !important; color: var(--ds-primary) !important;
   font: 500 0.875rem/1.125rem var(--ds-font-body) !important; text-align: center !important; cursor: pointer; transition: transform 0.12s ease;
 }
 .cura :global(.cura-chat-suggestion:active) { transform: scale(0.97); }
@@ -109,7 +111,7 @@
   box-shadow: inset 0 0 0 1px var(--ds-outline) !important; transition: box-shadow 0.15s ease;
 }
 .cura :global(#cura-chat-input:focus) { box-shadow: inset 0 0 0 1.5px var(--ds-primary) !important; }
-.cura :global(#cura-chat-input::placeholder) { color: var(--ds-on-surface-variant); opacity: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cura :global(#cura-chat-input::placeholder) { color: var(--ds-on-surface-variant); opacity: 0.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cura :global(#cura-chat-send) {
   width: 3rem !important; height: 3rem !important; min-width: 3rem; flex: none; padding: 0 !important; margin: 0 !important; border: 0 !important; box-shadow: none !important;
   border-radius: var(--ds-r-full) !important; background: var(--ds-primary) !important; color: var(--ds-on-primary) !important; opacity: 1 !important;
@@ -128,3 +130,4 @@
 /* Full-width Support centre button under the chat: the sheet footer pads 0.75rem left and 1.5rem right
    (made for a note plus a button), so pull the right edge out to the same 0.75rem gutter */
 .chatFootBtn { flex: 1; margin-right: -0.75rem; }
+@media (min-width: 768px) { .chatFootBtn { margin: 0 0 0 0.75rem; } }
