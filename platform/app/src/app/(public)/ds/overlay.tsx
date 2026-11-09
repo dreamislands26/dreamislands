@@ -73,12 +73,21 @@ export function BottomSheet({ open, onClose, title, footer, tall, wide, back, ch
     const setFp = (p: number) => sh?.style.setProperty("--fp", p.toFixed(3))
     let startY: number | null = null, startX = 0, dy = 0, mode: "unfold" | "fold" | "close" | "none" | null = null
     let inHead = false, atTop = true, canUnfold = false, H = 56
+    // The element a swipe scrolls: the body, or a scroller of its own inside it (the support chat's thread,
+    // Oleg 09.11.2026: a swipe in the thread folded the sheet instead of scrolling back to the greeting)
+    const scrollerOf = (target: EventTarget | null) => {
+      for (let el = target as HTMLElement | null; el && el !== b && el !== sh; el = el.parentElement) {
+        if (el.scrollHeight > el.clientHeight + 2 && /auto|scroll/.test(getComputedStyle(el).overflowY)) return el
+      }
+      return b
+    }
     const onStart = (e: TouchEvent) => {
       if (!sh || window.innerWidth >= 768) return
       startY = e.touches[0].clientY; startX = e.touches[0].clientX; dy = 0; mode = null
       inHead = !!(e.target as Element).closest(`.${s.bsHead}`)
-      atTop = !b || b.scrollTop <= 0
-      canUnfold = !!b && (b.scrollHeight > b.clientHeight + 2 || sh.classList.contains(s.bsTall))
+      const sc = scrollerOf(e.target)
+      atTop = !sc || sc.scrollTop <= 0
+      canUnfold = !!sc && (sc.scrollHeight > sc.clientHeight + 2 || sh.classList.contains(s.bsTall))
       H = header()
     }
     const onMove = (e: TouchEvent) => {
