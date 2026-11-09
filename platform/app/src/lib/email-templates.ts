@@ -86,6 +86,7 @@ export function availabilityRequest(args: {
   pax: number
   sourcePage: string | null
   room?: string | null
+  session?: string | null
   adminBookingUrl: string
 }) {
   const subject = `🔎 Availability request: ${args.programName} — ${args.guestName}`
@@ -95,11 +96,12 @@ export function availabilityRequest(args: {
      <p><strong>Guest:</strong> ${escape(args.guestName)} (${escape(args.guestContact)})</p>
      <p><strong>Program:</strong> ${escape(args.programName)}${args.propertyName ? ` @ ${escape(args.propertyName)}` : ""}</p>
      <p><strong>Preferred arrival:</strong> ${args.arrival ? escape(args.arrival) : "—"} · ${args.pax} pax</p>
+     ${args.session ? `<p><strong>Session:</strong> ${escape(args.session)}</p>` : ""}
      ${args.room ? `<p><strong>Room:</strong> ${escape(args.room)}</p>` : ""}
      ${args.sourcePage ? `<p><strong>Source page:</strong> ${escape(args.sourcePage)}</p>` : ""}
      <p>${btn("Open in admin", args.adminBookingUrl)}</p>`,
   )
-  const text = `Availability request — ${args.programName}\n${args.guestName} (${args.guestContact})\nArrival: ${args.arrival ?? "—"} · ${args.pax} pax\n${args.room ? `Room: ${args.room}\n` : ""}${args.sourcePage ? `Source: ${args.sourcePage}\n` : ""}${args.adminBookingUrl}`
+  const text = `Availability request — ${args.programName}\n${args.guestName} (${args.guestContact})\nArrival: ${args.arrival ?? "—"} · ${args.pax} pax\n${args.session ? `Session: ${args.session}\n` : ""}${args.room ? `Room: ${args.room}\n` : ""}${args.sourcePage ? `Source: ${args.sourcePage}\n` : ""}${args.adminBookingUrl}`
   return { subject, html, text }
 }
 
