@@ -61,7 +61,7 @@ export default function SupportChat() {
       tall
       footer={
         onSupport ? undefined : (
-          <ButtonLink href="/support" variant="tonal" size="l" icon="help" block className={s.chatFootBtn} onClick={close}>{t("Support centre")}</ButtonLink>
+          <ButtonLink href="/support" variant="text" size="l" icon="help" block className={s.chatFootBtn} onClick={close}>{t("Support centre")}</ButtonLink>
         )
       }
     >
