@@ -46,8 +46,13 @@ export function BottomSheet({ open, onClose, title, footer, tall, wide, back, ch
   const mounted = useSyncExternalStore(noopSubscribe, () => true, () => false)
   useEffect(() => {
     if (!open) return
-    const prev = document.body.style.overflow
+    // The page under the sheet stays still. iOS Safari does not honour overflow:hidden for touch scrolling,
+    // and a swipe on something that cannot scroll (the chat's input, its quick replies, the scrim) went to
+    // the page (Oleg 09.11.2026), so such swipes are also cancelled below.
+    const html = document.documentElement
+    const prev = document.body.style.overflow, prevHtml = html.style.overflow
     document.body.style.overflow = "hidden"
+    html.style.overflow = "hidden"
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose()
     document.addEventListener("keydown", onKey)
     // Keyboard users land inside the sheet (it shows no ring itself, see overlay.module.css)
@@ -71,8 +76,8 @@ export function BottomSheet({ open, onClose, title, footer, tall, wide, back, ch
     const EASE = "cubic-bezier(0.2, 0, 0, 1)"
     let full = false
     const setFp = (p: number) => sh?.style.setProperty("--fp", p.toFixed(3))
-    let startY: number | null = null, startX = 0, dy = 0, mode: "unfold" | "fold" | "close" | "none" | null = null
-    let inHead = false, atTop = true, canUnfold = false, H = 56
+    let startY: number | null = null, startX = 0, dy = 0, mode: "unfold" | "fold" | "close" | "scroll" | "hold" | "none" | null = null
+    let inHead = false, atTop = true, canUnfold = false, H = 56, sc: HTMLElement | null = null
     // The element a swipe scrolls: the body, or a scroller of its own inside it (the support chat's thread,
     // Oleg 09.11.2026: a swipe in the thread folded the sheet instead of scrolling back to the greeting)
     const scrollerOf = (target: EventTarget | null) => {
@@ -81,24 +86,32 @@ export function BottomSheet({ open, onClose, title, footer, tall, wide, back, ch
       }
       return b
     }
+    const scrolls = (el: HTMLElement | null, down: boolean) =>
+      !!el && el.scrollHeight > el.clientHeight + 2 && (down ? el.scrollTop + el.clientHeight < el.scrollHeight - 1 : el.scrollTop > 0)
     const onStart = (e: TouchEvent) => {
       if (!sh || window.innerWidth >= 768) return
       startY = e.touches[0].clientY; startX = e.touches[0].clientX; dy = 0; mode = null
       inHead = !!(e.target as Element).closest(`.${s.bsHead}`)
-      const sc = scrollerOf(e.target)
+      sc = scrollerOf(e.target)
       atTop = !sc || sc.scrollTop <= 0
       canUnfold = !!sc && (sc.scrollHeight > sc.clientHeight + 2 || sh.classList.contains(s.bsTall))
       H = header()
     }
     const onMove = (e: TouchEvent) => {
-      if (!sh || startY === null || mode === "none") return
+      if (!sh || startY === null || mode === "none" || mode === "scroll") return
+      if (mode === "hold") { if (e.cancelable) e.preventDefault(); return }
       const d = e.touches[0].clientY - startY, dx = e.touches[0].clientX - startX
       if (mode === null) {
         if (Math.max(Math.abs(d), Math.abs(dx)) < 6) return
         if (Math.abs(dx) > Math.abs(d)) { mode = "none"; return }
-        if (d < 0) mode = !full && canUnfold ? "unfold" : "none"
-        else mode = inHead || atTop ? (full ? "fold" : "close") : "none"
-        if (mode === "none") return
+        if (d < 0) mode = !full && canUnfold ? "unfold" : null
+        else mode = inHead || atTop ? (full ? "fold" : "close") : null
+        // Not a sheet gesture: the content scrolls natively if it can, otherwise the swipe is held here
+        if (mode === null) {
+          mode = scrolls(sc, d < 0) ? "scroll" : "hold"
+          if (mode === "hold" && e.cancelable) e.preventDefault()
+          return
+        }
         sh.style.transition = "none"
       }
       if (e.cancelable) e.preventDefault()
@@ -112,7 +125,7 @@ export function BottomSheet({ open, onClose, title, footer, tall, wide, back, ch
       startY = null
       const m = mode
       mode = null
-      if (!m || m === "none") return
+      if (m !== "unfold" && m !== "fold" && m !== "close") return
       sh.style.transition = `transform 0.2s ${EASE}, --fp 0.3s ${EASE}`
       // Folding stops at the open point; closing takes a swipe of its own
       const closing = m === "close" && dy > 90
@@ -127,8 +140,14 @@ export function BottomSheet({ open, onClose, title, footer, tall, wide, back, ch
     sh?.addEventListener("touchmove", onMove, { passive: false })
     sh?.addEventListener("touchend", onEnd)
     sh?.addEventListener("touchcancel", onEnd)
+    // A swipe on the scrim round the sheet never reaches the page either
+    const scrim = sh?.parentElement
+    const onScrimMove = (e: TouchEvent) => { if (e.cancelable && !sh?.contains(e.target as Node)) e.preventDefault() }
+    scrim?.addEventListener("touchmove", onScrimMove, { passive: false })
     return () => {
       document.body.style.overflow = prev
+      html.style.overflow = prevHtml
+      scrim?.removeEventListener("touchmove", onScrimMove)
       document.removeEventListener("keydown", onKey)
       b?.removeEventListener("scroll", onScroll)
       ro?.disconnect()
