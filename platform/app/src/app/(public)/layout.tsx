@@ -6,6 +6,7 @@ import PageTransition from "./ds/PageTransition"
 import CardClick from "./ds/CardClick"
 import { ICON_FONT_HREF } from "./ds/icon-font"
 import SupportFab from "./_components/SupportFab"
+import SupportChat from "./ds/SupportChat"
 import LocaleNotice from "./_components/LocaleNotice"
 import AutoTranslate from "./_components/AutoTranslate"
 import AuthProvider from "./_components/account/AuthProvider"
@@ -43,6 +44,7 @@ export default async function PublicLayout({
         <Footer />
         <WhatsAppFab />
         <SupportFab />
+        <SupportChat />
         <NavigationBar />
         <CardClick />
         <LocaleNotice />
