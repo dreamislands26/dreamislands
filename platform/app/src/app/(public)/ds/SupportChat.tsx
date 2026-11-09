@@ -30,7 +30,10 @@ type Status = "connecting" | "online" | "reconnecting" | "unavailable"
 const LABEL: Record<Status, string> = { connecting: "Connecting…", online: "Online", reconnecting: "Reconnecting…", unavailable: "Chat unavailable" }
 
 /** The parts of Cura's widget controller we use. Not a documented API, so every read is guarded. */
-type CuraController = { openPanel?: () => unknown; closePanel?: () => unknown; isOpen?: () => boolean; session?: unknown; phase?: string; stopped?: boolean }
+type CuraController = {
+  openPanel?: () => unknown; closePanel?: () => unknown; isOpen?: () => boolean
+  session?: { isResumed?: boolean } | null; phase?: string; stopped?: boolean; cfg?: { initialMessages?: string[] }
+}
 const controller = () => (window as unknown as { cura?: { __controller?: CuraController } }).cura?.__controller
 
 export default function SupportChat() {
@@ -95,6 +98,7 @@ function CuraSlot({ onStatus }: { onStatus: (s: Status) => void }) {
       // the thread, so moving it once is enough.
       const sug = root.querySelector("#cura-chat-suggestions"), composer = root.querySelector("#cura-chat-composer")
       if (sug && composer && sug.nextElementSibling !== composer) composer.before(sug)
+      keepGreeting(root)
       const c = controller()
       const banner = root.querySelector("#cura-chat-banner")?.textContent ?? ""
       if (!c || c.stopped || c.phase === "error") onStatus("unavailable")
@@ -112,4 +116,27 @@ function CuraSlot({ onStatus }: { onStatus: (s: Status) => void }) {
     }
   }, [onStatus])
   return <div ref={slot} className={s.cura} translate="no" />
+}
+
+/** A resumed conversation (the sheet reopened, or the page reloaded) comes back without the welcome
+ *  message: the widget drops it. Keep it at the top of the thread (Oleg 09.11.2026). Our copy has no
+ *  .cura-chat-msg-greeting class, so the widget neither removes it nor counts it as its own. */
+function keepGreeting(root: HTMLElement) {
+  const c = controller()
+  const thread = root.querySelector("#cura-chat-transcript")
+  const text = c?.cfg?.initialMessages?.map((m) => m.trim()).find(Boolean)
+  if (!thread || !text || !c?.session?.isResumed) return
+  if (thread.querySelector(".cura-chat-msg-greeting")) return
+  const mine = thread.querySelector<HTMLElement>("[data-dit-greeting]")
+  if (mine && thread.firstElementChild === mine) return
+  const row = mine ?? document.createElement("div")
+  if (!mine) {
+    row.className = "cura-chat-msg cura-chat-msg-assistant"
+    row.dataset.ditGreeting = ""
+    const bubble = document.createElement("div")
+    bubble.className = "cura-chat-msg-bubble"
+    bubble.textContent = text
+    row.append(bubble)
+  }
+  thread.prepend(row)
 }
