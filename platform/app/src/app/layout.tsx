@@ -8,6 +8,8 @@ import "./globals.css"
 const SITE_NAME = "Dream Islands"
 const DEFAULT_TITLE = "Dream Islands — Wellness Travel for Asia"
 const DEFAULT_DESCRIPTION = "We score your wellbeing then match you to a retreat that actually moves the number."
+// Fallback share image for every page that does not set its own (home, guides, tracks, destinations, ...).
+const DEFAULT_OG_IMAGE = "https://xbzrtofanbrahasxbisf.supabase.co/storage/v1/object/public/ecosystem/homepage/dream-islands-tropical-sunset-wellness-travel-asia.png"
 
 const baseMetadata: Metadata = {
   metadataBase: new URL("https://dreamislands.org"),
@@ -22,11 +24,13 @@ const baseMetadata: Metadata = {
     title: DEFAULT_TITLE,
     description: DEFAULT_DESCRIPTION,
     url: "https://dreamislands.org",
+    images: [{ url: DEFAULT_OG_IMAGE, alt: "Dream Islands: wellness travel across Asia" }],
   },
   twitter: {
     card: "summary_large_image",
     title: DEFAULT_TITLE,
     description: DEFAULT_DESCRIPTION,
+    images: [DEFAULT_OG_IMAGE],
   },
 }
 
@@ -87,20 +91,43 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "TravelAgency",
-              name: "Dream Islands",
-              url: "https://dreamislands.org",
-              sameAs: [
-                "https://www.instagram.com/dreamislands_travel/",
-                "https://www.linkedin.com/company/dream-islands/",
-                "https://www.youtube.com/@DreamIslandsTravel",
+              "@graph": [
+                {
+                  "@type": ["TravelAgency", "Organization"],
+                  "@id": "https://dreamislands.org/#organization",
+                  name: "Dream Islands",
+                  url: "https://dreamislands.org",
+                  logo: { "@type": "ImageObject", url: "https://dreamislands.org/brand/mark.svg" },
+                  description:
+                    "Wellness travel platform for Asia. A Wellness Journey assessment matches guests to wellness, longevity and recovery programmes at partner properties, and measures what changed after the stay. Dream Islands is a destination marketing organisation, not a medical provider.",
+                  areaServed: ["TH", "CN", "ID", "SG", "PH", "VN", "MY"],
+                  knowsAbout: [
+                    "Wellness travel in Asia",
+                    "Longevity and preventive health retreats",
+                    "Sleep, stress and burnout recovery retreats",
+                    "Medical travel coordination in China",
+                  ],
+                  sameAs: [
+                    "https://www.instagram.com/dreamislands_travel/",
+                    "https://www.linkedin.com/company/dream-islands/",
+                    "https://www.youtube.com/@DreamIslandsTravel",
+                  ],
+                  contactPoint: {
+                    "@type": "ContactPoint",
+                    email: "hello@dreamislands.org",
+                    telephone: "+66811612662",
+                    contactType: "customer service",
+                  },
+                },
+                {
+                  "@type": "WebSite",
+                  "@id": "https://dreamislands.org/#website",
+                  url: "https://dreamislands.org",
+                  name: "Dream Islands",
+                  inLanguage: "en",
+                  publisher: { "@id": "https://dreamislands.org/#organization" },
+                },
               ],
-              contactPoint: {
-                "@type": "ContactPoint",
-                email: "hello@dreamislands.org",
-                telephone: "+66811612662",
-                contactType: "customer service",
-              },
             }),
           }}
         />
