@@ -121,6 +121,7 @@ const NAV_BEFORE = [
 ]
 const NAV_AFTER = [
   { href: "/#how-it-works", label: "How it works" },
+  { href: "/guides", label: "Guides" },
   { href: "/about", label: "About" },
 ]
 
@@ -377,7 +378,7 @@ export function Footer() {
             <Link href="/programs" className={s.footerLink}>{t("Programmes")}</Link>
             <Link href="/destinations" className={s.footerLink}>{t("Destinations")}</Link>
             <Link href="/start" className={s.footerLink}>{t("Wellness Journey")}</Link>
-            <Link href="/guides/sleep-reset-retreats-asia" className={s.footerLink}>{t("Guides")}</Link>
+            <Link href="/guides" className={s.footerLink}>{t("Guides")}</Link>
           </div>
           <div className={cx(s.footerCol, s.footerColTracks)}>
             <h3>{t("Tracks")}</h3>

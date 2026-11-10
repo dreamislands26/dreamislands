@@ -13,6 +13,7 @@ export const STATIC_ROUTES: Array<{ path: string; changefreq: "weekly" | "monthl
   { path: "/tanya-samui/accommodation", changefreq: "monthly", priority: 0.6 },
   { path: "/tanya-samui/faq", changefreq: "monthly", priority: 0.5 },
   { path: "/tanya-samui/wellness-menu", changefreq: "monthly", priority: 0.5 },
+  { path: "/guides", changefreq: "weekly", priority: 0.8 },
   { path: "/guides/burnout-recovery-retreats-southeast-asia", changefreq: "monthly", priority: 0.7 },
   { path: "/guides/sleep-reset-retreats-asia", changefreq: "monthly", priority: 0.7 },
   { path: "/guides/metabolic-health-retreats-asia", changefreq: "monthly", priority: 0.7 },
