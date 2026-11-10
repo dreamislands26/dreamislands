@@ -1,69 +1,76 @@
 # Dream Islands
 
-> Dream Islands is an AI-powered wellness travel platform that helps people find the most appropriate wellness, longevity, rehabilitation, and preventive health programs based on their goals, health profile, and preferences. Its proprietary Wellness Baseline Score (WBS) assesses physical, mental, and lifestyle factors to match each guest with suitable partner programs and specialists. Dream Islands does not provide medical care directly. Medical services, where included, are delivered by licensed physicians and healthcare providers at partner clinics and retreat centers.
+> Dream Islands is a wellness travel platform for Asia. A free Wellness Journey assessment (about 2 minutes) scores a guest's baseline across body, recovery, metabolic health, mind and risk, then matches them to wellness, longevity, sleep, stress-recovery and performance programmes at partner properties in Thailand, China, Indonesia, Singapore, the Philippines, Vietnam and Malaysia. The guest repeats the assessment after the stay to see what changed. Dream Islands is a destination marketing organisation (DMO). It does not provide medical or psychiatric care. Where medical services are included, they are delivered by licensed physicians and healthcare providers at partner clinics and retreat centres.
 
-## Assessment
+## Start here
 
-- [Wellness Baseline Assessment](https://dreamislands.org/start): a free, ~5-minute, 22-question score across movement, recovery, lifestyle risk and emotional health, used to match guests to programs and track outcomes before, during and after a stay.
+- [Wellness Journey (assessment)](https://dreamislands.org/start): free, about 2 minutes, returns a Wellness Score and matched programmes.
+- [How it works](https://dreamislands.org/how-wbs-works): before, during and after, and how the Wellness Baseline Score is built.
+- [Browse all programmes](https://dreamislands.org/programs): filter by goal, track, destination and duration.
+- [Destinations](https://dreamislands.org/destinations): Thailand, China, Indonesia, Singapore, the Philippines, Vietnam, Malaysia.
+- [Properties](https://dreamislands.org/properties): partner resorts, retreats, medical wellness centres and clinics.
+- [Guides hub](https://dreamislands.org/guides): all guides below in one place.
 
-## Program tracks
+## Tracks
 
-- [Reset & Recovery](https://dreamislands.org/tracks/reset-recovery) — down-regulate, detox, re-sleep
-- [Performance](https://dreamislands.org/tracks/performance) — train smarter, rebuild capacity
-- [Mind Balance](https://dreamislands.org/tracks/mind-balance) — calm the nervous system, restore focus
-- [Island Immersion](https://dreamislands.org/tracks/island-immersion) — composite, longer-stay protocols
-- [Browse all programs](https://dreamislands.org/programs)
+- [Reset & Recovery](https://dreamislands.org/tracks/reset-recovery): rest, detox, sleep again
+- [Performance](https://dreamislands.org/tracks/performance): train smarter, rebuild capacity
+- [Mind Balance](https://dreamislands.org/tracks/mind-balance): calm the nervous system, restore focus
+- [Island Immersion](https://dreamislands.org/tracks/island-immersion): longer stays that change routine
+- [Sport & Chill](https://dreamislands.org/tracks/sport-chill): sport, recovery and leisure
 
-## Guides
+## Guides by outcome
+
 - [Burnout Recovery Retreats in Southeast Asia](https://dreamislands.org/guides/burnout-recovery-retreats-southeast-asia)
 - [Sleep and Nervous System Reset Retreats in Asia](https://dreamislands.org/guides/sleep-reset-retreats-asia)
 - [Anxiety and Stress Recovery Retreats in Asia](https://dreamislands.org/guides/anxiety-stress-recovery-retreats-asia)
 - [Longevity and Executive Health Retreats in Asia](https://dreamislands.org/guides/longevity-executive-health-retreats-asia)
-- [Wellness Travel Guide: Wudang Mountain, China](https://dreamislands.org/guides/wudang-mountain-wellness-guide)
-- [Wellness Travel Guide: Singapore & Sentosa](https://dreamislands.org/guides/singapore-sentosa-wellness-guide)
-- [Wellness Travel Guide: Koh Samui & Koh Phangan](https://dreamislands.org/guides/koh-samui-koh-phangan-wellness-guide)
+- [Metabolic Health Retreats in Asia](https://dreamislands.org/guides/metabolic-health-retreats-asia)
+- [Mental Clarity Retreats in Asia](https://dreamislands.org/guides/mental-clarity-retreats-asia)
+- [Fitness and Recovery Retreats in Asia](https://dreamislands.org/guides/fitness-recovery-retreats-asia)
+- [Boost Energy Retreats in Asia](https://dreamislands.org/guides/boost-energy-retreats-asia)
+
+## Guides by destination
+
 - [Wellness Travel Guide: Bali](https://dreamislands.org/guides/bali-wellness-guide)
-- [Wellness Travel Guide: Mile, Yunnan, China](https://dreamislands.org/guides/mile-yunnan-wellness-guide)
+- [Wellness Travel Guide: Koh Samui & Koh Phangan](https://dreamislands.org/guides/koh-samui-koh-phangan-wellness-guide)
+- [Wellness Travel Guide: Singapore & Sentosa](https://dreamislands.org/guides/singapore-sentosa-wellness-guide)
 - [Wellness Travel Guide: Boracay](https://dreamislands.org/guides/boracay-wellness-guide)
+- [Wellness Travel Guide: Wudang Mountain, China](https://dreamislands.org/guides/wudang-mountain-wellness-guide)
+- [Wellness Travel Guide: Mile, Yunnan, China](https://dreamislands.org/guides/mile-yunnan-wellness-guide)
+
+## Destination pages
+
+- [Thailand](https://dreamislands.org/destinations/thailand)
+- [China](https://dreamislands.org/destinations/china)
+- [Indonesia](https://dreamislands.org/destinations/indonesia)
+- [Singapore](https://dreamislands.org/destinations/singapore)
+- [Philippines](https://dreamislands.org/destinations/philippines)
+- [Vietnam](https://dreamislands.org/destinations/vietnam)
+- [Malaysia](https://dreamislands.org/destinations/malaysia)
+
 ## China wellness destinations
-- [Mile Wellness Resort, Mile, Yunnan](https://dreamislands.org/properties/mile-wellness-resort) - forest hot springs and 3-7 day wellness programs
-- [Pu'er Forest Wellness Base, Yunnan](https://dreamislands.org/properties/puer-forest-wellness-base) - forest and tea-culture base, 3-5 day stays
-- [Wyndham Jinghong Resort, Xishuangbanna](https://dreamislands.org/properties/xishuangbanna-jinghong-resort) - resort with open-air hot springs, tropical gardens and Dai culture
+
+- [Mile Wellness Resort, Mile, Yunnan](https://dreamislands.org/properties/mile-wellness-resort): forest hot springs and 3-7 day wellness programmes
+- [Pu'er Forest Wellness Base, Yunnan](https://dreamislands.org/properties/puer-forest-wellness-base): forest and tea-culture base, 3-5 day stays
+- [Wyndham Jinghong Resort, Xishuangbanna](https://dreamislands.org/properties/xishuangbanna-jinghong-resort): resort with open-air hot springs, tropical gardens and Dai culture
 - [Pu'er Forest & Tea Culture Wellness](https://dreamislands.org/programs/puer-forest-tea-wellness)
 - [Xishuangbanna Hot Springs & Dai Culture Wellness](https://dreamislands.org/programs/xishuangbanna-hotsprings-dai-wellness)
 - [Pu'er & Xishuangbanna Combined Wellness Journey](https://dreamislands.org/programs/puer-xishuangbanna-combined-journey)
 - [Huizhou TCM workshop](https://dreamislands.org/properties/traditional-chinese-medicine-workshop-huizhou)
 - [Better Migrate medical coordination, Xi'an](https://dreamislands.org/properties/better-migrate-medical-network)
 
-## Flagship partner
+## Featured partner properties
 
-Tanya Samui Holistic Health Retreat (Koh Samui, Thailand) is Dream Islands' flagship pilot partner and the primary operating case for the WBS-guided matching model — an independently owned and operated wellness retreat with a 15-year operating history. It is not owned or operated by Dream Islands.
+Partners are independently owned and operated. Dream Islands does not own or operate them.
 
-- [Tanya Samui](https://dreamislands.org/tanya-samui)
-- [Tanya Samui FAQ](https://dreamislands.org/tanya-samui/faq) — 23 real Q&A covering the protocol, medical safety, payment and logistics.
-
-## Partner network
-
-Beyond Tanya Samui, Dream Islands matches guests to certified partner properties and clinics across Indonesia, Thailand, Singapore, Malaysia, the Philippines, Vietnam and China, spanning resorts, medical wellness centers and specialist clinics.
-
-- [Browse all properties](https://dreamislands.org/properties)
-
-## Company
-
-- [About Dream Islands](https://dreamislands.org/about)
-- [Guest reviews](https://dreamislands.org/reviews)
-- [Partnership / B2B / MICE](https://dreamislands.org/partners)
-
-## Contact
-
-- WhatsApp: https://wa.me/message/HOF2AFIBDYY5J1
-- Email: hello@dreamislands.org
-
-## Legal
-
-Dream Islands operates as a Destination Marketing Organization (DMO) promoting wellness travel. It does not provide medical or psychiatric services directly and is not a medical institution. Content on this site is informational only and does not constitute medical advice.
+- [Tanya Samui Holistic Health Retreat, Koh Samui, Thailand](https://dreamislands.org/tanya-samui): the longest-running partner (open since 2009) and the main operating case for WBS-guided matching. [FAQ](https://dreamislands.org/tanya-samui/faq): 23 Q&A covering the protocol, medical safety, payment and logistics.
+- [Clinique La Prairie Phuket](https://dreamislands.org/properties/clinique-la-prairie-phuket): medical longevity programmes in Phuket, Thailand (pre-opening; programmes shown with supplier prices in CHF, availability on request).
 
 ## Medical tourism in China
+
+Dream Islands coordinates the route; hospitals and physicians provide diagnosis and treatment. No treatment outcome is guaranteed.
+
 - [Medical Tours to China for International Patients](https://dreamislands.org/medical/china): hospital and specialist matching, bilingual support, surgery coordination; service fees from RMB 3,500
 - [Peking Union Medical College Hospital](https://dreamislands.org/medical/china/hospitals/peking-union-medical-college-hospital)
 - [Fudan Zhongshan Hospital](https://dreamislands.org/medical/china/hospitals/fudan-zhongshan-hospital)
@@ -79,3 +86,19 @@ Dream Islands operates as a Destination Marketing Organization (DMO) promoting w
 - [How to Arrange Medical Treatment in China](https://dreamislands.org/medical/china/guides/how-to-arrange-treatment-china)
 - [How to Choose a Hospital in China](https://dreamislands.org/medical/china/guides/how-to-choose-hospital-china)
 - [Hospitals in China for International Patients](https://dreamislands.org/medical/china/guides/hospitals-china-international-patients)
+
+## Company
+
+- [About Dream Islands](https://dreamislands.org/about)
+- [Guest reviews](https://dreamislands.org/reviews)
+- [For properties (partner onboarding)](https://dreamislands.org/for-properties)
+- [Partnership / B2B / MICE](https://dreamislands.org/partners)
+
+## Contact
+
+- WhatsApp: https://wa.me/message/HOF2AFIBDYY5J1
+- Email: hello@dreamislands.org
+
+## Legal
+
+Dream Islands operates as a Destination Marketing Organization (DMO) promoting wellness travel. It does not provide medical or psychiatric services directly and is not a medical institution. Content on this site is informational only and does not constitute medical advice.

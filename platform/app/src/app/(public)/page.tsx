@@ -1,10 +1,22 @@
-﻿import { headers } from "next/headers"
+﻿import type { Metadata } from "next"
+import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { getSessionUser } from "@/lib/auth"
 import HomeV2 from "./_components/HomeV2"
 import { loadGallery, loadOutcomes, loadPrograms, loadProperties, loadReviews } from "./_lib/catalog"
 
 export const dynamic = "force-dynamic"
+
+// Keyword-bearing home title and description (the layout default is a brand line with no search terms).
+const HOME_TITLE = "Wellness & Longevity Retreats in Asia, Matched to Your Goal | Dream Islands"
+const HOME_DESC =
+  "Compare wellness, longevity, sleep, stress and recovery retreat programmes across Thailand, China, Indonesia, Singapore, the Philippines, Vietnam and Malaysia. Take a 2-minute Wellness Journey and get matched."
+export const metadata: Metadata = {
+  title: { absolute: HOME_TITLE },
+  description: HOME_DESC,
+  openGraph: { title: HOME_TITLE, description: HOME_DESC, url: "https://dreamislands.org", type: "website" },
+  twitter: { card: "summary_large_image", title: HOME_TITLE, description: HOME_DESC },
+}
 
 const PANEL_HOSTS = new Set(["panel.dreamislands.org"])
 const PUBLIC_HOSTS = new Set(["dreamislands.org", "www.dreamislands.org"])

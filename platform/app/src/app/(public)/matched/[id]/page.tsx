@@ -1,9 +1,13 @@
+import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { supabaseAdmin } from "@/lib/supabase-server"
 import { fetchMatchedBundle } from "@/lib/matched-programs"
 import MatchedView, { type MatchedProgram } from "./MatchedView"
 
 export const dynamic = "force-dynamic"
+
+// Personal result pages (one per assessment): never index.
+export const metadata: Metadata = { title: "Your matched programmes", robots: { index: false, follow: false } }
 
 type RawPayload = {
   wbs_version?: number
