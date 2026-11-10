@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { alternatesFor, HTML_LANG } from "@/lib/i18n"
 import { getLocale, getPathname } from "@/lib/i18n-server"
+import { OG_IMAGES, TWITTER_IMAGES } from "@/lib/og"
 import Script from "next/script"
 import { Belleza, Bricolage_Grotesque, DM_Sans, Roboto_Mono } from "next/font/google"
 import "./globals.css"
@@ -8,8 +9,6 @@ import "./globals.css"
 const SITE_NAME = "Dream Islands"
 const DEFAULT_TITLE = "Dream Islands — Wellness Travel for Asia"
 const DEFAULT_DESCRIPTION = "We score your wellbeing then match you to a retreat that actually moves the number."
-// Fallback share image for every page that does not set its own (home, guides, tracks, destinations, ...).
-const DEFAULT_OG_IMAGE = "https://xbzrtofanbrahasxbisf.supabase.co/storage/v1/object/public/ecosystem/homepage/dream-islands-tropical-sunset-wellness-travel-asia.png"
 
 const baseMetadata: Metadata = {
   metadataBase: new URL("https://dreamislands.org"),
@@ -24,13 +23,13 @@ const baseMetadata: Metadata = {
     title: DEFAULT_TITLE,
     description: DEFAULT_DESCRIPTION,
     url: "https://dreamislands.org",
-    images: [{ url: DEFAULT_OG_IMAGE, alt: "Dream Islands: wellness travel across Asia" }],
+    images: OG_IMAGES,
   },
   twitter: {
     card: "summary_large_image",
     title: DEFAULT_TITLE,
     description: DEFAULT_DESCRIPTION,
-    images: [DEFAULT_OG_IMAGE],
+    images: TWITTER_IMAGES,
   },
 }
 
