@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { OG_IMAGES, TWITTER_IMAGES } from "@/lib/og"
 import { ButtonLink, ListItem, SectionHead } from "../ds/ui"
 import x from "../ds/sections.module.css"
 import t from "../tracks/track.module.css"
@@ -12,7 +13,9 @@ export const metadata: Metadata = {
     title: "Wellness Travel Guides for Asia | Dream Islands",
     description: "Retreat guides by outcome and by destination across Asia, with real matched programmes, duration and price.",
     url: "https://dreamislands.org/guides",
+    images: OG_IMAGES,
   },
+  twitter: { card: "summary_large_image", images: TWITTER_IMAGES },
 }
 
 type Guide = { href: string; icon: string; title: string; sub: string }

@@ -2,6 +2,7 @@
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { getSessionUser } from "@/lib/auth"
+import { OG_IMAGES, TWITTER_IMAGES } from "@/lib/og"
 import HomeV2 from "./_components/HomeV2"
 import { loadGallery, loadOutcomes, loadPrograms, loadProperties, loadReviews } from "./_lib/catalog"
 
@@ -14,8 +15,8 @@ const HOME_DESC =
 export const metadata: Metadata = {
   title: { absolute: HOME_TITLE },
   description: HOME_DESC,
-  openGraph: { title: HOME_TITLE, description: HOME_DESC, url: "https://dreamislands.org", type: "website" },
-  twitter: { card: "summary_large_image", title: HOME_TITLE, description: HOME_DESC },
+  openGraph: { title: HOME_TITLE, description: HOME_DESC, url: "https://dreamislands.org", type: "website", images: OG_IMAGES },
+  twitter: { card: "summary_large_image", title: HOME_TITLE, description: HOME_DESC, images: TWITTER_IMAGES },
 }
 
 const PANEL_HOSTS = new Set(["panel.dreamislands.org"])
