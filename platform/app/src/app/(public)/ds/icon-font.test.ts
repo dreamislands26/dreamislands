@@ -23,6 +23,8 @@ const PATTERNS = [
   /\b(?:icon|trailingIcon)=["']([a-z0-9_]+)["']/g,
   /\b(?:icon|Icon|ICON)\w*\s*[:=]\s*["']([a-z0-9_]+)["']/g,
   /\/[a-z]+, "([a-z0-9_]+)"\]/g,
+  // a glyph written straight into the icon class, as in <span className="ds-icon">chevron_right</span>
+  /className=["'][^"']*\bds-icon\b[^"']*["'][^>]*>\s*([a-z][a-z0-9_]+)\s*</g,
 ]
 const PROP_EXPR = /(?:<Icon\s+name|\bicon|\btrailingIcon)=\{([^{}]*)\}/g
 const ICON_MAPS = /(?:GOAL_ICONS|TRACK_ICONS|ICONS)\b[^=]*=\s*\{([^}]*)\}/g
