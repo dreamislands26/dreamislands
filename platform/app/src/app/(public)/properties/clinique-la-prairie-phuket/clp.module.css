@@ -129,6 +129,7 @@
 .dark { background: var(--c-dark); color: #eef2ef; padding: clamp(64px, 9vw, 120px) var(--gutter); }
 .dark .split { max-width: var(--max); margin: 0 auto; }
 .dark .eyebrow, .dark .body, .dark .fine { color: #a9b5ae; }
+.dark .h2 { color: inherit; } /* the site's dark heading colour read dark on dark (12.11.2026) */
 .infraList { list-style: none; padding: 0; margin: 8px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
 .infraList li { padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.12); font-size: 17px; }
 
@@ -180,6 +181,7 @@
 .finalMedia::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(10, 16, 13, 0.78), rgba(10, 16, 13, 0.35)); }
 .finalInner { position: relative; max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
 .finalCopy .eyebrow, .finalCopy .body { color: rgba(255, 255, 255, 0.82); }
+.finalCopy .h2 { color: inherit; } /* white over the photo, as the section text */
 .form { background: #fff; color: var(--c-ink); border-radius: 8px; padding: clamp(24px, 3vw, 36px); display: flex; flex-direction: column; gap: 16px; }
 .form .fine { margin: 0; }
 .field { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; flex: 1; }

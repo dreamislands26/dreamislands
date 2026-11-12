@@ -17,7 +17,9 @@
 .tagOn { background: var(--ds-primary-container); color: var(--ds-on-primary-container); border-color: transparent; }
 .heroWrap { position: relative; }
 .pop { position: absolute; bottom: calc(100% + 0.75rem); left: 1rem; z-index: 30; width: min(38rem, calc(100% - 2rem)); padding: 1rem; border-radius: 1.25rem; background: var(--ds-surface); box-shadow: var(--ds-elev-3); display: flex; flex-wrap: wrap; gap: 0.5rem; }
-.goalBtn { text-align: left; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%; background: transparent; border: 0; padding: 0; font: inherit; color: inherit; }
+/* Font and colour come from .select, like the other fields: inheriting them took the hero's white text and the
+   goals showed white on the white search bar (desktop, 12.11.2026) */
+.goalBtn { text-align: left; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%; background: transparent; border: 0; padding: 0; }
 
 /* City autocomplete list (portalled, fixed) */
 .cityList { z-index: 200; margin: 0; padding: 0.25rem; list-style: none; max-height: 16rem; overflow-y: auto; border-radius: 0.75rem; background: var(--ds-surface); box-shadow: var(--ds-elev-3); border: 1px solid var(--ds-outline-variant); }

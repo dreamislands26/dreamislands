@@ -3,12 +3,14 @@
 import { useState } from "react"
 import { track } from "../../_lib/track"
 
-const TABS = [
+// `image`: a screenshot of that view (16:9). Until a tab has one, the card shows only its text: an empty
+// "Screenshot pending" frame filled the whole desktop screen (12.11.2026).
+const TABS: readonly { key: "admin" | "partner" | "user" | "consumer"; label: string; blurb: string; image?: string }[] = [
   { key: "admin", label: "Admin", blurb: "Manages the full network — properties, programmes, bookings and guest journeys in one place." },
   { key: "partner", label: "Partner", blurb: "What a property team sees — their guests, their programmes, their delivery calendar." },
   { key: "user", label: "User", blurb: "The guest's own view of their journey, goals and progress." },
   { key: "consumer", label: "Consumer frontend", blurb: "The public dreamislands.org experience guests book through." },
-] as const
+]
 
 export default function PlatformTabs() {
   const [active, setActive] = useState<(typeof TABS)[number]["key"]>("admin")
@@ -34,20 +36,14 @@ export default function PlatformTabs() {
         ))}
       </div>
       <div className="card" style={{ padding: 0, overflow: "hidden" }}>
-        <div
-          style={{
-            aspectRatio: "16 / 9",
-            background: "var(--card-2, #f4f6f5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderBottom: "1px solid var(--border, #e6e9e7)",
-          }}
-        >
-          <span className="body-sm" style={{ color: "var(--ink-3)" }}>
-            Screenshot pending — {activeTab.label} view
-          </span>
-        </div>
+        {activeTab.image && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={activeTab.image}
+            alt={`${activeTab.label} view of the Dream Islands platform`}
+            style={{ display: "block", width: "100%", aspectRatio: "16 / 9", objectFit: "cover", borderBottom: "1px solid var(--border, #e6e9e7)" }}
+          />
+        )}
         <p className="body-sm" style={{ margin: 0, padding: 20 }}>
           {activeTab.blurb}
         </p>
