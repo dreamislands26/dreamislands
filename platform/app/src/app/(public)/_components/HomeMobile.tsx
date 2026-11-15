@@ -1,8 +1,8 @@
 // S1 · Главная · Mobile (Figma 150:24912, revision 18.10.2026). Own layout, not a squeezed desktop.
-import { goalHue, homeRoutes, routeHref, routeMatch } from "../_lib/routes"
+import { homeRoutes, routeHref, routeMatch } from "../_lib/routes"
 import Link from "@/lib/i18n-link"
 import { COUNTRIES, countrySlug } from "../_lib/countries"
-import { outcomeLabel, type CatalogProgram, type CatalogProperty, type GuestReview, type Outcome } from "../_lib/catalog"
+import { type CatalogProgram, type CatalogProperty, type GuestReview, type Outcome } from "../_lib/catalog"
 import { ButtonLink, Facts, Icon, Stars } from "../ds/ui"
 import { Photo, ProgramCard } from "../ds/cards"
 import HomeMobileHeader, { HERO_ID, LoadMore } from "./HomeMobileHeader"
@@ -10,7 +10,7 @@ import PullRail from "./PullRail"
 import HeroVideo from "../ds/HeroVideo"
 import m from "./homeMobile.module.css"
 import Flag from "../ds/Flag"
-import GoalGlyph from "../ds/GoalGlyph"
+import GoalTile, { homeGoals, isMedical } from "../ds/GoalTile"
 
 const WA = "https://wa.me/message/HOF2AFIBDYY5J1"
 const SUB = "Good places for your body and mind"
@@ -39,7 +39,6 @@ function Arrow() {
   )
 }
 
-const isMedical = (p: CatalogProgram) => /medical|surgery|outpatient|bm-package/i.test(p.slug ?? "") || /medical|surgery|outpatient/i.test(p.name)
 
 function Head({ title, sub, href, seeAll }: { title: string; sub?: string; href?: string; seeAll?: boolean }) {
   return (
@@ -78,7 +77,7 @@ export default function HomeMobile({ programs, outcomes, properties, reviews }: 
   })
   const rest = countries.filter((r) => r.c !== "Thailand" && r.c !== "China")
   // Goal tiles: the curated goals that have programs, in taxonomy order.
-  const goalList = outcomes.map((o) => ({ ...o, n: wellness.filter((p) => p.outcomes.includes(o.slug)).length })).filter((o) => o.n > 0)
+  const goalList = homeGoals(outcomes, programs)
   // Two rows in one scroller (column flow): interleave so the top row reads 1, 2, 3, 4 and the bottom continues.
   const half = Math.ceil(goalList.length / 2)
   const goals = Array.from({ length: half }, (_, i) => [goalList[i], goalList[half + i]]).flat().filter((g): g is (typeof goalList)[number] => !!g)
@@ -144,12 +143,7 @@ export default function HomeMobile({ programs, outcomes, properties, reviews }: 
         <h2 className="ds-headline-m">What do you want to change?</h2>
         <div className={m.tiles}>
           {goals.map((g) => (
-            <Link key={g.slug} href={`/programs?goal=${g.slug}`} className={m.tile} style={{ "--tile-h": goalHue(g.slug) } as React.CSSProperties}>
-              <span className={m.tileTitle}>{outcomeLabel(g)}</span>
-              <span className={m.tileHook}>{g.hook}</span>
-              <GoalGlyph slug={g.slug} className={m.tileIcon} />
-              <span className={m.tileGo} aria-hidden><Arrow /></span>
-            </Link>
+            <GoalTile key={g.slug} goal={g} />
           ))}
         </div>
       </section>
