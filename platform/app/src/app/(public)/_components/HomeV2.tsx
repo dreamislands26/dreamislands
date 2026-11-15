@@ -1,9 +1,10 @@
 import Link from "@/lib/i18n-link"
 import { COUNTRY_FLAGS, COUNTRIES, countrySlug } from "../_lib/countries"
-import { GOALS, money, outcomeLabel, type CatalogProgram, type CatalogProperty, type GuestReview, type Outcome } from "../_lib/catalog"
+import { money, outcomeLabel, type CatalogProgram, type CatalogProperty, type GuestReview, type Outcome } from "../_lib/catalog"
 import { ButtonLink, Facts, Icon, SeeAll } from "../ds/ui"
-import { JourneyPrompt, OutcomeTile, Photo, PlaceCard, ProgramCard, cardStyles as cs } from "../ds/cards"
+import { JourneyPrompt, Photo, PlaceCard, ProgramCard, cardStyles as cs } from "../ds/cards"
 import HeroSearch from "../ds/HeroSearch"
+import GoalTile, { homeGoals } from "../ds/GoalTile"
 import { goalIcon } from "../_lib/routes"
 import x from "../ds/sections.module.css"
 import h from "./home.module.css"
@@ -15,15 +16,7 @@ const PHOTOS = "https://xbzrtofanbrahasxbisf.supabase.co/storage/v1/object/publi
 const THAILAND = PHOTOS + "dream-islands-tropical-sunset-wellness-travel-asia.png"
 const WA = "https://wa.me/message/HOF2AFIBDYY5J1"
 
-const GOAL_COPY: Record<string, { icon: string; hook: string }> = {
-  reset: { icon: "spa", hook: "Reset & Recovery: rest, detox, sleep again." },
-  performance: { icon: "directions_run", hook: "Performance: train smarter, rebuild capacity." },
-  mind: { icon: "self_improvement", hook: "Mind Balance: calm the nervous system." },
-  immersion: { icon: "landscape", hook: "Island Immersion: longer stays that change routine." },
-  sport: { icon: "surfing", hook: "Sport & Chill: sport, recovery and leisure." },
-}
 const isMedical = (slug: string | null, name: string) => /medical|surgery|outpatient|bm-package/i.test(slug ?? "") || /medical|surgery|outpatient/i.test(name)
-const HOME_GOAL_ORDER = ["reset", "performance", "mind", "immersion", "sport"]
 
 const STEPS = [
   { icon: "spa", h: "Take your Wellness Journey", t: "23 short questions in about 2 minutes. You get a Wellness Score and matched programmes." },
@@ -66,18 +59,13 @@ export default async function HomeV2({ programs, tanya, tanyaPhotos, chinaImage,
           <JourneyPrompt title={t("Not sure where to start?")} sub={t("Your Wellness Journey: 23 short questions, about 2 minutes. We match programmes to your result.")} cta={t("Start your Wellness Journey")} />
         </section>
 
-        {/* Tracks */}
+        {/* Goals: the same tiles as the phone home (Oleg 15.11.2026) */}
         <section className={x.sectionLoose} id="outcomes">
           <div className={h.head}>
-            <p className={h.overline}>{t("Five tracks")}</p>
             <h2 className="ds-headline-l">{t("What do you want to change?")}</h2>
           </div>
-          <div className={h.tiles}>
-            {HOME_GOAL_ORDER.map((k) => {
-              const g = GOALS.find((x) => x.key === k)!
-              const n = programs.filter((p) => p.cohort === g.cohort).length
-              return <OutcomeTile key={k} icon={GOAL_COPY[k].icon} title={t(g.chip)} hook={t(GOAL_COPY[k].hook)} count={t(n === 1 ? "{n} programme" : "{n} programmes", { n })} href={`/programs?track=${g.track}`} />
-            })}
+          <div className={h.goals}>
+            {homeGoals(outcomes, programs).map((g) => <GoalTile key={g.slug} goal={g} />)}
           </div>
         </section>
 

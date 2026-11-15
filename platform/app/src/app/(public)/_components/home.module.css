@@ -38,6 +38,9 @@
 .promise > :global(.ds-icon) { font-size: 2.5rem; font-weight: 300; }
 .promise h2 { max-width: 47.5rem; }
 .tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1.25rem; }
+.goals { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.25rem; }
+/* Narrow desktop: four columns get narrower than the phone tile (15rem) and titles run into the glyph, so the tiles scroll in two rows as on the phone */
+@media (max-width: 1079px) { .goals { grid-template-columns: none; grid-template-rows: repeat(2, 10.25rem); grid-auto-flow: column; grid-auto-columns: 15rem; overflow-x: auto; scrollbar-width: none; } .goals::-webkit-scrollbar { display: none; } }
 .big { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
 .big > article > div:first-child { aspect-ratio: 16 / 7; }
 .countries { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1.25rem; align-items: start; }
