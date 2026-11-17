@@ -1,90 +1,24 @@
+# Prefix rules match by string prefix: "/me" would also block /medical, "/partner" would also block /partners.
+# Use "/path/" plus "/path$" so only the private sections are blocked.
+
 User-agent: GPTBot
-Allow: /
-Disallow: /admin
-Disallow: /api/
-Disallow: /me
-Disallow: /partner
-Disallow: /login
-Disallow: /auth/callback
-
 User-agent: ChatGPT-User
-Allow: /
-Disallow: /admin
-Disallow: /api/
-Disallow: /me
-Disallow: /partner
-Disallow: /login
-Disallow: /auth/callback
-
 User-agent: OAI-SearchBot
-Allow: /
-Disallow: /admin
-Disallow: /api/
-Disallow: /me
-Disallow: /partner
-Disallow: /login
-Disallow: /auth/callback
-
 User-agent: ClaudeBot
-Allow: /
-Disallow: /admin
-Disallow: /api/
-Disallow: /me
-Disallow: /partner
-Disallow: /login
-Disallow: /auth/callback
-
 User-agent: anthropic-ai
-Allow: /
-Disallow: /admin
-Disallow: /api/
-Disallow: /me
-Disallow: /partner
-Disallow: /login
-Disallow: /auth/callback
-
 User-agent: Claude-Web
-Allow: /
-Disallow: /admin
-Disallow: /api/
-Disallow: /me
-Disallow: /partner
-Disallow: /login
-Disallow: /auth/callback
-
 User-agent: PerplexityBot
-Allow: /
-Disallow: /admin
-Disallow: /api/
-Disallow: /me
-Disallow: /partner
-Disallow: /login
-Disallow: /auth/callback
-
 User-agent: Google-Extended
-Allow: /
-Disallow: /admin
-Disallow: /api/
-Disallow: /me
-Disallow: /partner
-Disallow: /login
-Disallow: /auth/callback
-
 User-agent: CCBot
-Allow: /
-Disallow: /admin
-Disallow: /api/
-Disallow: /me
-Disallow: /partner
-Disallow: /login
-Disallow: /auth/callback
-
 User-agent: *
 Allow: /
-Disallow: /admin
+Disallow: /admin/
+Disallow: /admin$
 Disallow: /api/
-Disallow: /me
-Disallow: /partner
+Disallow: /me/
+Disallow: /me$
+Disallow: /partner/
+Disallow: /partner$
 Disallow: /login
 Disallow: /auth/callback
 

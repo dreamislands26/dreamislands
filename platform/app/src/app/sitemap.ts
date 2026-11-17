@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next"
 import { supabasePublic as supabaseAdmin } from "@/lib/supabase-public"  // anon + RLS, not service role
 import { STATIC_ROUTES } from "./sitemap-static"
 import { HTML_LANG, indexableLocales, localePath } from "@/lib/i18n"
+import { canonicalPathForDbSlug } from "@/lib/medical-routes"
 
 // Sitemap is generated from Supabase on every request: a published entity appears, an unpublished/archived one disappears.
 // STATIC_ROUTES holds only the non-entity pages (home, start, about, guides, tracks, ...).
@@ -35,7 +36,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     if (p.entity_type === "wellness_property" || p.entity_type === "medical_wellness_center") {
       out.push({ url: `${BASE}/properties/${p.slug}`, lastModified: d(p.updated_at), changeFrequency: "weekly", priority: 0.7 })
     } else if (p.entity_type === "hospital_clinic" && p.country === "China") {
-      out.push({ url: `${BASE}/medical/china/hospitals/${p.slug}`, lastModified: d(p.updated_at), changeFrequency: "monthly", priority: 0.6 })
+      // The route takes the EN slug (medical-routes), not properties.slug; hospitals without a route would 404.
+      const en = canonicalPathForDbSlug(p.slug)
+      if (en.startsWith("/medical/china/hospitals/")) {
+        out.push({ url: `${BASE}${en}`, lastModified: d(p.updated_at), changeFrequency: "monthly", priority: 0.6 })
+      }
     }
   }
   for (const c of (dests.data ?? []) as any[]) {

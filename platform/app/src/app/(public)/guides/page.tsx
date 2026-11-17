@@ -38,6 +38,9 @@ const DESTINATION: Guide[] = [
   { href: "/guides/boracay-wellness-guide", icon: "place", title: "Boracay", sub: "Philippines" },
   { href: "/guides/wudang-mountain-wellness-guide", icon: "place", title: "Wudang Mountain", sub: "China" },
   { href: "/guides/mile-yunnan-wellness-guide", icon: "place", title: "Mile, Yunnan", sub: "China" },
+  { href: "/guides/xishuangbanna-wellness-guide", icon: "place", title: "Xishuangbanna, Yunnan", sub: "Hot springs and Dai culture, China" },
+  { href: "/guides/puer-wellness-guide", icon: "place", title: "Pu'er, Yunnan", sub: "Forest and tea, China" },
+  { href: "/guides/yunnan-puer-xishuangbanna-route", icon: "route", title: "Pu'er + Xishuangbanna route", sub: "7–10 days across southern Yunnan" },
 ]
 
 const MEDICAL: Guide[] = [

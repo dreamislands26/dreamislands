@@ -69,6 +69,9 @@ export default async function Footer() {
     { href: "/guides/koh-samui-koh-phangan-wellness-guide", label: "Koh Samui & Koh Phangan Guide" },
     { href: "/guides/bali-wellness-guide", label: "Bali Guide" },
     { href: "/guides/mile-yunnan-wellness-guide", label: "Mile, Yunnan Guide" },
+    { href: "/guides/xishuangbanna-wellness-guide", label: "Xishuangbanna Guide" },
+    { href: "/guides/puer-wellness-guide", label: "Pu'er Guide" },
+    { href: "/guides/yunnan-puer-xishuangbanna-route", label: "Pu'er + Xishuangbanna Route" },
     { href: "/guides/boracay-wellness-guide", label: "Boracay Guide" },
     { href: "/partners", label: "Partnership / B2B / MICE" },
   ]
