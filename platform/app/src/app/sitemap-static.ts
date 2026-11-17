@@ -35,6 +35,8 @@ export const STATIC_ROUTES: Array<{ path: string; changefreq: "weekly" | "monthl
   { path: "/guides/xishuangbanna-wellness-guide", changefreq: "monthly", priority: 0.7 },
   { path: "/guides/puer-wellness-guide", changefreq: "monthly", priority: 0.7 },
   { path: "/guides/yunnan-puer-xishuangbanna-route", changefreq: "monthly", priority: 0.7 },
+  { path: "/guides/sanya-wellness-guide", changefreq: "monthly", priority: 0.7 },
+  { path: "/guides/huizhou-wellness-guide", changefreq: "monthly", priority: 0.7 },
   { path: "/guides/boracay-wellness-guide", changefreq: "monthly", priority: 0.7 },
   { path: "/destinations", changefreq: "weekly", priority: 0.9 },
   { path: "/medical/china", changefreq: "monthly", priority: 0.9 },

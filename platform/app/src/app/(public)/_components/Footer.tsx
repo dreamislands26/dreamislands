@@ -72,6 +72,8 @@ export default async function Footer() {
     { href: "/guides/xishuangbanna-wellness-guide", label: "Xishuangbanna Guide" },
     { href: "/guides/puer-wellness-guide", label: "Pu'er Guide" },
     { href: "/guides/yunnan-puer-xishuangbanna-route", label: "Pu'er + Xishuangbanna Route" },
+    { href: "/guides/sanya-wellness-guide", label: "Sanya Guide" },
+    { href: "/guides/huizhou-wellness-guide", label: "Huizhou Guide" },
     { href: "/guides/boracay-wellness-guide", label: "Boracay Guide" },
     { href: "/partners", label: "Partnership / B2B / MICE" },
   ]

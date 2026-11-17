@@ -41,6 +41,8 @@ const DESTINATION: Guide[] = [
   { href: "/guides/xishuangbanna-wellness-guide", icon: "place", title: "Xishuangbanna, Yunnan", sub: "Hot springs and Dai culture, China" },
   { href: "/guides/puer-wellness-guide", icon: "place", title: "Pu'er, Yunnan", sub: "Forest and tea, China" },
   { href: "/guides/yunnan-puer-xishuangbanna-route", icon: "route", title: "Pu'er + Xishuangbanna route", sub: "7–10 days across southern Yunnan" },
+  { href: "/guides/sanya-wellness-guide", icon: "place", title: "Sanya, Hainan", sub: "Island reset and TCM culture, China" },
+  { href: "/guides/huizhou-wellness-guide", icon: "place", title: "Huizhou, Guangdong", sub: "Lakeside reset, China" },
 ]
 
 const MEDICAL: Guide[] = [
