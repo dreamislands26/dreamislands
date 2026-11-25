@@ -9,6 +9,7 @@ import Gallery from "../../ds/Gallery"
 import SaveButton from "../../ds/SaveButton"
 import ShareButton from "../../ds/ShareButton"
 import BookingPanel from "./BookingPanel"
+import type { FixedSession } from "./departures"
 import { Icon as Brand } from "../../_components/Icon"
 import MobilePhoto from "../../ds/MobilePhoto"
 import x from "../../ds/sections.module.css"
@@ -178,6 +179,8 @@ export default function ProgramView({
   reviews,
   related,
   supplierPrice,
+  sessions = [],
+  fixedPrice = null,
 }: {
   program: ProgramDetail
   accommodations: AccommodationItem[]
@@ -186,6 +189,8 @@ export default function ProgramView({
   reviews: ProgramReview[]
   related: CatalogProgram[]
   supplierPrice?: { amount: number; currency: string } | null
+  sessions?: FixedSession[]
+  fixedPrice?: { amount: number; currency: string } | null
 }) {
   const cohort = COHORT_LABELS[program.cohort]
   const properties = program.program_properties.map((pp) => pp.properties).filter(Boolean)
@@ -357,6 +362,8 @@ export default function ProgramView({
             variants={variants.map((v) => ({ id: v.id, label: v.label, duration_days: v.duration_days, duration_nights: v.duration_nights, price_basic_usd: Number(v.price_basic_usd) || 0, checkout: v.price_basic_thb != null && Number(v.price_basic_thb) > 0 }))}
             waHref={waHref}
             supplierPrice={supplierPrice}
+            sessions={sessions}
+            fixedPrice={fixedPrice}
             rooms={accommodations.map((a) => ({ id: a.id, name: enOnly(a.room_type) ?? a.room_type, capacity: a.capacity ?? null, icon: roomIcon(a) }))}
           />
         </div>

@@ -14,7 +14,7 @@ import { getAttribution, getGaClientId, getSessionId, track } from "../../_lib/t
 import { Badge, Button, Chip, Facts, Icon, IconButton, Radio, TextField, cx } from "../../ds/ui"
 import { BottomSheet, Dialog, overlayStyles as o } from "../../ds/overlay"
 import { PaymentMarks } from "../../ds/payment"
-import { arrivalWindow, stayFor, type Slot } from "./departures"
+import { arrivalWindow, fixedSlot, stayFor, type FixedSession, type Slot } from "./departures"
 import RangeCalendar from "../../ds/RangeCalendar"
 import s from "./program.module.css"
 
@@ -49,6 +49,8 @@ export default function BookingPanel({
   placeLine,
   supplierPrice,
   rooms = [],
+  sessions = [],
+  fixedPrice = null,
 }: {
   programId: string
   programName: string
@@ -61,6 +63,10 @@ export default function BookingPanel({
   waHref: string
   placeLine?: string
   supplierPrice?: { amount: number; currency: string } | null
+  /** Fixed departures set by the partner; when present they replace the free arrival calendar */
+  sessions?: FixedSession[]
+  /** A fixed package price per person (e.g. THB 26,800); shown as is, without "From" */
+  fixedPrice?: { amount: number; currency: string } | null
 }) {
   const router = useRouter()
   const params = useSearchParams()
@@ -72,10 +78,14 @@ export default function BookingPanel({
   const days = v?.duration_days ?? 1
   // Arrival is free (calendar in the sheet); by default the first possible day and the shortest length
   const window_ = useMemo(() => arrivalWindow(), [])
-  const [start, setStart] = useState<string>(window_.earliest)
-  const slot = useMemo(() => stayFor(start, days), [start, days])
+  // Fixed departures (a retreat cohort): the guest picks one of them, no free arrival
+  const fixed = sessions.length > 0
+  const fixedSlots = useMemo(() => sessions.map((x) => ({ ...fixedSlot(x), name: x.name ?? null })), [sessions])
+  const [start, setStart] = useState<string>(fixed ? sessions[0].start : window_.earliest)
+  const slot = useMemo(() => (fixed ? fixedSlots.find((x) => x.start === start) ?? fixedSlots[0] : stayFor(start, days)), [fixed, fixedSlots, start, days])
+  const sessionName = fixed ? (fixedSlots.find((x) => x.start === slot?.start)?.name ?? null) : null
   // The reserve card (desktop) offers the next three weekly arrivals from the picked one's weekday
-  const slots = useMemo(() => [0, 7, 14].map((n) => { const d = new Date(`${window_.earliest}T00:00:00Z`); d.setUTCDate(d.getUTCDate() + n); return stayFor(d.toISOString().slice(0, 10), days) }), [window_, days])
+  const slots = useMemo(() => (fixed ? fixedSlots : [0, 7, 14].map((n) => { const d = new Date(`${window_.earliest}T00:00:00Z`); d.setUTCDate(d.getUTCDate() + n); return stayFor(d.toISOString().slice(0, 10), days) })), [fixed, fixedSlots, window_, days])
   const [pax, setPax] = useState(1)
   const [open, setOpen] = useState(false)
   // Phones: at the end of the page the fixed bar morphs into the card before the footer (Oleg 07.11.2026).
@@ -108,6 +118,8 @@ export default function BookingPanel({
   const price = v?.price_basic_usd ?? 0
   const fmtSup = (n: number) => `${supplierPrice!.currency} ${Math.round(n).toLocaleString("en-US")}`
   const sup = supplierPrice ? fmtSup(supplierPrice.amount) : null
+  const fmtFixed = (n: number) => (fixedPrice!.currency === "THB" ? thb(n) : `${fixedPrice!.currency} ${Math.round(n).toLocaleString("en-US")}`)
+  const fix = fixedPrice ? fmtFixed(fixedPrice.amount) : null
   const deposit = Math.round(price * (DEPOSIT_PCT / 100))
   const meta = { program_id: programId, property_id: propertyId, property_name: propertyName, destination_country: country }
 
@@ -144,7 +156,7 @@ export default function BookingPanel({
     <>
       <div className={s.barPrice}>
         <span className={s.barTop}>
-          <strong>{sup ? `from ${sup}` : price > 0 ? usd(price) : "On request"}</strong>
+          <strong>{fix ?? (sup ? `from ${sup}` : price > 0 ? usd(price) : "On request")}</strong>
           <span className="ds-sep" />
           <span>{days} days</span>
         </span>
@@ -163,11 +175,11 @@ export default function BookingPanel({
         </div>
         <div className={s.card}>
           <div className={s.priceRow}>
-            <span className="ds-headline-s">{sup ? `From ${sup}` : hasUsd ? `From ${usd(Math.min(...variants.map((x) => x.price_basic_usd).filter((n) => n > 0)))}` : "Price on request"}</span>
-            <span className="ds-body-m ds-muted"><Facts items={[hasUsd ? "per person" : null, `${days} days`]} /></span>
+            <span className="ds-headline-s">{fix ? fix : sup ? `From ${sup}` : hasUsd ? `From ${usd(Math.min(...variants.map((x) => x.price_basic_usd).filter((n) => n > 0)))}` : "Price on request"}</span>
+            <span className="ds-body-m ds-muted"><Facts items={[hasUsd || fix ? "per person" : null, `${days} days`]} /></span>
           </div>
-          {sup && price > 0 && <p className="ds-body-m ds-muted" style={{ margin: 0 }}>About {usd(price)} at today&apos;s exchange rate. Your coordinator confirms the final price.</p>}
-          {variants.length > 1 && (
+          {(sup || fix) && price > 0 && <p className="ds-body-m ds-muted" style={{ margin: 0 }}>About {usd(price)} at today&apos;s exchange rate.{fix ? "" : " Your coordinator confirms the final price."}</p>}
+          {!fixed && variants.length > 1 && (
             <div className={s.lengths} role="radiogroup" aria-label="Programme length">
               {variants.map((x) => (
                 <Chip key={x.id} selected={x.id === variantId} onClick={() => setVariantId(x.id)}>{x.duration_days} days</Chip>
@@ -175,22 +187,22 @@ export default function BookingPanel({
             </div>
           )}
           <div className={o.slots}>
-            <span className="ds-label-m ds-muted">Upcoming departures</span>
+            <span className="ds-label-m ds-muted">{fixed ? "Fixed dates" : "Upcoming departures"}</span>
             {slots.slice(0, 3).map((x) => (
-              <SlotRow key={x.start} slot={x} on={x.start === slot?.start} onPick={() => setStart(x.start)} sub={<Facts items={[x.weekdays, `${days} days`]} />} />
+              <SlotRow key={x.start} slot={x} on={x.start === slot?.start} onPick={() => setStart(x.start)} sub={<Facts items={fixed ? [fixedSlots.find((f) => f.start === x.start)?.name, x.weekdays] : [x.weekdays, `${days} days`]} />} />
             ))}
-            <Button variant="text" className={s.showAll} onClick={openDialog}>Show all dates</Button>
+            {(!fixed || slots.length > 3) && <Button variant="text" className={s.showAll} onClick={openDialog}>Show all dates</Button>}
           </div>
           <Button variant="filled" size="l" block onClick={openDialog}>{cta(true)}</Button>
           <p className={o.note}>
-            {priced ? `Pay a ${usd(deposit)} deposit now. The rest is due after a person confirms your trip on WhatsApp.` : "No payment needed now. A person confirms availability and the final price on WhatsApp."}
+            {priced ? `Pay a ${usd(deposit)} deposit now. The rest is due after a person confirms your trip on WhatsApp.` : fix ? "No payment needed now. A person confirms your place on WhatsApp." : "No payment needed now. A person confirms availability and the final price on WhatsApp."}
           </p>
-          {price > 0 && (
+          {(price > 0 || fix) && (
             <div className={o.summary}>
-              <div className={o.sumRow}><span>Programme, {days} days</span><span>{sup ?? usd(price)}</span></div>
+              <div className={o.sumRow}><span>Programme, {days} days</span><span>{fix ?? sup ?? usd(price)}</span></div>
               {priced && <div className={o.sumRow}><span>Deposit today</span><span>{usd(deposit)}</span></div>}
               <div className={o.sumRow}><span>Two Wellness Score check-ins</span><span>Included</span></div>
-              <div className={cx(o.sumRow, o.sumTotal)}><span>Total, {pax} {pax === 1 ? "guest" : "guests"}</span><span>{supplierPrice ? fmtSup(supplierPrice.amount * pax) : usd(price * pax)}</span></div>
+              <div className={cx(o.sumRow, o.sumTotal)}><span>Total, {pax} {pax === 1 ? "guest" : "guests"}</span><span>{fixedPrice ? fmtFixed(fixedPrice.amount * pax) : supplierPrice ? fmtSup(supplierPrice.amount * pax) : usd(price * pax)}</span></div>
             </div>
           )}
         </div>
@@ -224,6 +236,10 @@ export default function BookingPanel({
         rooms={rooms}
         roomId={roomId}
         onRoom={setRoomId}
+        fixedSlots={fixed ? fixedSlots : undefined}
+        onSession={setStart}
+        sessionName={sessionName}
+        priceLabel={fix}
       />
 
       {/* CF8: payment didn't go through */}
@@ -329,8 +345,12 @@ function BookingDialog(props: {
   rooms: PanelRoom[]
   roomId: string
   onRoom: (id: string) => void
+  fixedSlots?: (Slot & { name: string | null })[]
+  onSession: (start: string) => void
+  sessionName: string | null
+  priceLabel: string | null
 }) {
-  const { open, onClose, mobile, programId, programName, placeLine, priced, variants, variantId, window: win, slot, onStay, pax, setPax, priceUsd, meta, waHref, rooms, roomId, onRoom } = props
+  const { open, onClose, mobile, programId, programName, placeLine, priced, variants, variantId, window: win, slot, onStay, pax, setPax, priceUsd, meta, waHref, rooms, roomId, onRoom, fixedSlots, onSession, sessionName, priceLabel } = props
   const room = rooms.find((r) => r.id === roomId) ?? rooms[0]
   const [step, setStep] = useState<"choose" | "details" | "sent">("choose")
   const [thbVariants, setThbVariants] = useState<ThbVariant[]>([])
@@ -378,6 +398,8 @@ function BookingDialog(props: {
       const shared = {
         program_id: programId,
         arrival: slot.start,
+        departure: fixedSlots ? slot.end : undefined,
+        session: fixedSlots ? (sessionName ? `${sessionName}, ${slot.title}` : slot.title) : undefined,
         pax,
         room: room?.name,
         guest_name: name,
@@ -424,7 +446,7 @@ function BookingDialog(props: {
     return (
       <Dialog open={open} onClose={close} title="Request sent">
         <Badge icon="mark_chat_read" size="s" />
-        <p className="ds-body-m ds-muted" style={{ margin: 0 }}>A person checks availability and the final price and writes to you on WhatsApp within a day. Nothing is charged.</p>
+        <p className="ds-body-m ds-muted" style={{ margin: 0 }}>{priceLabel ? "A person checks your request and writes to you on WhatsApp within a day. Nothing is charged." : "A person checks availability and the final price and writes to you on WhatsApp within a day. Nothing is charged."}</p>
         <div className={s.dialogActions}>
           <a href="/start" className={s.filledLink}>Take your Wellness Journey</a>
           <Button variant="text" onClick={close}>Done</Button>
@@ -438,7 +460,7 @@ function BookingDialog(props: {
       <Dialog open={open} onClose={close} title={isPriced ? "Pay your deposit" : "Request your dates"} back={() => setStep("choose")}>
         <div className={s.box}>
           <span className="ds-title-m">{programName}</span>
-          <span className="ds-body-m ds-muted"><Facts items={[placeLine, slot?.title, `${pax} ${pax === 1 ? "guest" : "guests"}`]} /></span>
+          <span className="ds-body-m ds-muted"><Facts items={[placeLine, sessionName, slot?.title, `${pax} ${pax === 1 ? "guest" : "guests"}`]} /></span>
         </div>
         <form onSubmit={submit} className={s.form}>
           <TextField label="Name" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} required />
@@ -495,6 +517,16 @@ function BookingDialog(props: {
           <h3 className="ds-headline-s">Guests</h3>
           <Stepper pax={pax} setPax={setPax} />
         </section>
+        {fixedSlots ? (
+          <section className={s.depGroup}>
+            <h3 className="ds-headline-s">Dates</h3>
+            <div className={o.slots} role="radiogroup" aria-label="Dates">
+              {fixedSlots.map((x) => (
+                <SlotRow key={x.start} slot={x} on={x.start === slot?.start} onPick={() => onSession(x.start)} tall sub={<Facts items={[x.name, x.weekdays, priceLabel ? `${priceLabel} per person` : null]} />} />
+              ))}
+            </div>
+          </section>
+        ) : (
         <section className={s.depGroup}>
           {/* A calendar of the trips one can take; the picked stay is highlighted; the month sits on the title row (Oleg 07.11.2026) */}
           {/* Arrival then departure; the lengths replace the old Length chips, the tag tells the length (Oleg 07.11.2026) */}
@@ -515,8 +547,9 @@ function BookingDialog(props: {
             </div>
           )}
         </section>
+        )}
         <p className={o.note} style={{ textAlign: "center" }}>
-          {priced ? "Deposit by card, Apple Pay or Google Pay. A person confirms your trip on WhatsApp." : "No payment now. A person confirms availability and the price on WhatsApp."}
+          {priced ? "Deposit by card, Apple Pay or Google Pay. A person confirms your trip on WhatsApp." : priceLabel ? "No payment now. A person confirms your place on WhatsApp." : "No payment now. A person confirms availability and the price on WhatsApp."}
         </p>
         {priced && <div className={s.marksRow}><PaymentMarks /></div>}
       </div>
